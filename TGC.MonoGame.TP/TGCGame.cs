@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -56,21 +55,15 @@ namespace TGC.MonoGame.TP
         private Matrix Projection { get; set; }
         
         // Geometries
-        private SpherePrimitive Sphere { get; set; }
         private QuadPrimitive Quad { get; set; }
         private BoxPrimitive BoxPrimitive { get; set; }
         
         // Sphere position & rotation
-        private Vector3 SpherePosition { get; set; }
-        private Matrix SphereScale { get; set; }
-        
-        // World matrices
-        private List<Matrix> _platformMatrices;
+        public static readonly Vector3 InitialSpherePosition = new(300f, 10f, 0f);
+        public const float InitialSphereYaw = 1.57f;
+        private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
+        private const float SphereRadius = 5f;
 
-        private List<Matrix> _rampMatrices;
-
-        private List<Matrix> _platformMatricesLevel2;
-        
         // Effects
         // Effect for the Platforms
         private Effect PlatformEffect { get; set; }
@@ -79,30 +72,22 @@ namespace TGC.MonoGame.TP
         private Effect Effect { get; set; }
         private Effect TextureEffect { get; set; }
         
-        // private Effect SkyboxEffect { get; set; }
-        
         // Textures
         private Texture2D StonesTexture { get; set; }
         private Texture2D MarbleTexture { get; set; }
         private Texture2D RubberTexture { get; set; }
         private Texture2D MetalTexture { get; set; }
-        
-        // private Texture2D Sk
 
         // Models
         private Model StarModel { get; set; }
         private Model SphereModel { get; set; }
         private Matrix StarWorld { get; set; }
-
         private Player _player;
         
-        
         // Colliders
-        public BoundingBox[] Colliders { get; set; }
-        public static OrientedBoundingBox[] OrientedColliders { get; set; }
-        private BoundingSphere _boundingSphere { get; set; }
-        
-        
+        private Gizmos.Gizmos Gizmos { get; set; }
+
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aqui el codigo de inicializacion: el procesamiento que podemos pre calcular para nuestro juego.
@@ -129,320 +114,24 @@ namespace TGC.MonoGame.TP
             Projection =
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 250);
             
-            // Sphere
-            SpherePosition = new Vector3(0f, 10f, 0f);
-            SphereScale = Matrix.CreateScale(5f);
-            
             // Player
-            _player = new Player(SphereScale, SpherePosition, new BoundingSphere(SpherePosition, 5f));
+            _player = new Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
             
-            
+            // Gizmos
+            Gizmos = new Gizmos.Gizmos
+            {
+                Enabled = true
+            };
+
             // Star
             StarWorld = Matrix.Identity;
             
-            // Box/platforms
-            _platformMatrices = new List<Matrix>();
-            _rampMatrices = new List<Matrix>();
-
-            _platformMatricesLevel2 = new List<Matrix>();
-
-            
             Prefab.CreateSquareCircuit(Vector3.Zero);
             Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
-            _platformMatrices = Prefab.PlatformMatrices;
-            _rampMatrices = Prefab.RampMatrices;
-            
-            /*
-             ===================================================================================================
-             Bridge between Circuit 1 and Circuit 2
-             ===================================================================================================
-            */
-            
-            // Platform
-            CreatePlatform(new Vector3(90f, 6f, 30f), new Vector3(-50f, 0f, 0f));
-            CreatePlatform(new Vector3(30f, 6f, 30f), new Vector3(-120f, 0f, 0f));
-            CreatePlatform(new Vector3(30f, 6f, 30f), new Vector3(-160f, 0f, 0f));
-            
-            // Ramp
-
-            CreateRamp(new Vector3(30f, 6f, 30f), new Vector3(-190f, 5f, 0f), Matrix.CreateRotationZ(-0.3f));
-            
-            /*
-             ===================================================================================================
-             COLLIDERS
-             ===================================================================================================
-            */
-            // Create bounding boxes for static geometries
-            // Circuit 1 floor + Bridge's platforms
-            Colliders = new BoundingBox[_platformMatrices.Count + 4];
-            OrientedColliders = new OrientedBoundingBox[_rampMatrices.Count];
-            
-            // Instantiate the circuits' platforms bounding boxes.
-            int index = 0;
-            for (; index < _platformMatrices.Count; index++)
-            {
-                Colliders[index] = BoundingVolumesExtensions.FromMatrix(_platformMatrices[index]);
-            }
-            
-            // Instantiate the bridges boxes
-            // platforms
-            Colliders[index] = BoundingVolumesExtensions.FromMatrix(Matrix.CreateScale(new Vector3(90f, 6f, 30f)) *
-                                                                    Matrix.CreateTranslation(new Vector3(-50f, 0f,
-                                                                        0f)));
-            index++;
-            Colliders[index] = BoundingVolumesExtensions.FromMatrix(Matrix.CreateScale(new Vector3(30f, 6f, 30f)) *
-                                                                    Matrix.CreateTranslation(new Vector3(-120f, 0f, 0f)));
-            index++;
-            Colliders[index] = BoundingVolumesExtensions.FromMatrix(Matrix.CreateScale(new Vector3(30f, 6f, 30f)) *
-                                                                    Matrix.CreateTranslation(new Vector3(-160f, 0f, 0f)));
-
-            OrientedColliders = Prefab.RampOBB.ToArray();
-            
-            // ramp
-            /*index++;
-            Colliders[index] = BoundingVolumesExtensions.FromMatrix(Matrix.CreateScale(new Vector3(30f, 6f, 30f)) * 
-                                                                    Matrix.CreateRotationZ(-0.3f) * 
-                                                                    Matrix.CreateTranslation(new Vector3(-190f, 5f, 0f)));*/
-
-            CreateRamp(new Vector3(30f, 6f, 30f), new Vector3(-190f, 5f, 0f), Matrix.CreateRotationZ(-0.3f));
-            
-            /*
-             ===================================================================================================
-             Circuit 3
-             ===================================================================================================
-            */
-            float altura = -24;
-            for (int pisos = 0; pisos < 6; pisos++) {
-                altura += 29;
-                // Ramp
-                CreateRamp(new Vector3(200f, 6f, 50f), new Vector3(-800f, altura, 0f), Matrix.CreateRotationZ(-0.3f));
-                altura += 29;
-                // Platform
-                CreatePlatform(new Vector3(50f, 6f, 100f), new Vector3(-920f, altura, 25f));
-                altura += 29;
-                // Ramp
-                CreateRamp(new Vector3(200f, 6f, 50f), new Vector3(-800f, altura, 50f), Matrix.CreateRotationZ(0.3f));
-                altura += 29;
-                // Platform
-                CreatePlatform(new Vector3(50f, 6f, 100f), new Vector3(-680f, altura, 25f));
-            }
-            
-            /*
-             ===================================================================================================
-             Bridge between Circuit 3 and Maze
-             ===================================================================================================
-            */
-            
-            // Platform
-            CreatePlatform(new Vector3(50f, 6f, 30f), new Vector3(-620f, altura, 0f));
-            CreatePlatform(new Vector3(50f, 6f, 25f), new Vector3(-560f, altura, 0f));
-            CreatePlatform(new Vector3(50f, 6f, 20f), new Vector3(-500f, altura, 0f));
-            CreatePlatform(new Vector3(50f, 6f, 15f), new Vector3(-440f, altura, 0f));
-            
-            // Ramp
-            CreateRamp(new Vector3(30f, 6f, 15f), new Vector3(-390f, altura, 0f), Matrix.CreateRotationZ(0.3f));
-            
-            /*
-             ===================================================================================================
-             Maze
-             ===================================================================================================
-            */
-            
-            // Entrance platform
-            CreatePlatform(new Vector3(50f, 6f, 50f), new Vector3(-300f, altura, 0f));
-            
-            // Maze platform
-            CreatePlatform(new Vector3(750f, 6f, 750f), new Vector3(100f, altura, 0f));
-            
-            // Center platform to go next level, tendria que moverse hacia arriba hasta 900f
-            CreatePlatform(new Vector3(50f, 6f, 50f), new Vector3(100f, altura, 0f));
-            
-            // Border Walls
-            CreatePlatform(new Vector3(750f, 50f, 6f), new Vector3(100f, altura+25f, 375f));
-            CreatePlatform(new Vector3(750f, 50f, 6f), new Vector3(100f, altura+25f, -375f));
-            CreatePlatform(new Vector3(6f, 50f, 750f), new Vector3(475f, altura+25f, 0f));
-            CreatePlatform(new Vector3(6f, 50f, 350f), new Vector3(-275f, altura+25f, 200f));
-            CreatePlatform(new Vector3(6f, 50f, 350f), new Vector3(-275f, altura+25f, -200f));
-            
-            // Vertical Walls from largest to shortest
-            CreatePlatform(new Vector3(6f, 50f, 250f), new Vector3(225f, altura+25f, -50f));
-            CreatePlatform(new Vector3(6f, 50f, 250f), new Vector3(275f, altura+25f, -200f));
-            CreatePlatform(new Vector3(6f, 50f, 200f), new Vector3(-125f, altura+25f, 225f));
-            CreatePlatform(new Vector3(6f, 50f, 200f), new Vector3(-75f, altura+25f, -75f));
-            CreatePlatform(new Vector3(6f, 50f, 200f), new Vector3(-25f, altura+25f, 175f));
-            CreatePlatform(new Vector3(6f, 50f, 200f), new Vector3(-25f, altura+25f, -125f));
-            CreatePlatform(new Vector3(6f, 50f, 150f), new Vector3(-225f, altura+25f, 250f));
-            CreatePlatform(new Vector3(6f, 50f, 150f), new Vector3(-225f, altura+25f, -100f));
-            CreatePlatform(new Vector3(6f, 50f, 150f), new Vector3(25f, altura+25f, 0f));
-            CreatePlatform(new Vector3(6f, 50f, 150f), new Vector3(275f, altura+25f, 250f));
-            CreatePlatform(new Vector3(6f, 50f, 150f), new Vector3(275f, altura+25f, 50f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(-225f, altura+25f, 75f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(-175f, altura+25f, -25f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(-175f, altura+25f, -225f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(-125f, altura+25f, 25f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(-125f, altura+25f, -225f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(75f, altura+25f, 325f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(75f, altura+25f, 175f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(75f, altura+25f, 25f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(75f, altura+25f, -225f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(125f, altura+25f, -25f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(125f, altura+25f, -225f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(175f, altura+25f, 275f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(175f, altura+25f, 25f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(225f, altura+25f, -325f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(325f, altura+25f, -25f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(375f, altura+25f, 125f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(375f, altura+25f, -275f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(425f, altura+25f, 75f));
-            CreatePlatform(new Vector3(6f, 50f, 100f), new Vector3(425f, altura+25f, -125f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-225f, altura+25f, -300f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-175f, altura+25f, 250f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-175f, altura+25f, 100f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-175f, altura+25f, -350f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-75f, altura+25f, 300f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-75f, altura+25f, 200f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-75f, altura+25f, -300f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-25f, altura+25f, 350f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(-25f, altura+25f, -300f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(25f, altura+25f, 150f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(25f, altura+25f, -150f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(25f, altura+25f, -300f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(75f, altura+25f, -350f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(125f, altura+25f, 100f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(175f, altura+25f, -150f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(175f, altura+25f, -300f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(225f, altura+25f, 150f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(325f, altura+25f, 250f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(325f, altura+25f, -150f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(375f, altura+25f, -100f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(425f, altura+25f, 200f));
-            CreatePlatform(new Vector3(6f, 50f, 50f), new Vector3(425f, altura+25f, -250f));
-            
-            // Columns
-            CreatePlatform(new Vector3(6f, 50f, 6f), new Vector3(125f, altura+25f, 225f));
-            CreatePlatform(new Vector3(6f, 50f, 6f), new Vector3(125f, altura+25f, -325f));
-            CreatePlatform(new Vector3(6f, 50f, 6f), new Vector3(325f, altura+25f, -275f));
-            
-            // Horizontal walls from largest to shortest
-            CreatePlatform(new Vector3(200f, 50f, 6f), new Vector3(-125f, altura+25f, 125f));
-            CreatePlatform(new Vector3(200f, 50f, 6f), new Vector3(225f, altura+25f, 125f));
-            CreatePlatform(new Vector3(150f, 50f, 6f), new Vector3(200f, altura+25f, -225f));
-            CreatePlatform(new Vector3(150f, 50f, 6f), new Vector3(100f, altura+25f, -125f));
-            CreatePlatform(new Vector3(150f, 50f, 6f), new Vector3(-50f, altura+25f, 75f));
-            CreatePlatform(new Vector3(150f, 50f, 6f), new Vector3(150f, altura+25f, 175f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(325f, altura+25f, -325f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(-125f, altura+25f, -275f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(-25f, altura+25f, -225f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(-125f, altura+25f, -125f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(325f, altura+25f, -125f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(125f, altura+25f, -75f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(375f, altura+25f, 25f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(-225f, altura+25f, 175f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(325f, altura+25f, 175f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(25f, altura+25f, 225f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(225f, altura+25f, 225f));
-            CreatePlatform(new Vector3(100f, 50f, 6f), new Vector3(-25f, altura+25f, 275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-100f, altura+25f, -325f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(450f, altura+25f, -325f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-250f, altura+25f, -275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(50f, altura+25f, -275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(200f, altura+25f, -275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-200f, altura+25f, -225f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(350f, altura+25f, -225f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(450f, altura+25f, -225f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-200f, altura+25f, -175f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(100f, altura+25f, -175f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(200f, altura+25f, -175f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(400f, altura+25f, -175f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-150f, altura+25f, -75f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(0f, altura+25f, -75f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(400f, altura+25f, -75f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-100f, altura+25f, -25f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(100f, altura+25f, -25f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(350f, altura+25f, -25f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(450f, altura+25f, -25f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-200f, altura+25f, 25f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(0f, altura+25f, 25f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(150f, altura+25f, 25f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(100f, altura+25f, 75f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(200f, altura+25f, 75f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(350f, altura+25f, 75f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(50f, altura+25f, 125f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-50f, altura+25f, 175f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-200f, altura+25f, 225f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(400f, altura+25f, 225f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(100f, altura+25f, 275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(250f, altura+25f, 275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(350f, altura+25f, 275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(450f, altura+25f, 275f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(-150f, altura+25f, 325f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(50f, altura+25f, 325f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(150f, altura+25f, 325f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(250f, altura+25f, 325f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(350f, altura+25f, 325f));
-            CreatePlatform(new Vector3(50f, 50f, 6f), new Vector3(450f, altura+25f, 325f));
-            
-            /*
-             ===================================================================================================
-             Circuit 4
-             ===================================================================================================
-            */
-            
-            //TODO cada 3 circuitos y un maze "subir de nivel" (alcanzar una altura mayor y cambiar texturas)
-
-            altura = 900f;
-            CreatePlatformLevel2(new Vector3(50f, 6f, 50f), new Vector3(150f, altura, 0f));
-
+            Prefab.CreateBridge();
+            Prefab.CreateSwitchbackRamp();
             
             base.Initialize();
-        }
-
-        /// <summary>
-        ///     Creates a platform with the specified scale, position and rotation.
-        /// </summary>
-        /// <param name="scale">The scale of the platform</param>
-        /// <param name="position">The position of the platform</param>
-        /// <param name="rotation">The rotation of the platform</param>
-        private void CreateRamp(Vector3 scale, Vector3 position, Matrix rotation)
-        {
-            var platformWorld = Matrix.CreateScale(scale) * rotation * Matrix.CreateTranslation(position);
-            _rampMatrices.Add(platformWorld);
-        }
-        
-        /// <summary>
-        ///     Creates a platform with the specified scale and position.
-        /// </summary>
-        /// <param name="scale">The scale of the platform</param>
-        /// <param name="position">The position of the platform</param>
-        private void CreatePlatform(Vector3 scale, Vector3 position)
-        {
-            var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-            _platformMatrices.Add(platformWorld);
-        }
-        
-        /// <summary>
-        ///     Creates a platform with the specified scale, position and rotation.
-        /// </summary>
-        /// <param name="scale">The scale of the platform</param>
-        /// <param name="position">The position of the platform</param>
-        /// <param name="rotation">The rotation of the platform</param>
-        
-         private void CreatePlatformLevel2(Vector3 scale, Vector3 position, Matrix rotation)
-        {
-            var platformWorld = Matrix.CreateScale(scale) * rotation * Matrix.CreateTranslation(position);
-            _platformMatricesLevel2.Add(platformWorld);
-        }
-        
-        /// <summary>
-        ///     Creates a platform with the specified scale and position.
-        /// </summary>
-        /// <param name="scale">The scale of the platform</param>
-        /// <param name="position">The position of the platform</param>
-        
-        private void CreatePlatformLevel2(Vector3 scale, Vector3 position)
-        {
-            var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-            _platformMatricesLevel2.Add(platformWorld);
         }
 
         /// <summary>
@@ -452,7 +141,6 @@ namespace TGC.MonoGame.TP
         /// </summary>
         protected override void LoadContent()
         {
-            // Aca es donde deberiamos cargar todos los contenido necesarios antes de iniciar el juego.
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             
             StonesTexture = Content.Load<Texture2D>(ContentFolderTextures + "stones");
@@ -460,20 +148,14 @@ namespace TGC.MonoGame.TP
             RubberTexture = Content.Load<Texture2D>(ContentFolderTextures + "goma_diffuse");
             MetalTexture = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
             
-            // Create our Quad (to draw the Floor)
             Quad = new QuadPrimitive(GraphicsDevice);
             
-            // Create our box
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, StonesTexture);
-
-            // Cargo el modelo del logo.
-            //Model = Content.Load<Model>(ContentFolder3D + "tgc-logo/tgc-logo");
+            
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
 
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-
-            // Cargo un efecto basico propio declarado en el Content pipeline.
-            // En el juego no pueden usar BasicEffect de MG, deben usar siempre efectos propios.
+            
             Effect = Content.Load<Effect>(ContentFolderEffects + "BasicShader");
             PlatformEffect = Content.Load<Effect>(ContentFolderEffects + "PlatformShader");
             loadEffectOnMesh(StarModel, Effect);
@@ -481,25 +163,14 @@ namespace TGC.MonoGame.TP
             TextureEffect = Content.Load<Effect>(ContentFolderEffects + "BasicTextureShader");
             loadEffectOnMesh(SphereModel, TextureEffect);
 
-            SphereWorld = SphereScale * Matrix.CreateTranslation(SpherePosition);
-
-            // SkyboxEffect = Content.Load<Effect>()
+            SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
             
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
             var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
 
-            // Asigno el efecto que cargue a cada parte del mesh.
-            // Un modelo puede tener mas de 1 mesh internamente.
-            /*foreach (var mesh in Model.Meshes)
-            {
-                // Un mesh puede tener mas de 1 mesh part (cada 1 puede tener su propio efecto).
-                foreach (var meshPart in mesh.MeshParts)
-                {
-                    meshPart.Effect = Effect;
-                }
-            }*/
+            Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
         }
@@ -511,46 +182,37 @@ namespace TGC.MonoGame.TP
         /// </summary>
         protected override void Update(GameTime gameTime)
         {
-            // Aca deberiamos poner toda la logica de actualizacion del juego.
-            
             var keyboardState = Keyboard.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-
-            // SphereWorld = _player.Update(time, keyboardState);
-            SphereWorld = _player.Update(time, keyboardState, Colliders);
             
-            // Capturar Input teclado
+            SphereWorld = _player.Update(time, keyboardState);
+            
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
-                //Salgo del juego.
                 Exit();
             }
 
             UpdateCamera(_player.SpherePosition, _player.Yaw);
+
+            Prefab.UpdateMovingPlatforms();
+            
+            Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
             base.Update(gameTime);
         }
         
         private void UpdateCamera(Vector3 position, float yaw)
         {
-            // Create a position that orbits the Robot by its direction (Rotation)
-
-            // Create a normalized vector that points to the back of the Robot
             var sphereBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
-            // Then scale the vector by a radius, to set an horizontal distance between the Camera and the Robot
+            
             var orbitalPosition = sphereBackDirection * 60f;
-
-            // We will move the Camera in the Y axis by a given distance, relative to the Robot
+            
             var upDistance = Vector3.Up * 15f;
-
-            // Calculate the new Camera Position by using the Robot Position, then adding the vector orbitalPosition that sends 
-            // the camera further in the back of the Robot, and then we move it up by a given distance
+            
             TargetCamera.Position = position + orbitalPosition + upDistance;
 
-            // Set the Target as the Robot, the Camera needs to be always pointing to it
             TargetCamera.TargetPosition = position;
-
-            // Build the View matrix from the Position and TargetPosition
+            
             TargetCamera.BuildView();
         }
 
@@ -560,23 +222,19 @@ namespace TGC.MonoGame.TP
         /// </summary>
         protected override void Draw(GameTime gameTime)
         {
-            // Aca deberiamos poner toda la logia de renderizado del juego.
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
-            foreach (var platformWorld in _platformMatrices)
+            foreach (var platformWorld in Prefab.PlatformMatrices)
             {
-                // Configura la matriz de mundo del efecto con la matriz del Floor actual
                 PlatformEffect.Parameters["World"].SetValue(platformWorld);
                 PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
                 PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
                 PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
                 BoxPrimitive.Draw(PlatformEffect);
-            }  
+            }
             
-
-            foreach (var rampWorld in _rampMatrices)
+            foreach (var rampWorld in Prefab.RampMatrices)
             {
-                // Configura la matriz de mundo del efecto con la matriz del Floor actual
                 PlatformEffect.Parameters["World"].SetValue(rampWorld);
                 PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
                 PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
@@ -584,19 +242,35 @@ namespace TGC.MonoGame.TP
                 
                 BoxPrimitive.Draw(PlatformEffect);
             } 
-            
-            //Sphere.Draw(World, TargetCamera.View, TargetCamera.Projection); // TODO: no usar
-            
-            foreach (var platformWorld in _platformMatricesLevel2)
+
+            foreach (var boundingBox in Prefab.PlatformAbb)
             {
-                // Configura la matriz de mundo del efecto con la matriz del Floor actual
-                PlatformEffect.Parameters["World"].SetValue(platformWorld);
+                var center = BoundingVolumesExtensions.GetCenter(boundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.Red);
+            }
+
+            foreach (var movingPlatform in Prefab.MovingPlatforms)
+            {
+                PlatformEffect.Parameters["World"].SetValue(movingPlatform.World);
                 PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
                 PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture); // TODO agregar otra textura
+                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
+                
                 BoxPrimitive.Draw(PlatformEffect);
-            } 
-            
+                
+                var movingBoundingBox = movingPlatform.MovingBoundingBox;
+                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
+            }
+
+            foreach (var orientedBoundingBox in Prefab.RampObb)
+            {
+                var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f) 
+                                               * orientedBoundingBox.Orientation * Matrix.CreateTranslation(orientedBoundingBox.Center);
+                Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
+            }
 
             DrawTexturedModel(SphereWorld, SphereModel, TextureEffect, RubberTexture);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
@@ -604,12 +278,13 @@ namespace TGC.MonoGame.TP
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
             DrawModel(StarWorld, StarModel, Effect);
             
+            Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
+            Gizmos.Draw();
+            
             var originalRasterizerState = GraphicsDevice.RasterizerState;
             var rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
             Graphics.GraphicsDevice.RasterizerState = rasterizerState;
-
-
             
             SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, new Vector3(0f,0f,0f));
             GraphicsDevice.RasterizerState = originalRasterizerState;
