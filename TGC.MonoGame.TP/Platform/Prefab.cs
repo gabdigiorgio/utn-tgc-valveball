@@ -2,15 +2,15 @@
 using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Collisions;
 
-namespace TGC.MonoGame.TP;
+namespace TGC.MonoGame.TP.Platform;
 
 public static class Prefab
 {
     public static readonly List<Matrix> PlatformMatrices =  new();
     public static readonly List<Matrix> RampMatrices =  new();
-    public static readonly List<BoundingBox> PlatformAbb =  new();
-    public static readonly List<MovingPlatform> MovingPlatforms =  new();
+    public static readonly List<BoundingBox> PlatformAabb =  new();
     public static readonly List<OrientedBoundingBox> RampObb =  new();
+    public static readonly List<MovingPlatform> MovingPlatforms =  new();
     
     public static void CreateSquareCircuit(Vector3 offset)
     {
@@ -266,7 +266,7 @@ public static class Prefab
     private static void CreatePlatform(Vector3 scale, Vector3 position)
     {
         var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        PlatformAbb.Add(BoundingVolumesExtensions.FromMatrix(platformWorld));
+        PlatformAabb.Add(BoundingVolumesExtensions.FromMatrix(platformWorld));
         PlatformMatrices.Add(platformWorld);
     }
 }
