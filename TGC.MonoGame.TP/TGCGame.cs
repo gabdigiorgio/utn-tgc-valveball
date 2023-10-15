@@ -59,7 +59,7 @@ namespace TGC.MonoGame.TP
         private BoxPrimitive BoxPrimitive { get; set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(300f, 10f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new Vector3(-300f, 750f, 0f); //new(300f, 10f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
@@ -355,7 +355,7 @@ namespace TGC.MonoGame.TP
             if(texture == MarbleTexture){
                 _player.Acceleration = 30f;
             }else if(texture == RubberTexture){
-                _player.MaxJumpHeight = 70f;
+                _player.MaxJumpHeight = 40f;
             }else if(texture == MetalTexture){
                 _player.Acceleration = 100f;
                 _player.MaxSpeed = 230f;

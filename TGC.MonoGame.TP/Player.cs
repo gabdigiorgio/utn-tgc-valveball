@@ -49,6 +49,8 @@ public class Player
         var rotationX = Matrix.CreateRotationX(_pitch);
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
+        
+        Console.WriteLine("on ground:" + _onGround);
         return _sphereScale * rotationX * rotationY * translation;
     }
 
@@ -218,7 +220,7 @@ public class Player
             
             var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, BoundingSphere.Center);
             var distance = Vector3.Distance(closestPoint, BoundingSphere.Center);
-            var colliderY = BoundingVolumesExtensions.GetCenter(collider).Y;
+            var colliderY = collider.Max.Y;
 
             if (!(distance <= BoundingSphere.Radius)) continue;
             BoundingSphere.Center = SolveCollisionPosition(sphereCenter, closestPoint, radius, distance);
