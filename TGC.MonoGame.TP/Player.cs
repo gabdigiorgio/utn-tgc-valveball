@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Collisions;
@@ -49,8 +50,6 @@ public class Player
         var rotationX = Matrix.CreateRotationX(_pitch);
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
-        
-        Console.WriteLine("on ground:" + _onGround);
         return _sphereScale * rotationX * rotationY * translation;
     }
 
@@ -164,7 +163,7 @@ public class Player
 
         AdjustPitchSpeed(time);
         AdjustSpeed(time, forward);
-        SolveYCollisions();
+        SolveCollisions();
         UpdateSpherePosition(BoundingSphere.Center);
     }
 
@@ -207,24 +206,23 @@ public class Player
         _speed += Acceleration * time * decelerationDirection;
     }
 
-    private void SolveYCollisions()
+    private void SolveCollisions()
     {
         var sphereCenter = BoundingSphere.Center;
         var radius = BoundingSphere.Radius;
-        
+        var collisions = new List<CollisionInfo>();
+
         _onGround = false;
         
-        foreach(var collider in Prefab.PlatformAabb)
+        foreach (var collider in Prefab.PlatformAabb)
         {
             if (!collider.Intersects(BoundingSphere)) continue;
             
-            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, BoundingSphere.Center);
-            var distance = Vector3.Distance(closestPoint, BoundingSphere.Center);
-            var colliderY = collider.Max.Y;
+            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
+            collisions.Add(new CollisionInfo(closestPoint, distance));
 
-            if (!(distance <= BoundingSphere.Radius)) continue;
-            BoundingSphere.Center = SolveCollisionPosition(sphereCenter, closestPoint, radius, distance);
-            if (!(sphereCenter.Y > colliderY)) continue;
+            if (!(sphereCenter.Y > collider.Max.Y)) continue;
             _onGround = true;
             EndJump();
         }
@@ -233,33 +231,41 @@ public class Player
         {
             if (!collider.Intersects(BoundingSphere, out _, out _)) continue;
             
-            var closestPoint = collider.ClosestPoint(BoundingSphere.Center);
-            var distance = Vector3.Distance(closestPoint, BoundingSphere.Center);
+            var closestPoint = collider.ClosestPoint(sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
+            collisions.Add(new CollisionInfo(closestPoint, distance));
 
-            if (!(distance <= BoundingSphere.Radius)) continue;
-            BoundingSphere.Center = SolveCollisionPosition(sphereCenter, closestPoint, radius, distance);
             _onGround = true;
             EndJump();
         }
-
+        
         foreach (var movingPlatform in Prefab.MovingPlatforms)
         {
             var collider = movingPlatform.MovingBoundingBox; 
             
             if (!collider.Intersects(BoundingSphere)) continue;
             
-            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, BoundingSphere.Center);
-            var distance = Vector3.Distance(closestPoint, BoundingSphere.Center);
-            var colliderY = BoundingVolumesExtensions.GetCenter(collider).Y;
-
-            if (!(distance <= BoundingSphere.Radius)) continue;
+            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
             var platformMovement = movingPlatform.Position - movingPlatform.PreviousPosition;
-            BoundingSphere.Center = SolveCollisionPosition(sphereCenter, closestPoint, radius, distance) + platformMovement;
-            if (!(sphereCenter.Y > colliderY)) continue;
+            collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
+            
+            if (!(sphereCenter.Y > collider.Max.Y)) continue;
             _onGround = true;
             EndJump();
         }
+
+        // Solve first near collisions
+        collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+        
+        foreach (var collision in collisions)
+        {
+            BoundingSphere.Center = SolveCollisionPosition(BoundingSphere.Center, collision.ClosestPoint, radius, collision.Distance)
+                + collision.ColliderMovement;
+        }
     }
+
+
 
     private static Vector3 SolveCollisionPosition(Vector3 currentPosition, Vector3 closestPoint, float radius, float distance)
     {
