@@ -49,8 +49,6 @@ namespace TGC.MonoGame.TP
         // Camera
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
-        private const float CameraFollowRadius = 60f;
-        private const float CameraUpDistance = 15f;
         
         // Scene
         private Matrix SphereWorld { get; set; }
@@ -174,7 +172,7 @@ namespace TGC.MonoGame.TP
 
             base.LoadContent();
         }
-        
+
         /// <summary>
         ///     Se llama en cada frame.
         ///     Se debe escribir toda la logica de computo del modelo, asi como tambien verificar entradas del usuario y reacciones
@@ -184,71 +182,23 @@ namespace TGC.MonoGame.TP
         {
             var keyboardState = Keyboard.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-            
+
             SphereWorld = _player.Update(time, keyboardState);
-            
+
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 Exit();
             }
 
-            UpdateCamera(_player.SpherePosition, _player.Yaw);
+            TargetCamera.Update(_player.SpherePosition, _player.Yaw);
 
             Prefab.UpdateMovingPlatforms();
-            
+
             Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
             base.Update(gameTime);
         }
         
-        private void UpdateCamera(Vector3 playerPosition, float yaw)
-        {
-            var playerBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
-            
-            var orbitalPosition = playerBackDirection * CameraFollowRadius;
-            
-            var upDistance = Vector3.Up * CameraUpDistance;
-            
-            var newCameraPosition = playerPosition + orbitalPosition + upDistance;
-
-            var collisionDistance = CameraCollided(newCameraPosition, playerPosition);
-
-            if (collisionDistance.HasValue)
-            {
-                var clampedDistance =
-                    MathHelper.Clamp(CameraFollowRadius - collisionDistance.Value, 0.1f, CameraFollowRadius);
-                
-                var recalculatedPosition = playerBackDirection * clampedDistance;
-                
-                TargetCamera.Position = playerPosition + recalculatedPosition + upDistance;
-            }
-            else
-            {
-                TargetCamera.Position = newCameraPosition;
-            }
-
-            TargetCamera.TargetPosition = playerPosition;
-            
-            TargetCamera.BuildView();
-        }
-        
-        private static float? CameraCollided(Vector3 cameraPosition, Vector3 playerPosition)
-        {
-            var difference = playerPosition - cameraPosition;
-            var distanceToPlayer = Vector3.Distance(playerPosition, cameraPosition);
-            var normalizedDifference = difference / distanceToPlayer;
-
-            var cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
-            
-            foreach (var t in Prefab.PlatformAabb)
-            {
-                var distance = cameraToPlayerRay.Intersects(t);
-                if (distance < distanceToPlayer)
-                    return distance;
-            }
-            return null;
-        }
-
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aqui el codigo referido al renderizado.
