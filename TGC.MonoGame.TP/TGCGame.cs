@@ -49,6 +49,8 @@ namespace TGC.MonoGame.TP
         // Camera
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
+        private const float CameraFollowRadius = 60f;
+        private const float CameraUpDistance = 15f;
         
         // Scene
         private Matrix SphereWorld { get; set; }
@@ -199,19 +201,52 @@ namespace TGC.MonoGame.TP
             base.Update(gameTime);
         }
         
-        private void UpdateCamera(Vector3 position, float yaw)
+        private void UpdateCamera(Vector3 playerPosition, float yaw)
         {
-            var sphereBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
+            var playerBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
             
-            var orbitalPosition = sphereBackDirection * 60f;
+            var orbitalPosition = playerBackDirection * CameraFollowRadius;
             
-            var upDistance = Vector3.Up * 15f;
+            var upDistance = Vector3.Up * CameraUpDistance;
             
-            TargetCamera.Position = position + orbitalPosition + upDistance;
+            var newCameraPosition = playerPosition + orbitalPosition + upDistance;
 
-            TargetCamera.TargetPosition = position;
+            var collisionDistance = CameraCollided(newCameraPosition, playerPosition);
+
+            if (collisionDistance.HasValue)
+            {
+                var clampedDistance =
+                    MathHelper.Clamp(CameraFollowRadius - collisionDistance.Value, 0.1f, CameraFollowRadius);
+                
+                var recalculatedPosition = playerBackDirection * clampedDistance;
+                
+                TargetCamera.Position = playerPosition + recalculatedPosition + upDistance;
+            }
+            else
+            {
+                TargetCamera.Position = newCameraPosition;
+            }
+
+            TargetCamera.TargetPosition = playerPosition;
             
             TargetCamera.BuildView();
+        }
+        
+        private static float? CameraCollided(Vector3 cameraPosition, Vector3 playerPosition)
+        {
+            var difference = playerPosition - cameraPosition;
+            var distanceToPlayer = Vector3.Distance(playerPosition, cameraPosition);
+            var normalizedDifference = difference / distanceToPlayer;
+
+            var cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
+            
+            foreach (var t in Prefab.PlatformAabb)
+            {
+                var distance = cameraToPlayerRay.Intersects(t);
+                if (distance < distanceToPlayer)
+                    return distance;
+            }
+            return null;
         }
 
         /// <summary>
