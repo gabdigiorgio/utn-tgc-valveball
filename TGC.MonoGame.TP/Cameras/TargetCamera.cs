@@ -109,32 +109,9 @@ namespace TGC.MonoGame.TP.Cameras
             }
 
             TargetPosition = playerPosition;
-            
             BuildView();
         }
-
-        private void UpdateFollowRadius(MouseState mouseState)
-        {
-            
-            if (mouseState.ScrollWheelValue < _previousScrollValue)
-            {
-                _cameraFollowRadius += RadiusIncrement;
-                _mouseWheelChanged = true;
-            }
-            else if (mouseState.ScrollWheelValue > _previousScrollValue)
-            {
-                _cameraFollowRadius -= RadiusIncrement;
-                _mouseWheelChanged = true;
-            }
-            
-            _cameraFollowRadius = MathHelper.Clamp(_cameraFollowRadius, MinCameraFollowRadius, MaxCameraFollowRadius);
-
-            if (!_mouseWheelChanged) return;
-            _previousScrollValue = mouseState.ScrollWheelValue;
-            _mouseWheelChanged = false;
-
-        }
-
+        
         private static float? CameraCollided(Vector3 cameraPosition, Vector3 playerPosition)
         {
             var difference = playerPosition - cameraPosition;
@@ -149,6 +126,44 @@ namespace TGC.MonoGame.TP.Cameras
                     return distance;
             }
             return null;
+        }
+
+        private void UpdateFollowRadius(MouseState mouseState)
+        {
+            ZoomIn(mouseState);
+            ZoomOut(mouseState);
+            AdjustCameraFollowRadius();
+            HandleMouseWheelChange(mouseState);
+        }
+        
+        private void ZoomIn(MouseState mouseState)
+        {
+            if (mouseState.ScrollWheelValue >= _previousScrollValue) return;
+            UpdateCameraFollowRadius(_cameraFollowRadius + RadiusIncrement);
+        }
+        
+        private void ZoomOut(MouseState mouseState)
+        {
+            if (mouseState.ScrollWheelValue <= _previousScrollValue) return;
+            UpdateCameraFollowRadius(_cameraFollowRadius - RadiusIncrement);
+        }
+        
+        private void UpdateCameraFollowRadius(float newRadius)
+        {
+            _cameraFollowRadius = newRadius;
+            _mouseWheelChanged = true;
+        }
+
+        private void HandleMouseWheelChange(MouseState mouseState)
+        {
+            if (!_mouseWheelChanged) return;
+            _previousScrollValue = mouseState.ScrollWheelValue;
+            _mouseWheelChanged = false;
+        }
+
+        private void AdjustCameraFollowRadius()
+        {
+            _cameraFollowRadius = MathHelper.Clamp(_cameraFollowRadius, MinCameraFollowRadius, MaxCameraFollowRadius);
         }
     }
 }
