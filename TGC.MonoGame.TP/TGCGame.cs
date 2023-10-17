@@ -59,7 +59,7 @@ namespace TGC.MonoGame.TP
         private BoxPrimitive BoxPrimitive { get; set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(300f, 10f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new Vector3(-300f, 750f, 0f); //new(300f, 10f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
@@ -172,7 +172,7 @@ namespace TGC.MonoGame.TP
 
             base.LoadContent();
         }
-        
+
         /// <summary>
         ///     Se llama en cada frame.
         ///     Se debe escribir toda la logica de computo del modelo, asi como tambien verificar entradas del usuario y reacciones
@@ -182,38 +182,23 @@ namespace TGC.MonoGame.TP
         {
             var keyboardState = Keyboard.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-            
+
             SphereWorld = _player.Update(time, keyboardState);
-            
+
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 Exit();
             }
 
-            UpdateCamera(_player.SpherePosition, _player.Yaw);
+            TargetCamera.Update(_player.SpherePosition, _player.Yaw);
 
             Prefab.UpdateMovingPlatforms();
-            
+
             Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
             base.Update(gameTime);
         }
         
-        private void UpdateCamera(Vector3 position, float yaw)
-        {
-            var sphereBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
-            
-            var orbitalPosition = sphereBackDirection * 60f;
-            
-            var upDistance = Vector3.Up * 15f;
-            
-            TargetCamera.Position = position + orbitalPosition + upDistance;
-
-            TargetCamera.TargetPosition = position;
-            
-            TargetCamera.BuildView();
-        }
-
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aqui el codigo referido al renderizado.
@@ -355,7 +340,7 @@ namespace TGC.MonoGame.TP
             if(texture == MarbleTexture){
                 _player.Acceleration = 30f;
             }else if(texture == RubberTexture){
-                _player.MaxJumpHeight = 70f;
+                _player.MaxJumpHeight = 40f;
             }else if(texture == MetalTexture){
                 _player.Acceleration = 100f;
                 _player.MaxSpeed = 230f;
