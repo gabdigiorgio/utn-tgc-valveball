@@ -181,6 +181,7 @@ namespace TGC.MonoGame.TP
         protected override void Update(GameTime gameTime)
         {
             var keyboardState = Keyboard.GetState();
+            var mouseState = Mouse.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
             SphereWorld = _player.Update(time, keyboardState);
@@ -190,7 +191,7 @@ namespace TGC.MonoGame.TP
                 Exit();
             }
 
-            TargetCamera.Update(_player.SpherePosition, _player.Yaw);
+            TargetCamera.Update(_player.SpherePosition, _player.Yaw, mouseState);
 
             Prefab.UpdateMovingPlatforms();
 

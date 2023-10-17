@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
-using TGC.MonoGame.TP.Collisions;
+using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Platform;
 
 namespace TGC.MonoGame.TP.Cameras
@@ -11,8 +11,15 @@ namespace TGC.MonoGame.TP.Cameras
     /// </summary>
     public class TargetCamera : Camera
     {
-        private const float CameraFollowRadius = 60f;
+        private int _previousScrollValue;
+        private bool _mouseWheelChanged;
+        private float _cameraFollowRadius = InitialCameraFollowRadius;
+        private const float MaxCameraFollowRadius = 100f;
+        private const float MinCameraFollowRadius = 30f;
+        private const float InitialCameraFollowRadius = 60f;
+        private const float RadiusIncrement = 10f;
         private const float CameraUpDistance = 15f;
+
         
         /// <summary>
         ///     The direction that is "up" from the camera's point of view.
@@ -78,10 +85,11 @@ namespace TGC.MonoGame.TP.Cameras
             // This camera has no movement, once initialized with position and lookAt it is no longer updated automatically.
         }
         
-        public void Update(Vector3 playerPosition, float yaw)
+        public void Update(Vector3 playerPosition, float yaw, MouseState mouseState)
         {
+            UpdateFollowRadius(mouseState);
             var playerBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
-            var orbitalPosition = playerBackDirection * CameraFollowRadius;
+            var orbitalPosition = playerBackDirection * _cameraFollowRadius;
             var upDistance = Vector3.Up * CameraUpDistance;
             var newCameraPosition = playerPosition + orbitalPosition + upDistance;
             var collisionDistance = CameraCollided(newCameraPosition, playerPosition);
@@ -89,7 +97,7 @@ namespace TGC.MonoGame.TP.Cameras
             if (collisionDistance.HasValue)
             {
                 var clampedDistance =
-                    MathHelper.Clamp(CameraFollowRadius - collisionDistance.Value, 0.1f, CameraFollowRadius);
+                    MathHelper.Clamp(_cameraFollowRadius - collisionDistance.Value, 0.1f, _cameraFollowRadius);
                 
                 var recalculatedPosition = playerBackDirection * clampedDistance;
                 
@@ -101,7 +109,6 @@ namespace TGC.MonoGame.TP.Cameras
             }
 
             TargetPosition = playerPosition;
-            
             BuildView();
         }
         
@@ -119,6 +126,44 @@ namespace TGC.MonoGame.TP.Cameras
                     return distance;
             }
             return null;
+        }
+
+        private void UpdateFollowRadius(MouseState mouseState)
+        {
+            ZoomIn(mouseState);
+            ZoomOut(mouseState);
+            AdjustCameraFollowRadius();
+            HandleMouseWheelChange(mouseState);
+        }
+        
+        private void ZoomIn(MouseState mouseState)
+        {
+            if (mouseState.ScrollWheelValue >= _previousScrollValue) return;
+            UpdateCameraFollowRadius(_cameraFollowRadius + RadiusIncrement);
+        }
+        
+        private void ZoomOut(MouseState mouseState)
+        {
+            if (mouseState.ScrollWheelValue <= _previousScrollValue) return;
+            UpdateCameraFollowRadius(_cameraFollowRadius - RadiusIncrement);
+        }
+        
+        private void UpdateCameraFollowRadius(float newRadius)
+        {
+            _cameraFollowRadius = newRadius;
+            _mouseWheelChanged = true;
+        }
+
+        private void HandleMouseWheelChange(MouseState mouseState)
+        {
+            if (!_mouseWheelChanged) return;
+            _previousScrollValue = mouseState.ScrollWheelValue;
+            _mouseWheelChanged = false;
+        }
+
+        private void AdjustCameraFollowRadius()
+        {
+            _cameraFollowRadius = MathHelper.Clamp(_cameraFollowRadius, MinCameraFollowRadius, MaxCameraFollowRadius);
         }
     }
 }
