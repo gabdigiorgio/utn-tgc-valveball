@@ -230,21 +230,6 @@ public class Player
         }
     }
     
-    private void DetectObbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
-    {
-        foreach (var collider in Prefab.RampObb)
-        {
-            if (!collider.Intersects(BoundingSphere, out _, out _)) continue;
-
-            var closestPoint = collider.ClosestPoint(sphereCenter);
-            var distance = Vector3.Distance(closestPoint, sphereCenter);
-            collisions.Add(new CollisionInfo(closestPoint, distance));
-
-            _onGround = true;
-            EndJump();
-        }
-    }
-
     private void DetectAabbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
         foreach (var collider in Prefab.PlatformAabb)
@@ -256,6 +241,21 @@ public class Player
             collisions.Add(new CollisionInfo(closestPoint, distance));
 
             if (!(sphereCenter.Y > collider.Max.Y)) continue;
+            _onGround = true;
+            EndJump();
+        }
+    }
+    
+    private void DetectObbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
+    {
+        foreach (var collider in Prefab.RampObb)
+        {
+            if (!collider.Intersects(BoundingSphere, out _, out _)) continue;
+
+            var closestPoint = collider.ClosestPoint(sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
+            collisions.Add(new CollisionInfo(closestPoint, distance));
+
             _onGround = true;
             EndJump();
         }

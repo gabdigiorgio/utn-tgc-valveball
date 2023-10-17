@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Platform;
 
 namespace TGC.MonoGame.TP.Cameras
@@ -14,7 +17,7 @@ namespace TGC.MonoGame.TP.Cameras
         /// <summary>
         ///     The direction that is "up" from the camera's point of view.
         /// </summary>
-        public readonly Vector3 DefaultWorldUpVector = Vector3.Up;
+        private readonly Vector3 _defaultWorldUpVector = Vector3.Up;
 
         /// <summary>
         ///     Camera looking at a particular direction, which has the up vector (0,1,0).
@@ -44,7 +47,7 @@ namespace TGC.MonoGame.TP.Cameras
         /// <summary>
         ///     The target towards which the camera is pointing.
         /// </summary>
-        public Vector3 TargetPosition { get; set; }
+        private Vector3 TargetPosition { get; set; }
 
         /// <summary>
         ///     Build view matrix and update the internal directions.
@@ -64,7 +67,7 @@ namespace TGC.MonoGame.TP.Cameras
         private void BuildView()
         {
             FrontDirection = Vector3.Normalize(TargetPosition - Position);
-            RightDirection = Vector3.Normalize(Vector3.Cross(DefaultWorldUpVector, FrontDirection));
+            RightDirection = Vector3.Normalize(Vector3.Cross(_defaultWorldUpVector, FrontDirection));
             UpDirection = Vector3.Cross(FrontDirection, RightDirection);
             View = Matrix.CreateLookAt(Position, Position + FrontDirection, UpDirection);
         }
@@ -78,13 +81,9 @@ namespace TGC.MonoGame.TP.Cameras
         public void Update(Vector3 playerPosition, float yaw)
         {
             var playerBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
-            
             var orbitalPosition = playerBackDirection * CameraFollowRadius;
-            
             var upDistance = Vector3.Up * CameraUpDistance;
-            
             var newCameraPosition = playerPosition + orbitalPosition + upDistance;
-
             var collisionDistance = CameraCollided(newCameraPosition, playerPosition);
 
             if (collisionDistance.HasValue)
@@ -111,12 +110,11 @@ namespace TGC.MonoGame.TP.Cameras
             var difference = playerPosition - cameraPosition;
             var distanceToPlayer = Vector3.Distance(playerPosition, cameraPosition);
             var normalizedDifference = difference / distanceToPlayer;
-
             var cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
             
-            foreach (var t in Prefab.PlatformAabb)
+            foreach (var collider in Prefab.PlatformAabb)
             {
-                var distance = cameraToPlayerRay.Intersects(t);
+                var distance = cameraToPlayerRay.Intersects(collider);
                 if (distance < distanceToPlayer)
                     return distance;
             }
