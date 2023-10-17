@@ -214,46 +214,11 @@ public class Player
 
         _onGround = false;
         
-        foreach (var collider in Prefab.PlatformAabb)
-        {
-            if (!collider.Intersects(BoundingSphere)) continue;
-            
-            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
-            var distance = Vector3.Distance(closestPoint, sphereCenter);
-            collisions.Add(new CollisionInfo(closestPoint, distance));
-
-            if (!(sphereCenter.Y > collider.Max.Y)) continue;
-            _onGround = true;
-            EndJump();
-        }
+        DetectAabbCollisions(sphereCenter, collisions);
         
-        foreach (var collider in Prefab.RampObb)
-        {
-            if (!collider.Intersects(BoundingSphere, out _, out _)) continue;
-            
-            var closestPoint = collider.ClosestPoint(sphereCenter);
-            var distance = Vector3.Distance(closestPoint, sphereCenter);
-            collisions.Add(new CollisionInfo(closestPoint, distance));
-
-            _onGround = true;
-            EndJump();
-        }
+        DetectObbCollisions(sphereCenter, collisions);
         
-        foreach (var movingPlatform in Prefab.MovingPlatforms)
-        {
-            var collider = movingPlatform.MovingBoundingBox; 
-            
-            if (!collider.Intersects(BoundingSphere)) continue;
-            
-            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
-            var distance = Vector3.Distance(closestPoint, sphereCenter);
-            var platformMovement = movingPlatform.Position - movingPlatform.PreviousPosition;
-            collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
-            
-            if (!(sphereCenter.Y > collider.Max.Y)) continue;
-            _onGround = true;
-            EndJump();
-        }
+        DetectMovingCollisions(sphereCenter, collisions);
 
         // Solve first near collisions
         collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
@@ -264,8 +229,56 @@ public class Player
                 + collision.ColliderMovement;
         }
     }
+    
+    private void DetectObbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
+    {
+        foreach (var collider in Prefab.RampObb)
+        {
+            if (!collider.Intersects(BoundingSphere, out _, out _)) continue;
 
+            var closestPoint = collider.ClosestPoint(sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
+            collisions.Add(new CollisionInfo(closestPoint, distance));
 
+            _onGround = true;
+            EndJump();
+        }
+    }
+
+    private void DetectAabbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
+    {
+        foreach (var collider in Prefab.PlatformAabb)
+        {
+            if (!collider.Intersects(BoundingSphere)) continue;
+
+            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
+            collisions.Add(new CollisionInfo(closestPoint, distance));
+
+            if (!(sphereCenter.Y > collider.Max.Y)) continue;
+            _onGround = true;
+            EndJump();
+        }
+    }
+
+    private void DetectMovingCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
+    {
+        foreach (var movingPlatform in Prefab.MovingPlatforms)
+        {
+            var collider = movingPlatform.MovingBoundingBox;
+
+            if (!collider.Intersects(BoundingSphere)) continue;
+
+            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
+            var platformMovement = movingPlatform.Position - movingPlatform.PreviousPosition;
+            collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
+
+            if (!(sphereCenter.Y > collider.Max.Y)) continue;
+            _onGround = true;
+            EndJump();
+        }
+    }
 
     private static Vector3 SolveCollisionPosition(Vector3 currentPosition, Vector3 closestPoint, float radius, float distance)
     {
