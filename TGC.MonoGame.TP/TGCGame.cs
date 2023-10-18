@@ -59,7 +59,7 @@ namespace TGC.MonoGame.TP
         private BoxPrimitive BoxPrimitive { get; set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new Vector3(-300f, 750f, 0f); //new(300f, 10f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(300f, 10f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
@@ -120,7 +120,7 @@ namespace TGC.MonoGame.TP
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = true
+                Enabled = false
             };
 
             // Star
@@ -144,9 +144,14 @@ namespace TGC.MonoGame.TP
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             
             StonesTexture = Content.Load<Texture2D>(ContentFolderTextures + "stones");
+            
             MarbleTexture = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_01_c");
             RubberTexture = Content.Load<Texture2D>(ContentFolderTextures + "goma_diffuse");
             MetalTexture = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
+            
+            Material.Marble.LoadTexture(MarbleTexture);
+            Material.Rubber.LoadTexture(RubberTexture);
+            Material.Metal.LoadTexture(MetalTexture);
             
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, StonesTexture);
             
@@ -256,7 +261,7 @@ namespace TGC.MonoGame.TP
                 Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
             }
 
-            DrawTexturedModel(SphereWorld, SphereModel, TextureEffect, RubberTexture);
+            DrawTexturedModel(SphereWorld, SphereModel, TextureEffect, _player.CurrentMaterial.Texture);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
             DrawModel(StarWorld, StarModel, Effect);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
@@ -293,8 +298,6 @@ namespace TGC.MonoGame.TP
             effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
             effect.Parameters["DiffuseColor"]?.SetValue(Color.IndianRed.ToVector3());
             effect.Parameters["Texture"]?.SetValue(texture);
-
-            //chequearPropiedadesTextura(texture);
 
             foreach (var mesh in model.Meshes)
             {   
