@@ -294,7 +294,7 @@ namespace TGC.MonoGame.TP
             effect.Parameters["DiffuseColor"]?.SetValue(Color.IndianRed.ToVector3());
             effect.Parameters["Texture"]?.SetValue(texture);
 
-            chequearPropiedadesTextura(texture);
+            //chequearPropiedadesTextura(texture);
 
             foreach (var mesh in model.Meshes)
             {   
@@ -334,7 +334,7 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        public void chequearPropiedadesTextura(Texture2D texture){
+        /*public void chequearPropiedadesTextura(Texture2D texture){
             //La bola de marmol acelera mas lento
             //La bola de goma salta mas alto
             //La bola de metal acelera mas rápido
@@ -346,6 +346,6 @@ namespace TGC.MonoGame.TP
                 _player.Acceleration = 100f;
                 _player.MaxSpeed = 230f;
             }
-        }
+        }*/
     }
 }
