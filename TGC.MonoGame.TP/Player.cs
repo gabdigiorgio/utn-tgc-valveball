@@ -30,7 +30,7 @@ public class Player
         Yaw = yaw;
     }
 
-    public Material CurrentMaterial { get; private set; } = Material.Marble;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
 
     private const float PitchMaxSpeed = 15f;
     private const float YawMaxSpeed = 5.8f;
@@ -42,15 +42,15 @@ public class Player
     {
         if (keyboardState.IsKeyDown(Keys.D1))
         {
-            CurrentMaterial = Material.Marble;
+            CurrentSphereMaterial = SphereMaterial.SphereMarble;
         }
         if (keyboardState.IsKeyDown(Keys.D2))
         {
-            CurrentMaterial = Material.Rubber;
+            CurrentSphereMaterial = SphereMaterial.SphereRubber;
         }
         if (keyboardState.IsKeyDown(Keys.D3))
         {
-            CurrentMaterial = Material.Metal;
+            CurrentSphereMaterial = SphereMaterial.SphereMetal;
         }
         
         HandleJumping(keyboardState);
@@ -117,7 +117,7 @@ public class Player
 
     private float CalculateJumpSpeed()
     {
-        return (float)Math.Sqrt(2 * CurrentMaterial.MaxJumpHeight * Math.Abs(Gravity));
+        return (float)Math.Sqrt(2 * CurrentSphereMaterial.MaxJumpHeight * Math.Abs(Gravity));
     }
 
     private void HandleYaw(float time, KeyboardState keyboardState)
@@ -159,17 +159,17 @@ public class Player
     {
         if (keyboardState.IsKeyDown(Keys.W))
         {
-            Accelerate(CurrentMaterial.Acceleration, time);
+            Accelerate(CurrentSphereMaterial.Acceleration, time);
             AcceleratePitch(PitchAcceleration, time);
         }
         else if (keyboardState.IsKeyDown(Keys.S))
         {
-            Accelerate(-CurrentMaterial.Acceleration, time);
+            Accelerate(-CurrentSphereMaterial.Acceleration, time);
             AcceleratePitch(-PitchAcceleration, time);
         }
         else
         {
-            Decelerate(CurrentMaterial.Acceleration, time);
+            Decelerate(CurrentSphereMaterial.Acceleration, time);
             DeceleratePitch(time);
         }
 
@@ -186,7 +186,7 @@ public class Player
 
     private void AdjustSpeed(float time, Vector3 forward)
     {
-        _speed = MathHelper.Clamp(_speed, -CurrentMaterial.MaxSpeed, CurrentMaterial.MaxSpeed);
+        _speed = MathHelper.Clamp(_speed, -CurrentSphereMaterial.MaxSpeed, CurrentSphereMaterial.MaxSpeed);
         BoundingSphere.Center += forward * time * _speed;
     }
 

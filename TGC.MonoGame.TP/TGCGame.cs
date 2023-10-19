@@ -166,18 +166,6 @@ namespace TGC.MonoGame.TP
             BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
             loadEffectOnMesh(SphereModel, BlinnPhongEffect);
             
-            // Uniforms
-            BlinnPhongEffect.Parameters["ambientColor"].SetValue(new Vector3(1f, 1f, 1f));
-            BlinnPhongEffect.Parameters["diffuseColor"].SetValue(new Vector3(1f, 1f, 1f));
-            BlinnPhongEffect.Parameters["specularColor"].SetValue(new Vector3(1f, 1f, 1f));
-
-            // Between 0-1
-            BlinnPhongEffect.Parameters["KAmbient"].SetValue(0.310f);
-            BlinnPhongEffect.Parameters["KDiffuse"].SetValue(0.830f);
-            BlinnPhongEffect.Parameters["KSpecular"].SetValue(1.0f);
-            // Between 1-64
-            BlinnPhongEffect.Parameters["shininess"].SetValue(29.0f);
-            
             SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
             
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
@@ -277,7 +265,7 @@ namespace TGC.MonoGame.TP
                 Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
             }
 
-            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentMaterial.Texture);
+            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
             DrawModel(StarWorld, StarModel, Effect);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
@@ -311,12 +299,24 @@ namespace TGC.MonoGame.TP
             }
         }
         
-        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Texture2D texture){
+        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
             effect.Parameters["World"].SetValue(worldMatrix);
             effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
             effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetCamera.View * TargetCamera.Projection);
-            effect.Parameters["ModelTexture"].SetValue(texture);
+            effect.Parameters["ModelTexture"].SetValue(material.Texture);
             effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
+            
+            // Uniforms
+            effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+            effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+            effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+
+            // Between 0-1
+            effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+            effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+            effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+            // Between 1-64
+            effect.Parameters["shininess"].SetValue(material.Shininess);
             
             foreach (var mesh in model.Meshes)
             {   

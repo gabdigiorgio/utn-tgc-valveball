@@ -1,28 +1,33 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.TP;
 
 public class Material
 {
-    public float Acceleration { get; private set; }
-    public float MaxJumpHeight { get; private set; }
-    public float MaxSpeed { get; private set; }
     public Texture2D Texture { get; private set; }
-
-    private Material(float acceleration = 60f, float maxJumpHeight = 35f, float maxSpeed = 180f)
+    public Vector3 AmbientColor { get; private set; } = new(1f, 1f, 1f);
+    public Vector3 DiffuseColor { get; private set; } = new(1f, 1f, 1f);
+    public Vector3 SpecularColor { get; private set; } = new(1f, 1f, 1f);
+    
+    public float KAmbient { get; private set; }
+    public float KDiffuse { get; private set; }
+    public float KSpecular { get; private set; }
+    public float Shininess { get; private set; }
+    
+    public Material(float kAmbient, float kDiffuse, float kSpecular, float shininess)
     {
-        Acceleration = acceleration;
-        MaxJumpHeight = maxJumpHeight;
-        MaxSpeed = maxSpeed;
+        KAmbient = kAmbient;
+        KDiffuse = kDiffuse;
+        KSpecular = kSpecular;
+        Shininess = shininess;
     }
-
+    
+    public static readonly Material Marble = new(0.310f, 0.830f, 1.0f, 29.0f);
+    public static readonly Material Rubber = new(0.310f, 0.830f, 1.0f, 29.0f);
+    public static readonly Material Metal = new(0.310f, 0.830f, 1.0f, 29.0f);
     public void LoadTexture(Texture2D texture)
     {
         Texture = texture;
     }
-
-    public static readonly Material Marble = new(acceleration: 30f);
-    public static readonly Material Rubber = new(maxJumpHeight: 40f);
-    public static readonly Material Metal = new(acceleration: 100f, maxSpeed: 230f);
-    
 }
