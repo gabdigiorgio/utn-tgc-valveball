@@ -71,6 +71,7 @@ namespace TGC.MonoGame.TP
         // Effect for the ball
         private Effect Effect { get; set; }
         private Effect TextureEffect { get; set; }
+        private Effect BlinnPhongEffect { get; set; }
         
         // Textures
         private Texture2D StonesTexture { get; set; }
@@ -154,18 +155,29 @@ namespace TGC.MonoGame.TP
             Material.Metal.LoadTexture(MetalTexture);
             
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, StonesTexture);
+            PlatformEffect = Content.Load<Effect>(ContentFolderEffects + "PlatformShader");
             
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
-
-            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-            
             Effect = Content.Load<Effect>(ContentFolderEffects + "BasicShader");
-            PlatformEffect = Content.Load<Effect>(ContentFolderEffects + "PlatformShader");
             loadEffectOnMesh(StarModel, Effect);
+            
+            // Blinn Phong
+            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
+            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
+            
+            // Uniforms
+            BlinnPhongEffect.Parameters["ambientColor"].SetValue(new Vector3(1f, 1f, 1f));
+            BlinnPhongEffect.Parameters["diffuseColor"].SetValue(new Vector3(1f, 1f, 1f));
+            BlinnPhongEffect.Parameters["specularColor"].SetValue(new Vector3(1f, 1f, 1f));
 
-            TextureEffect = Content.Load<Effect>(ContentFolderEffects + "BasicTextureShader");
-            loadEffectOnMesh(SphereModel, TextureEffect);
-
+            // Between 0-1
+            BlinnPhongEffect.Parameters["KAmbient"].SetValue(0.310f);
+            BlinnPhongEffect.Parameters["KDiffuse"].SetValue(0.830f);
+            BlinnPhongEffect.Parameters["KSpecular"].SetValue(1.0f);
+            // Between 1-64
+            BlinnPhongEffect.Parameters["shininess"].SetValue(29.0f);
+            
             SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
             
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
@@ -197,6 +209,10 @@ namespace TGC.MonoGame.TP
             }
 
             TargetCamera.Update(_player.SpherePosition, _player.Yaw, mouseState);
+            
+            var lightPosition = new Vector3(150f, 100f, 0f);
+            BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
+            BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
 
             Prefab.UpdateMovingPlatforms();
 
@@ -261,7 +277,7 @@ namespace TGC.MonoGame.TP
                 Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
             }
 
-            DrawTexturedModel(SphereWorld, SphereModel, TextureEffect, _player.CurrentMaterial.Texture);
+            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentMaterial.Texture);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
             DrawModel(StarWorld, StarModel, Effect);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
@@ -277,6 +293,9 @@ namespace TGC.MonoGame.TP
             
             SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, new Vector3(0f,0f,0f));
             GraphicsDevice.RasterizerState = originalRasterizerState;
+            
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            base.Draw(gameTime);
         }
 
         private void DrawModel(Matrix world, Model model, Effect effect){
@@ -286,7 +305,7 @@ namespace TGC.MonoGame.TP
 
             foreach (var mesh in model.Meshes)
             {
-                Matrix meshMatrix = mesh.ParentBone.Transform;
+                var meshMatrix = mesh.ParentBone.Transform;
                 effect.Parameters["World"].SetValue(meshMatrix * world);
                 mesh.Draw();
             }
@@ -294,11 +313,11 @@ namespace TGC.MonoGame.TP
         
         private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Texture2D texture){
             effect.Parameters["World"].SetValue(worldMatrix);
-            effect.Parameters["View"].SetValue(TargetCamera.View);
-            effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-            effect.Parameters["DiffuseColor"]?.SetValue(Color.IndianRed.ToVector3());
-            effect.Parameters["Texture"]?.SetValue(texture);
-
+            effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
+            effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetCamera.View * TargetCamera.Projection);
+            effect.Parameters["ModelTexture"].SetValue(texture);
+            effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
+            
             foreach (var mesh in model.Meshes)
             {   
                 mesh.Draw();
@@ -326,29 +345,15 @@ namespace TGC.MonoGame.TP
             base.UnloadContent();
         }
 
-        public static void loadEffectOnMesh(Model modelo,Effect efecto)
+        private static void loadEffectOnMesh(Model model,Effect effect)
         {
-            foreach (var mesh in modelo.Meshes)
+            foreach (var mesh in model.Meshes)
             {
                 foreach (var meshPart in mesh.MeshParts)
                 {
-                    meshPart.Effect = efecto;
+                    meshPart.Effect = effect;
                 }
             }
         }
-
-        /*public void chequearPropiedadesTextura(Texture2D texture){
-            //La bola de marmol acelera mas lento
-            //La bola de goma salta mas alto
-            //La bola de metal acelera mas rápido
-            if(texture == MarbleTexture){
-                _player.Acceleration = 30f;
-            }else if(texture == RubberTexture){
-                _player.MaxJumpHeight = 40f;
-            }else if(texture == MetalTexture){
-                _player.Acceleration = 100f;
-                _player.MaxSpeed = 230f;
-            }
-        }*/
     }
 }

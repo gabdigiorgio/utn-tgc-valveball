@@ -63,6 +63,18 @@
 /processorParam:DebugMode=Auto
 /build:Effects/BasicTextureShader.fx
 
+#begin Effects/BlinnPhong.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/BlinnPhong.fx
+
+#begin Effects/BlinnPhongTypes.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/BlinnPhongTypes.fx
+
 #begin Effects/Gizmos.fx
 /importer:EffectImporter
 /processor:EffectProcessor

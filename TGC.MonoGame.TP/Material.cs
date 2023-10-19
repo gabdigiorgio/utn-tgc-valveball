@@ -15,13 +15,14 @@ public class Material
         MaxJumpHeight = maxJumpHeight;
         MaxSpeed = maxSpeed;
     }
-    
+
     public void LoadTexture(Texture2D texture)
     {
         Texture = texture;
     }
-    
+
     public static readonly Material Marble = new(acceleration: 30f);
     public static readonly Material Rubber = new(maxJumpHeight: 40f);
     public static readonly Material Metal = new(acceleration: 100f, maxSpeed: 230f);
+    
 }
