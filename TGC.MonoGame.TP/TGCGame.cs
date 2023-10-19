@@ -303,19 +303,15 @@ namespace TGC.MonoGame.TP
             effect.Parameters["World"].SetValue(worldMatrix);
             effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
             effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetCamera.View * TargetCamera.Projection);
+            
             effect.Parameters["ModelTexture"].SetValue(material.Texture);
             effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
-            
-            // Uniforms
             effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
             effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
             effect.Parameters["specularColor"].SetValue(material.SpecularColor);
-
-            // Between 0-1
             effect.Parameters["KAmbient"].SetValue(material.KAmbient);
             effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
             effect.Parameters["KSpecular"].SetValue(material.KSpecular);
-            // Between 1-64
             effect.Parameters["shininess"].SetValue(material.Shininess);
             
             foreach (var mesh in model.Meshes)
