@@ -26,7 +26,7 @@ public class Material
         Shininess = shininess;
     }
     
-    public static readonly Material Marble = new(0.310f, 0.830f, 1.0f, 29.0f);
+    public static readonly Material Marble = new(0.5f, 0.320f, 0.820f, 9.820f);
     public static readonly Material Rubber = new(0.4f, 0.670f, 0.240f, 7.930f);
     public static readonly Material Metal = new(0.310f, 0.830f, 1.0f, 29.0f);
     public void LoadTexture(Texture2D texture)
