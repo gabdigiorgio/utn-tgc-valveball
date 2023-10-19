@@ -223,61 +223,20 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
-            foreach (var platformWorld in Prefab.PlatformMatrices)
-            {
-                PlatformEffect.Parameters["World"].SetValue(platformWorld);
-                PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
-                PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
-                BoxPrimitive.Draw(PlatformEffect);
-            }
+            DrawPlatforms(PlatformEffect);
             
-            foreach (var rampWorld in Prefab.RampMatrices)
-            {
-                PlatformEffect.Parameters["World"].SetValue(rampWorld);
-                PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
-                PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
-                
-                BoxPrimitive.Draw(PlatformEffect);
-            } 
+            DrawRamps(PlatformEffect); 
 
-            foreach (var boundingBox in Prefab.PlatformAabb)
-            {
-                var center = BoundingVolumesExtensions.GetCenter(boundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.Red);
-            }
-
-            foreach (var orientedBoundingBox in Prefab.RampObb)
-            {
-                var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f) 
-                                               * orientedBoundingBox.Orientation * Matrix.CreateTranslation(orientedBoundingBox.Center);
-                Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
-            }
-            
-            foreach (var movingPlatform in Prefab.MovingPlatforms)
-            {
-                PlatformEffect.Parameters["World"].SetValue(movingPlatform.World);
-                PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
-                PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
-                
-                BoxPrimitive.Draw(PlatformEffect);
-                
-                var movingBoundingBox = movingPlatform.MovingBoundingBox;
-                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
-            }
+            DrawMovingPlatforms(PlatformEffect);
 
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
+            
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
             DrawModel(StarWorld, StarModel, Effect);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
             DrawModel(StarWorld, StarModel, Effect);
             
-            Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
+            DrawGizmos();
             Gizmos.Draw();
             
             var originalRasterizerState = GraphicsDevice.RasterizerState;
@@ -290,6 +249,73 @@ namespace TGC.MonoGame.TP
             
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             base.Draw(gameTime);
+        }
+
+        private void DrawPlatforms(Effect effect)
+        {
+            foreach (var platformWorld in Prefab.PlatformMatrices)
+            {
+                effect.Parameters["World"].SetValue(platformWorld);
+                effect.Parameters["View"].SetValue(TargetCamera.View);
+                effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
+                effect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
+
+                BoxPrimitive.Draw(effect);
+            }
+        }
+        
+        private void DrawRamps(Effect effect)
+        {
+            foreach (var rampWorld in Prefab.RampMatrices)
+            {
+                effect.Parameters["World"].SetValue(rampWorld);
+                effect.Parameters["View"].SetValue(TargetCamera.View);
+                effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
+                effect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
+
+                BoxPrimitive.Draw(PlatformEffect);
+            }
+        }
+        
+        private void DrawMovingPlatforms(Effect effect)
+        {
+            foreach (var movingPlatform in Prefab.MovingPlatforms)
+            {
+                effect.Parameters["World"].SetValue(movingPlatform.World);
+                effect.Parameters["View"].SetValue(TargetCamera.View);
+                effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
+                effect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
+
+                BoxPrimitive.Draw(PlatformEffect);
+            }
+        }
+
+        private void DrawGizmos()
+        {
+            foreach (var boundingBox in Prefab.PlatformAabb)
+            {
+                var center = BoundingVolumesExtensions.GetCenter(boundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.Red);
+            }
+
+            foreach (var orientedBoundingBox in Prefab.RampObb)
+            {
+                var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f)
+                                               * orientedBoundingBox.Orientation *
+                                               Matrix.CreateTranslation(orientedBoundingBox.Center);
+                Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
+            }
+
+            foreach (var movingPlatform in Prefab.MovingPlatforms)
+            {
+                var movingBoundingBox = movingPlatform.MovingBoundingBox;
+                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
+            }
+            
+            Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
         private void DrawModel(Matrix world, Model model, Effect effect){
