@@ -6,6 +6,7 @@ namespace TGC.MonoGame.TP;
 public class Material
 {
     public Texture2D Texture { get; private set; }
+    public Texture2D NormalTexture { get; private set; }
     public Vector3 AmbientColor { get; private set; } = new(1f, 1f, 1f);
     public Vector3 DiffuseColor { get; private set; } = new(1f, 1f, 1f);
     public Vector3 SpecularColor { get; private set; } = new(1f, 1f, 1f);
@@ -32,5 +33,9 @@ public class Material
     public void LoadTexture(Texture2D texture)
     {
         Texture = texture;
+    }
+    public void LoadNormalTexture(Texture2D normalTexture)
+    {
+        NormalTexture = normalTexture;
     }
 }
