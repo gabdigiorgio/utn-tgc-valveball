@@ -40,19 +40,8 @@ public class Player
 
     public Matrix Update(float time, KeyboardState keyboardState)
     {
-        if (keyboardState.IsKeyDown(Keys.D1))
-        {
-            CurrentSphereMaterial = SphereMaterial.SphereMarble;
-        }
-        if (keyboardState.IsKeyDown(Keys.D2))
-        {
-            CurrentSphereMaterial = SphereMaterial.SphereRubber;
-        }
-        if (keyboardState.IsKeyDown(Keys.D3))
-        {
-            CurrentSphereMaterial = SphereMaterial.SphereMetal;
-        }
-        
+        ChangeSphereMaterial(keyboardState);
+
         HandleJumping(keyboardState);
         HandleFalling(time);
         HandleYaw(time, keyboardState);
@@ -63,6 +52,24 @@ public class Player
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
         return _sphereScale * rotationX * rotationY * translation;
+    }
+
+    private void ChangeSphereMaterial(KeyboardState keyboardState)
+    {
+        if (keyboardState.IsKeyDown(Keys.D1))
+        {
+            CurrentSphereMaterial = SphereMaterial.SphereMarble;
+        }
+
+        if (keyboardState.IsKeyDown(Keys.D2))
+        {
+            CurrentSphereMaterial = SphereMaterial.SphereRubber;
+        }
+
+        if (keyboardState.IsKeyDown(Keys.D3))
+        {
+            CurrentSphereMaterial = SphereMaterial.SphereMetal;
+        }
     }
 
     private void RestartPosition(KeyboardState keyboardState)
