@@ -53,8 +53,8 @@ public static class Prefab
     public static void CreateBridge()
     {
         // Platform
-        CreatePlatform(new Vector3(90f, 6f, 30f), new Vector3(-50f, 0f, 0f));
-        CreatePlatform(new Vector3(30f, 6f, 30f), new Vector3(-120f, 0f, 0f));
+        CreatePlatform(new Vector3(30f, 6f, 30f), new Vector3(-40f, 0f, 0f));
+        CreatePlatform(new Vector3(30f, 6f, 30f), new Vector3(-100f, 0f, 0f));
         CreatePlatform(new Vector3(30f, 6f, 30f), new Vector3(-160f, 0f, 0f));
 
         // Ramp
