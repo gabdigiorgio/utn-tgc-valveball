@@ -72,9 +72,6 @@ namespace TGC.MonoGame.TP
         private Effect Effect { get; set; }
         private Effect TextureEffect { get; set; }
         private Effect BlinnPhongEffect { get; set; }
-        
-        // Textures
-        private Texture2D StonesTexture { get; set; }
 
         // Models
         private Model StarModel { get; set; }
@@ -141,26 +138,21 @@ namespace TGC.MonoGame.TP
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             
-            StonesTexture = Content.Load<Texture2D>(ContentFolderTextures + "stones");
+            var platformDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
+            var marbleDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_diffuse");
+            var rubberDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "rubber_diffuse");
+            var metalDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
             
-            var marbleTexture = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_01_c");
-            var rubberTexture = Content.Load<Texture2D>(ContentFolderTextures + "goma_diffuse");
-            var metalTexture = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
-            
-            var marbleNormal = Content.Load<Texture2D>(ContentFolderTextures + "marble_normal");
+            var plainNormal = Content.Load<Texture2D>(ContentFolderTextures + "plain_normal");
             var rubberNormal = Content.Load<Texture2D>(ContentFolderTextures + "rubber_normal");
             var metalNormal = Content.Load<Texture2D>(ContentFolderTextures + "metal_normal");
             
-            Material.Marble.LoadTexture(marbleTexture);
-            Material.Marble.LoadNormalTexture(marbleNormal);
+            Material.Plastic.LoadTexture(platformDiffuse, plainNormal);
+            Material.Marble.LoadTexture(marbleDiffuse, plainNormal);
+            Material.Rubber.LoadTexture(rubberDiffuse, rubberNormal);
+            Material.Metal.LoadTexture(metalDiffuse, metalNormal);
             
-            Material.Rubber.LoadTexture(rubberTexture);
-            Material.Rubber.LoadNormalTexture(rubberNormal);
-            
-            Material.Metal.LoadTexture(metalTexture);
-            Material.Metal.LoadNormalTexture(metalNormal);
-            
-            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, StonesTexture);
+            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformDiffuse);
             PlatformEffect = Content.Load<Effect>(ContentFolderEffects + "PlatformShader");
             
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
@@ -204,7 +196,7 @@ namespace TGC.MonoGame.TP
 
             TargetCamera.Update(_player.SpherePosition, _player.Yaw, mouseState);
             
-            var lightPosition = new Vector3(150f, 100f, 0f);
+            var lightPosition = new Vector3(150f, 750f, 0f);
             BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
             BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
 
@@ -223,7 +215,7 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
-            DrawPlatforms(PlatformEffect);
+            DrawPlatforms(BlinnPhongEffect, Material.Plastic);
             
             DrawRamps(PlatformEffect); 
 
@@ -251,14 +243,25 @@ namespace TGC.MonoGame.TP
             base.Draw(gameTime);
         }
 
-        private void DrawPlatforms(Effect effect)
+        private void DrawPlatforms(Effect effect, Material material)
         {
             foreach (var platformWorld in Prefab.PlatformMatrices)
             {
+                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
                 effect.Parameters["World"].SetValue(platformWorld);
-                effect.Parameters["View"].SetValue(TargetCamera.View);
-                effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                effect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
+                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(platformWorld)));
+                effect.Parameters["WorldViewProjection"].SetValue(platformWorld * TargetCamera.View * TargetCamera.Projection);
+            
+                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+                effect.Parameters["NormalTexture"]?.SetValue(material.Normal);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 2.5f);
+                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+                effect.Parameters["shininess"].SetValue(material.Shininess);
 
                 BoxPrimitive.Draw(effect);
             }
@@ -271,7 +274,7 @@ namespace TGC.MonoGame.TP
                 effect.Parameters["World"].SetValue(rampWorld);
                 effect.Parameters["View"].SetValue(TargetCamera.View);
                 effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                effect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
+                effect.Parameters["Textura_Plataformas"].SetValue(Material.Plastic.Diffuse);
 
                 BoxPrimitive.Draw(PlatformEffect);
             }
@@ -284,7 +287,7 @@ namespace TGC.MonoGame.TP
                 effect.Parameters["World"].SetValue(movingPlatform.World);
                 effect.Parameters["View"].SetValue(TargetCamera.View);
                 effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                effect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
+                effect.Parameters["Textura_Plataformas"].SetValue(Material.Plastic.Diffuse);
 
                 BoxPrimitive.Draw(PlatformEffect);
             }
@@ -337,8 +340,8 @@ namespace TGC.MonoGame.TP
             effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
             effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetCamera.View * TargetCamera.Projection);
             
-            effect.Parameters["ModelTexture"].SetValue(material.Texture);
-            effect.Parameters["NormalTexture"]?.SetValue(material.NormalTexture);
+            effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+            effect.Parameters["NormalTexture"]?.SetValue(material.Normal);
             effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
             effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
             effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
@@ -352,16 +355,6 @@ namespace TGC.MonoGame.TP
             {   
                 mesh.Draw();
             }
-        }
-        
-        private void DrawGeometry(GeometricPrimitive geometry, Matrix worldMatrix, Effect effect)
-        {
-            effect.Parameters["World"].SetValue(worldMatrix);
-            effect.Parameters["View"].SetValue(TargetCamera.View);
-            effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-            effect.Parameters["DiffuseColor"]?.SetValue(Color.IndianRed.ToVector3());
-            effect.Parameters["Texture"]?.SetValue(StonesTexture);
-            geometry.Draw(effect);
         }
 
         /// <summary>

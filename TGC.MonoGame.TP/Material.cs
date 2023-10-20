@@ -5,8 +5,8 @@ namespace TGC.MonoGame.TP;
 
 public class Material
 {
-    public Texture2D Texture { get; private set; }
-    public Texture2D NormalTexture { get; private set; }
+    public Texture2D Diffuse { get; private set; }
+    public Texture2D Normal { get; private set; }
     public Vector3 AmbientColor { get; private set; } = new(1f, 1f, 1f);
     public Vector3 DiffuseColor { get; private set; } = new(1f, 1f, 1f);
     public Vector3 SpecularColor { get; private set; } = new(1f, 1f, 1f);
@@ -29,13 +29,12 @@ public class Material
     
     public static readonly Material Marble = new(0.5f, 0.320f, 0.820f, 9.820f);
     public static readonly Material Rubber = new(0.4f, 0.670f, 0.240f, 7.930f);
-    public static readonly Material Metal = new(0.310f, 0.830f, 1.0f, 29.0f);
-    public void LoadTexture(Texture2D texture)
+    public static readonly Material Metal = new(0.310f, 0.830f, 1.0f, 64.0f);
+    public static readonly Material Plastic = new(0.4f, 0.320f, 0.820f, 9.820f);
+
+    public void LoadTexture(Texture2D diffuseTexture, Texture2D normalTexture)
     {
-        Texture = texture;
-    }
-    public void LoadNormalTexture(Texture2D normalTexture)
-    {
-        NormalTexture = normalTexture;
+        Diffuse = diffuseTexture;
+        Normal = normalTexture;
     }
 }
