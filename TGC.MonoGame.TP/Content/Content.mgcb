@@ -217,18 +217,6 @@
 /processorParam:TextureFormat=Color
 /build:Textures/plain_normal.png
 
-#begin Textures/plain_normal.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/plain_normal.png
-
 #begin Textures/platform_green_diffuse.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -240,6 +228,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/platform_green_diffuse.png
+
+#begin Textures/platform_square_normal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/platform_square_normal.png
 
 #begin Textures/rubber_diffuse.png
 /importer:TextureImporter

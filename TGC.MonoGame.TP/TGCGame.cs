@@ -143,11 +143,12 @@ namespace TGC.MonoGame.TP
             var rubberDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "rubber_diffuse");
             var metalDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
             
+            var platformNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_square_normal");
             var plainNormal = Content.Load<Texture2D>(ContentFolderTextures + "plain_normal");
             var rubberNormal = Content.Load<Texture2D>(ContentFolderTextures + "rubber_normal");
             var metalNormal = Content.Load<Texture2D>(ContentFolderTextures + "metal_normal");
             
-            Material.Plastic.LoadTexture(platformDiffuse, plainNormal);
+            Material.Plastic.LoadTexture(platformDiffuse, platformNormal);
             Material.Marble.LoadTexture(marbleDiffuse, plainNormal);
             Material.Rubber.LoadTexture(rubberDiffuse, rubberNormal);
             Material.Metal.LoadTexture(metalDiffuse, metalNormal);
@@ -254,7 +255,7 @@ namespace TGC.MonoGame.TP
             
                 effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
                 effect.Parameters["NormalTexture"].SetValue(material.Normal);
-                effect.Parameters["Tiling"].SetValue(Vector2.One * 2.5f);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 3f);
                 effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
                 effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
                 effect.Parameters["specularColor"].SetValue(material.SpecularColor);
