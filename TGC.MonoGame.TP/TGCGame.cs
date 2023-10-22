@@ -65,12 +65,8 @@ namespace TGC.MonoGame.TP
         private const float SphereRadius = 5f;
 
         // Effects
-        // Effect for the Platforms
-        private Effect PlatformEffect { get; set; }
-
-        // Effect for the ball
-        private Effect Effect { get; set; }
         private Effect BlinnPhongEffect { get; set; }
+        private Effect StarShader { get; set; }
 
         // Models
         private Model StarModel { get; set; }
@@ -163,8 +159,8 @@ namespace TGC.MonoGame.TP
             
             // Star
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
-            Effect = Content.Load<Effect>(ContentFolderEffects + "BasicShader");
-            loadEffectOnMesh(StarModel, Effect);
+            StarShader = Content.Load<Effect>(ContentFolderEffects + "StarShader");
+            loadEffectOnMesh(StarModel, StarShader);
             
             // Sphere
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
@@ -236,9 +232,9 @@ namespace TGC.MonoGame.TP
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
             
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
-            DrawModel(StarWorld, StarModel, Effect);
+            DrawModel(StarWorld, StarModel, StarShader, gameTime);
             StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
-            DrawModel(StarWorld, StarModel, Effect);
+            DrawModel(StarWorld, StarModel, StarShader, gameTime);
             
             DrawGizmos();
             Gizmos.Draw();
@@ -357,10 +353,11 @@ namespace TGC.MonoGame.TP
             Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
-        private void DrawModel(Matrix world, Model model, Effect effect){
+        private void DrawModel(Matrix world, Model model, Effect effect, GameTime gameTime){
             effect.Parameters["View"].SetValue(TargetCamera.View);
             effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-            effect.Parameters["DiffuseColor"].SetValue(Color.Yellow.ToVector3());
+            effect.Parameters["DiffuseColor"]?.SetValue(Color.Yellow.ToVector3());
+            effect.Parameters["Time"].SetValue((float)gameTime.TotalGameTime.TotalSeconds);
 
             foreach (var mesh in model.Meshes)
             {
