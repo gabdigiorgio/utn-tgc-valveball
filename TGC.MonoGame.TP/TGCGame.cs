@@ -112,7 +112,7 @@ namespace TGC.MonoGame.TP
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = true
+                Enabled = false
             };
             
             // Stars
@@ -211,7 +211,7 @@ namespace TGC.MonoGame.TP
 
             Prefab.UpdateMovingPlatforms();
 
-            _stars[0].Update(gameTime);
+            UpdateStars(gameTime);
 
             Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
@@ -222,6 +222,14 @@ namespace TGC.MonoGame.TP
         {
             BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
             BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
+        }
+
+        private void UpdateStars(GameTime gameTime)
+        {
+            foreach (var star in _stars)
+            {
+                star.Update(gameTime);
+            }
         }
 
         /// <summary>
