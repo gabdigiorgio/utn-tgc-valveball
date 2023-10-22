@@ -138,22 +138,25 @@ namespace TGC.MonoGame.TP
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             
-            var platformDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
+            var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
+            var platformOrangeDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_orange_diffuse");
             var marbleDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_diffuse");
             var rubberDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "rubber_diffuse");
             var metalDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
             
-            var platformNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_square_normal");
+            var platformSquareNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_square_normal");
+            var platformNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_normal");
             var plainNormal = Content.Load<Texture2D>(ContentFolderTextures + "plain_normal");
             var rubberNormal = Content.Load<Texture2D>(ContentFolderTextures + "rubber_normal");
             var metalNormal = Content.Load<Texture2D>(ContentFolderTextures + "metal_normal");
             
-            Material.Plastic.LoadTexture(platformDiffuse, platformNormal);
+            Material.Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
+            Material.MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
             Material.Marble.LoadTexture(marbleDiffuse, plainNormal);
             Material.Rubber.LoadTexture(rubberDiffuse, rubberNormal);
             Material.Metal.LoadTexture(metalDiffuse, metalNormal);
             
-            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformDiffuse);
+            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
             PlatformEffect = Content.Load<Effect>(ContentFolderEffects + "PlatformShader");
             
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
@@ -216,11 +219,11 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
-            DrawPlatforms(BlinnPhongEffect, Material.Plastic);
+            DrawPlatforms(BlinnPhongEffect, Material.Platform);
             
-            DrawRamps(BlinnPhongEffect, Material.Plastic); 
+            DrawRamps(BlinnPhongEffect, Material.Platform); 
 
-            DrawMovingPlatforms(BlinnPhongEffect, Material.Plastic);
+            DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
 
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
             
@@ -305,7 +308,7 @@ namespace TGC.MonoGame.TP
             
                 effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
                 effect.Parameters["NormalTexture"].SetValue(material.Normal);
-                effect.Parameters["Tiling"].SetValue(Vector2.One * 2.5f);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 3f);
                 effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
                 effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
                 effect.Parameters["specularColor"].SetValue(material.SpecularColor);
