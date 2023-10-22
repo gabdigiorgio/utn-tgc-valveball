@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -35,7 +36,6 @@ namespace TGC.MonoGame.TP
             // Carpeta raiz donde va a estar toda la Media.
             Content.RootDirectory = "Content";
             // Hace que el mouse sea visible.
-            // Hace que el mouse sea visible.
             IsMouseVisible = true;
         }
     
@@ -71,8 +71,10 @@ namespace TGC.MonoGame.TP
         // Models
         private Model StarModel { get; set; }
         private Model SphereModel { get; set; }
-        private Matrix StarWorld { get; set; }
         private Player _player;
+        
+        // Collectibles
+        private readonly List<Star> _stars = new();
         
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
@@ -110,11 +112,16 @@ namespace TGC.MonoGame.TP
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = false
+                Enabled = true
             };
-
-            // Star
-            StarWorld = Matrix.Identity;
+            
+            // Stars
+            var offset = 0f;
+            for (var index = 0; index < 2; index++)
+            {
+                _stars.Add(new Star(new Vector3(150f + offset, 5f, 0f), 0.5f));
+                offset -= 600f;
+            }
             
             Prefab.CreateSquareCircuit(Vector3.Zero);
             Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
@@ -204,6 +211,8 @@ namespace TGC.MonoGame.TP
 
             Prefab.UpdateMovingPlatforms();
 
+            _stars[0].Update(gameTime);
+
             Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
             base.Update(gameTime);
@@ -230,11 +239,8 @@ namespace TGC.MonoGame.TP
             DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
 
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
-            
-            StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
-            DrawModel(StarWorld, StarModel, StarShader, gameTime);
-            StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
-            DrawModel(StarWorld, StarModel, StarShader, gameTime);
+
+            DrawStars(_stars, gameTime);
             
             DrawGizmos();
             Gizmos.Draw();
@@ -353,6 +359,17 @@ namespace TGC.MonoGame.TP
             Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
+        private void DrawStars(List<Star> stars, GameTime gameTime)
+        {
+            foreach (var star in stars)
+            {
+                DrawModel(star.World, StarModel, StarShader, gameTime);
+                var center = BoundingVolumesExtensions.GetCenter(star.BoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(star.BoundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.Red);
+            }
+        }
+        
         private void DrawModel(Matrix world, Model model, Effect effect, GameTime gameTime){
             effect.Parameters["View"].SetValue(TargetCamera.View);
             effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
