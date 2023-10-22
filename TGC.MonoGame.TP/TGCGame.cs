@@ -282,7 +282,7 @@ namespace TGC.MonoGame.TP
             
                 effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
                 effect.Parameters["NormalTexture"].SetValue(material.Normal);
-                effect.Parameters["Tiling"].SetValue(Vector2.One * 2.5f);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 2f);
                 effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
                 effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
                 effect.Parameters["specularColor"].SetValue(material.SpecularColor);
