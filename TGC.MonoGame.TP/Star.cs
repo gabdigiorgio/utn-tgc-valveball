@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Collisions;
 
 namespace TGC.MonoGame.TP;
@@ -8,7 +9,10 @@ public class Star
     public Matrix World { get; private set; }
     private Vector3 Position { get; set; }
     public BoundingBox BoundingBox { get; private set; }
-    private float Scale { get; set; }
+    private float Scale { get; }
+
+    private const float Amplitude = 0.15f;
+    private const float MaxVerticalSpeed = 2f;
 
     public Star(Vector3 position, float scale)
     {
@@ -23,9 +27,15 @@ public class Star
 
     public void Update(GameTime gameTime)
     {
-        var increment = Vector3.Up * 0.5f;
-        Position += increment;
-        BoundingBox = new BoundingBox(BoundingBox.Min + increment, BoundingBox.Max + increment);
+        var time = (float)gameTime.TotalGameTime.TotalSeconds;
+
+        var verticalOffset = Amplitude * (float)Math.Cos(time * MaxVerticalSpeed);
+
+        Position = new Vector3(Position.X, Position.Y + verticalOffset, Position.Z);
+
+        BoundingBox = new BoundingBox(BoundingBox.Min + Vector3.Up * verticalOffset, BoundingBox.Max + Vector3.Up * verticalOffset);
+
         World = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
     }
+
 }
