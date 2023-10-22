@@ -70,7 +70,6 @@ namespace TGC.MonoGame.TP
 
         // Effect for the ball
         private Effect Effect { get; set; }
-        private Effect TextureEffect { get; set; }
         private Effect BlinnPhongEffect { get; set; }
 
         // Models
@@ -138,43 +137,48 @@ namespace TGC.MonoGame.TP
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             
+            // Diffuse
             var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
             var platformOrangeDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_orange_diffuse");
             var marbleDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_diffuse");
             var rubberDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "rubber_diffuse");
             var metalDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
             
+            // Normals
             var platformSquareNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_square_normal");
             var platformNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_normal");
             var plainNormal = Content.Load<Texture2D>(ContentFolderTextures + "plain_normal");
             var rubberNormal = Content.Load<Texture2D>(ContentFolderTextures + "rubber_normal");
             var metalNormal = Content.Load<Texture2D>(ContentFolderTextures + "metal_normal");
             
+            // Materials
             Material.Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
             Material.MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
             Material.Marble.LoadTexture(marbleDiffuse, plainNormal);
             Material.Rubber.LoadTexture(rubberDiffuse, rubberNormal);
             Material.Metal.LoadTexture(metalDiffuse, metalNormal);
             
+            // Platform
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
-            PlatformEffect = Content.Load<Effect>(ContentFolderEffects + "PlatformShader");
             
+            // Star
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
             Effect = Content.Load<Effect>(ContentFolderEffects + "BasicShader");
             loadEffectOnMesh(StarModel, Effect);
             
-            // Blinn Phong
+            // Sphere
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
             BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
             loadEffectOnMesh(SphereModel, BlinnPhongEffect);
-            
             SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
             
+            // SkyBox
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
             var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
-
+            
+            // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
@@ -200,9 +204,7 @@ namespace TGC.MonoGame.TP
 
             TargetCamera.Update(_player.SpherePosition, _player.Yaw, mouseState);
             
-            var lightPosition = new Vector3(150f, 750f, 0f);
-            BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
-            BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
+            SetLightPosition(new Vector3(150f, 750f, 0f));
 
             Prefab.UpdateMovingPlatforms();
 
@@ -210,7 +212,13 @@ namespace TGC.MonoGame.TP
 
             base.Update(gameTime);
         }
-        
+
+        private void SetLightPosition(Vector3 lightPosition)
+        {
+            BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
+            BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
+        }
+
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aqui el codigo referido al renderizado.
