@@ -7,6 +7,7 @@ using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
 using TGC.MonoGame.TP.Platform;
+using TGC.MonoGame.TP.PowerUps;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace TGC.MonoGame.TP

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace TGC.MonoGame.TP;
+namespace TGC.MonoGame.TP.PowerUps;
 
 public abstract class PowerUp
 {

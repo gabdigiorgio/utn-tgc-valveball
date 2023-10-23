@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using TGC.MonoGame.TP.Collisions;
 
-namespace TGC.MonoGame.TP;
+namespace TGC.MonoGame.TP.PowerUps;
 
 public class Star : PowerUp
 {
