@@ -19,7 +19,8 @@ public abstract class PowerUp
     public Effect Shader { get; set; }
     
     private const float Amplitude = 0.15f;
-    private const float MaxVerticalSpeed = 2f;
+    private const float VerticalSpeed = 2f;
+    private const float RotationSpeed = 1.25f;
     protected PowerUp(BoundingBox boundingBox)
     {
         BoundingBox = boundingBox;
@@ -38,10 +39,11 @@ public abstract class PowerUp
     private void UpdateAnimation(GameTime gameTime)
     {
         var totalTime = (float)gameTime.TotalGameTime.TotalSeconds;
-        var verticalOffset = Amplitude * (float)Math.Cos(totalTime * MaxVerticalSpeed);
+        var verticalOffset = Amplitude * (float)Math.Cos(totalTime * VerticalSpeed);
+        var rotationAngle = totalTime * RotationSpeed;
         Position = new Vector3(Position.X, Position.Y + verticalOffset, Position.Z);
         BoundingBox = new BoundingBox(BoundingBox.Min + Vector3.Up * verticalOffset, BoundingBox.Max + Vector3.Up * verticalOffset);
-        World = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
+        World = Matrix.CreateScale(Scale) * Matrix.CreateRotationY(rotationAngle) * Matrix.CreateTranslation(Position);
     }
 
     private void HandlePlayerPowerUp(Player player, GameTime gameTime)
