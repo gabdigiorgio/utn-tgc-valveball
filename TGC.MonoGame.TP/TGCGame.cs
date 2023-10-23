@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -35,7 +36,6 @@ namespace TGC.MonoGame.TP
             // Carpeta raiz donde va a estar toda la Media.
             Content.RootDirectory = "Content";
             // Hace que el mouse sea visible.
-            // Hace que el mouse sea visible.
             IsMouseVisible = true;
         }
     
@@ -59,30 +59,22 @@ namespace TGC.MonoGame.TP
         private BoxPrimitive BoxPrimitive { get; set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new Vector3(-300f, 750f, 0f); //new(300f, 10f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(300f, 10f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
 
         // Effects
-        // Effect for the Platforms
-        private Effect PlatformEffect { get; set; }
-
-        // Effect for the ball
-        private Effect Effect { get; set; }
-        private Effect TextureEffect { get; set; }
-        
-        // Textures
-        private Texture2D StonesTexture { get; set; }
-        private Texture2D MarbleTexture { get; set; }
-        private Texture2D RubberTexture { get; set; }
-        private Texture2D MetalTexture { get; set; }
+        private Effect BlinnPhongEffect { get; set; }
+        private Effect StarShader { get; set; }
 
         // Models
         private Model StarModel { get; set; }
         private Model SphereModel { get; set; }
-        private Matrix StarWorld { get; set; }
         private Player _player;
+        
+        // Collectibles
+        private readonly List<Star> _stars = new();
         
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
@@ -120,11 +112,16 @@ namespace TGC.MonoGame.TP
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = true
+                Enabled = false
             };
-
-            // Star
-            StarWorld = Matrix.Identity;
+            
+            // Stars
+            var offset = 0f;
+            for (var index = 0; index < 2; index++)
+            {
+                _stars.Add(new Star(new Vector3(150f + offset, 5f, 0f), 0.5f));
+                offset -= 600f;
+            }
             
             Prefab.CreateSquareCircuit(Vector3.Zero);
             Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
@@ -143,31 +140,48 @@ namespace TGC.MonoGame.TP
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             
-            StonesTexture = Content.Load<Texture2D>(ContentFolderTextures + "stones");
-            MarbleTexture = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_01_c");
-            RubberTexture = Content.Load<Texture2D>(ContentFolderTextures + "goma_diffuse");
-            MetalTexture = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
+            // Diffuse
+            var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
+            var platformOrangeDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_orange_diffuse");
+            var marbleDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_diffuse");
+            var rubberDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "rubber_diffuse");
+            var metalDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
             
-            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, StonesTexture);
+            // Normals
+            var platformSquareNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_square_normal");
+            var platformNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_normal");
+            var plainNormal = Content.Load<Texture2D>(ContentFolderTextures + "plain_normal");
+            var rubberNormal = Content.Load<Texture2D>(ContentFolderTextures + "rubber_normal");
+            var metalNormal = Content.Load<Texture2D>(ContentFolderTextures + "metal_normal");
             
+            // Materials
+            Material.Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
+            Material.MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
+            Material.Marble.LoadTexture(marbleDiffuse, plainNormal);
+            Material.Rubber.LoadTexture(rubberDiffuse, rubberNormal);
+            Material.Metal.LoadTexture(metalDiffuse, metalNormal);
+            
+            // Platform
+            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
+            
+            // Star
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
-
-            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+            StarShader = Content.Load<Effect>(ContentFolderEffects + "StarShader");
+            loadEffectOnMesh(StarModel, StarShader);
             
-            Effect = Content.Load<Effect>(ContentFolderEffects + "BasicShader");
-            PlatformEffect = Content.Load<Effect>(ContentFolderEffects + "PlatformShader");
-            loadEffectOnMesh(StarModel, Effect);
-
-            TextureEffect = Content.Load<Effect>(ContentFolderEffects + "BasicTextureShader");
-            loadEffectOnMesh(SphereModel, TextureEffect);
-
+            // Sphere
+            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
+            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
             SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
             
+            // SkyBox
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
             var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
-
+            
+            // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
@@ -192,14 +206,32 @@ namespace TGC.MonoGame.TP
             }
 
             TargetCamera.Update(_player.SpherePosition, _player.Yaw, mouseState);
+            
+            SetLightPosition(new Vector3(150f, 750f, 0f));
 
             Prefab.UpdateMovingPlatforms();
+
+            UpdateStars(gameTime);
 
             Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
             base.Update(gameTime);
         }
-        
+
+        private void SetLightPosition(Vector3 lightPosition)
+        {
+            BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
+            BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
+        }
+
+        private void UpdateStars(GameTime gameTime)
+        {
+            foreach (var star in _stars)
+            {
+                star.Update(gameTime);
+            }
+        }
+
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aqui el codigo referido al renderizado.
@@ -208,61 +240,17 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
-            foreach (var platformWorld in Prefab.PlatformMatrices)
-            {
-                PlatformEffect.Parameters["World"].SetValue(platformWorld);
-                PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
-                PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
-                BoxPrimitive.Draw(PlatformEffect);
-            }
+            DrawPlatforms(BlinnPhongEffect, Material.Platform);
             
-            foreach (var rampWorld in Prefab.RampMatrices)
-            {
-                PlatformEffect.Parameters["World"].SetValue(rampWorld);
-                PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
-                PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
-                
-                BoxPrimitive.Draw(PlatformEffect);
-            } 
+            DrawRamps(BlinnPhongEffect, Material.Platform); 
 
-            foreach (var boundingBox in Prefab.PlatformAabb)
-            {
-                var center = BoundingVolumesExtensions.GetCenter(boundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.Red);
-            }
+            DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
 
-            foreach (var movingPlatform in Prefab.MovingPlatforms)
-            {
-                PlatformEffect.Parameters["World"].SetValue(movingPlatform.World);
-                PlatformEffect.Parameters["View"].SetValue(TargetCamera.View);
-                PlatformEffect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-                PlatformEffect.Parameters["Textura_Plataformas"].SetValue(StonesTexture);
-                
-                BoxPrimitive.Draw(PlatformEffect);
-                
-                var movingBoundingBox = movingPlatform.MovingBoundingBox;
-                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
-            }
+            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
 
-            foreach (var orientedBoundingBox in Prefab.RampObb)
-            {
-                var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f) 
-                                               * orientedBoundingBox.Orientation * Matrix.CreateTranslation(orientedBoundingBox.Center);
-                Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
-            }
-
-            DrawTexturedModel(SphereWorld, SphereModel, TextureEffect, RubberTexture);
-            StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-450f, 5f, 0f);
-            DrawModel(StarWorld, StarModel, Effect);
-            StarWorld = Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(150f, 5f, 0f);
-            DrawModel(StarWorld, StarModel, Effect);
+            DrawStars(_stars, gameTime);
             
-            Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
+            DrawGizmos();
             Gizmos.Draw();
             
             var originalRasterizerState = GraphicsDevice.RasterizerState;
@@ -272,44 +260,159 @@ namespace TGC.MonoGame.TP
             
             SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, new Vector3(0f,0f,0f));
             GraphicsDevice.RasterizerState = originalRasterizerState;
+            
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            base.Draw(gameTime);
         }
 
-        private void DrawModel(Matrix world, Model model, Effect effect){
+        private void DrawPlatforms(Effect effect, Material material)
+        {
+            foreach (var platformWorld in Prefab.PlatformMatrices)
+            {
+                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
+                effect.Parameters["World"].SetValue(platformWorld);
+                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(platformWorld)));
+                effect.Parameters["WorldViewProjection"].SetValue(platformWorld * TargetCamera.View * TargetCamera.Projection);
+            
+                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+                effect.Parameters["NormalTexture"].SetValue(material.Normal);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 3f);
+                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+                effect.Parameters["shininess"].SetValue(material.Shininess);
+
+                BoxPrimitive.Draw(effect);
+            }
+        }
+        
+        private void DrawRamps(Effect effect, Material material)
+        {
+            foreach (var rampWorld in Prefab.RampMatrices)
+            {
+                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
+                effect.Parameters["World"].SetValue(rampWorld);
+                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(rampWorld)));
+                effect.Parameters["WorldViewProjection"].SetValue(rampWorld * TargetCamera.View * TargetCamera.Projection);
+            
+                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+                effect.Parameters["NormalTexture"].SetValue(material.Normal);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 2f);
+                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+                effect.Parameters["shininess"].SetValue(material.Shininess);
+
+                BoxPrimitive.Draw(effect);
+            }
+        }
+        
+        private void DrawMovingPlatforms(Effect effect, Material material)
+        {
+            foreach (var movingPlatform in Prefab.MovingPlatforms)
+            {
+                var movingPlatformWorld = movingPlatform.World;
+                
+                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
+                effect.Parameters["World"].SetValue(movingPlatformWorld);
+                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(movingPlatformWorld)));
+                effect.Parameters["WorldViewProjection"].SetValue(movingPlatformWorld * TargetCamera.View * TargetCamera.Projection);
+            
+                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+                effect.Parameters["NormalTexture"].SetValue(material.Normal);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 3f);
+                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+                effect.Parameters["shininess"].SetValue(material.Shininess);
+
+                BoxPrimitive.Draw(effect);
+            }
+        }
+
+        private void DrawGizmos()
+        {
+            foreach (var boundingBox in Prefab.PlatformAabb)
+            {
+                var center = BoundingVolumesExtensions.GetCenter(boundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.Red);
+            }
+
+            foreach (var orientedBoundingBox in Prefab.RampObb)
+            {
+                var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f)
+                                               * orientedBoundingBox.Orientation *
+                                               Matrix.CreateTranslation(orientedBoundingBox.Center);
+                Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
+            }
+
+            foreach (var movingPlatform in Prefab.MovingPlatforms)
+            {
+                var movingBoundingBox = movingPlatform.MovingBoundingBox;
+                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
+            }
+            
+            Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
+        }
+
+        private void DrawStars(List<Star> stars, GameTime gameTime)
+        {
+            foreach (var star in stars)
+            {
+                DrawModel(star.World, StarModel, StarShader, gameTime);
+                var center = BoundingVolumesExtensions.GetCenter(star.BoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(star.BoundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.Red);
+            }
+        }
+        
+        private void DrawModel(Matrix world, Model model, Effect effect, GameTime gameTime){
             effect.Parameters["View"].SetValue(TargetCamera.View);
             effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-            effect.Parameters["DiffuseColor"].SetValue(Color.Yellow.ToVector3());
+            effect.Parameters["DiffuseColor"]?.SetValue(Color.Yellow.ToVector3());
+            effect.Parameters["Time"].SetValue((float)gameTime.TotalGameTime.TotalSeconds);
 
             foreach (var mesh in model.Meshes)
             {
-                Matrix meshMatrix = mesh.ParentBone.Transform;
+                var meshMatrix = mesh.ParentBone.Transform;
                 effect.Parameters["World"].SetValue(meshMatrix * world);
                 mesh.Draw();
             }
         }
         
-        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Texture2D texture){
+        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
+            effect.CurrentTechnique = effect.Techniques["NormalMapping"];
             effect.Parameters["World"].SetValue(worldMatrix);
-            effect.Parameters["View"].SetValue(TargetCamera.View);
-            effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-            effect.Parameters["DiffuseColor"]?.SetValue(Color.IndianRed.ToVector3());
-            effect.Parameters["Texture"]?.SetValue(texture);
-
-            chequearPropiedadesTextura(texture);
-
+            effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
+            effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetCamera.View * TargetCamera.Projection);
+            
+            effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+            effect.Parameters["NormalTexture"]?.SetValue(material.Normal);
+            effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
+            effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+            effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+            effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+            effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+            effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+            effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+            effect.Parameters["shininess"].SetValue(material.Shininess);
+            
             foreach (var mesh in model.Meshes)
             {   
                 mesh.Draw();
             }
-        }
-        
-        private void DrawGeometry(GeometricPrimitive geometry, Matrix worldMatrix, Effect effect)
-        {
-            effect.Parameters["World"].SetValue(worldMatrix);
-            effect.Parameters["View"].SetValue(TargetCamera.View);
-            effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
-            effect.Parameters["DiffuseColor"]?.SetValue(Color.IndianRed.ToVector3());
-            effect.Parameters["Texture"]?.SetValue(StonesTexture);
-            geometry.Draw(effect);
         }
 
         /// <summary>
@@ -323,28 +426,14 @@ namespace TGC.MonoGame.TP
             base.UnloadContent();
         }
 
-        public static void loadEffectOnMesh(Model modelo,Effect efecto)
+        private static void loadEffectOnMesh(Model model,Effect effect)
         {
-            foreach (var mesh in modelo.Meshes)
+            foreach (var mesh in model.Meshes)
             {
                 foreach (var meshPart in mesh.MeshParts)
                 {
-                    meshPart.Effect = efecto;
+                    meshPart.Effect = effect;
                 }
-            }
-        }
-
-        public void chequearPropiedadesTextura(Texture2D texture){
-            //La bola de marmol acelera mas lento
-            //La bola de goma salta mas alto
-            //La bola de metal acelera mas rápido
-            if(texture == MarbleTexture){
-                _player.Acceleration = 30f;
-            }else if(texture == RubberTexture){
-                _player.MaxJumpHeight = 40f;
-            }else if(texture == MetalTexture){
-                _player.Acceleration = 100f;
-                _player.MaxSpeed = 230f;
             }
         }
     }

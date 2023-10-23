@@ -30,17 +30,18 @@ public class Player
         Yaw = yaw;
     }
 
-    public float MaxSpeed = 180f;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereRubber;
+
     private const float PitchMaxSpeed = 15f;
     private const float YawMaxSpeed = 5.8f;
-    public float Acceleration = 60f;
     private const float PitchAcceleration = 5f;
     private const float YawAcceleration = 5f;
     private const float Gravity = 175f;
-    public float MaxJumpHeight = 35f;
 
     public Matrix Update(float time, KeyboardState keyboardState)
     {
+        ChangeSphereMaterial(keyboardState);
+
         HandleJumping(keyboardState);
         HandleFalling(time);
         HandleYaw(time, keyboardState);
@@ -51,6 +52,24 @@ public class Player
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
         return _sphereScale * rotationX * rotationY * translation;
+    }
+
+    private void ChangeSphereMaterial(KeyboardState keyboardState)
+    {
+        if (keyboardState.IsKeyDown(Keys.D1))
+        {
+            CurrentSphereMaterial = SphereMaterial.SphereMarble;
+        }
+
+        if (keyboardState.IsKeyDown(Keys.D2))
+        {
+            CurrentSphereMaterial = SphereMaterial.SphereRubber;
+        }
+
+        if (keyboardState.IsKeyDown(Keys.D3))
+        {
+            CurrentSphereMaterial = SphereMaterial.SphereMetal;
+        }
     }
 
     private void RestartPosition(KeyboardState keyboardState)
@@ -105,7 +124,7 @@ public class Player
 
     private float CalculateJumpSpeed()
     {
-        return (float)Math.Sqrt(2 * MaxJumpHeight * Math.Abs(Gravity));
+        return (float)Math.Sqrt(2 * CurrentSphereMaterial.MaxJumpHeight * Math.Abs(Gravity));
     }
 
     private void HandleYaw(float time, KeyboardState keyboardState)
@@ -147,17 +166,17 @@ public class Player
     {
         if (keyboardState.IsKeyDown(Keys.W))
         {
-            Accelerate(Acceleration, time);
+            Accelerate(CurrentSphereMaterial.Acceleration, time);
             AcceleratePitch(PitchAcceleration, time);
         }
         else if (keyboardState.IsKeyDown(Keys.S))
         {
-            Accelerate(-Acceleration, time);
+            Accelerate(-CurrentSphereMaterial.Acceleration, time);
             AcceleratePitch(-PitchAcceleration, time);
         }
         else
         {
-            Decelerate(time);
+            Decelerate(CurrentSphereMaterial.Acceleration, time);
             DeceleratePitch(time);
         }
 
@@ -174,7 +193,7 @@ public class Player
 
     private void AdjustSpeed(float time, Vector3 forward)
     {
-        _speed = MathHelper.Clamp(_speed, -MaxSpeed, MaxSpeed);
+        _speed = MathHelper.Clamp(_speed, -CurrentSphereMaterial.MaxSpeed, CurrentSphereMaterial.MaxSpeed);
         BoundingSphere.Center += forward * time * _speed;
     }
 
@@ -200,10 +219,10 @@ public class Player
         _speed += acceleration * time;
     }
 
-    private void Decelerate(float time)
+    private void Decelerate(float acceleration, float time)
     {
         var decelerationDirection = Math.Sign(_speed) * -1;
-        _speed += Acceleration * time * decelerationDirection;
+        _speed += acceleration * time * decelerationDirection;
     }
 
     private void SolveCollisions()
