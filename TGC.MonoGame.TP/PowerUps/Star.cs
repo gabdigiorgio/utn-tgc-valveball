@@ -8,7 +8,6 @@ public class Star : PowerUp
     public Matrix World { get; private set; }
     private Vector3 Position { get; set; }
     private float Scale { get; }
-
     private const float Amplitude = 0.15f;
     private const float MaxVerticalSpeed = 2f;
 
@@ -25,8 +24,8 @@ public class Star : PowerUp
     public void Update(GameTime gameTime)
     {
         HandlePlayerPowerUp(TGCGame.Player, gameTime);
-        var time = (float)gameTime.TotalGameTime.TotalSeconds;
-        var verticalOffset = Amplitude * (float)Math.Cos(time * MaxVerticalSpeed);
+        var totalTime = (float)gameTime.TotalGameTime.TotalSeconds;
+        var verticalOffset = Amplitude * (float)Math.Cos(totalTime * MaxVerticalSpeed);
         Position = new Vector3(Position.X, Position.Y + verticalOffset, Position.Z);
         BoundingBox = new BoundingBox(BoundingBox.Min + Vector3.Up * verticalOffset, BoundingBox.Max + Vector3.Up * verticalOffset);
         World = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);

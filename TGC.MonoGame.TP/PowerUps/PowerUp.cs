@@ -8,16 +8,18 @@ public abstract class PowerUp
     protected float PowerUpDuration { get; init; }
     protected bool IsPowerUpActive { get; set; }
     private float ElapsedTimeSinceActivation { get; set; }
+    private bool CanInteract { get; set; }
     protected PowerUp(BoundingBox boundingBox)
     {
         BoundingBox = boundingBox;
+        CanInteract = true;
     }
 
     protected void HandlePlayerPowerUp(Player player, GameTime gameTime)
     {
         var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         
-        if (player.BoundingSphere.Intersects(BoundingBox))
+        if (CanInteract && player.BoundingSphere.Intersects(BoundingBox))
         {
             ActivatePowerUp(player);
         }
@@ -36,6 +38,7 @@ public abstract class PowerUp
 
     private void ActivatePowerUp(Player player)
     {
+        CanInteract = false;
         SetPowerUp(player);
         IsPowerUpActive = true;
     }
