@@ -117,10 +117,10 @@ namespace TGC.MonoGame.TP
             };
             
             // PowerUps
-            CreateLowGravityStar(new Vector3(150f, 5f, 0f));
-            CreateLowGravityStar(new Vector3(-450f, 5f, 0f));
-            CreateSpeedUp(new Vector3(150f, 5f, -200f));
-            CreateSpeedUp(new Vector3(150f, 5f, 200f));
+            CreatePowerUp<LowGravityStar>(new Vector3(150f, 5f, 0f));
+            CreatePowerUp<LowGravityStar>(new Vector3(-450f, 5f, 0f));
+            CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, -200f));
+            CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, 200f));
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
@@ -131,15 +131,10 @@ namespace TGC.MonoGame.TP
             base.Initialize();
         }
 
-        private void CreateLowGravityStar(Vector3 position)
+        private void CreatePowerUp<T>(Vector3 position) where T : PowerUp
         {
             const float scale = 0.5f;
-            _powerUps.Add(new LowGravityStar(position, scale));
-        }
-        private void CreateSpeedUp(Vector3 position)
-        {
-            const float scale = 0.5f;
-            _powerUps.Add(new SpeedUp(position, scale));
+            _powerUps.Add((T)Activator.CreateInstance(typeof(T), position, scale));
         }
 
         /// <summary>
