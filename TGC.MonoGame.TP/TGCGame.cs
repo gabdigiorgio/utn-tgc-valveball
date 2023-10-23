@@ -114,10 +114,10 @@ namespace TGC.MonoGame.TP
             // PowerUps
             PowerUpManager.CreatePowerUp<LowGravityStar>(new Vector3(150f, 5f, 0f));
             PowerUpManager.CreatePowerUp<LowGravityStar>(new Vector3(-450f, 5f, 0f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, -200f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, 200f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, -200f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, 200f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 10f, -200f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 10f, 200f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f,10f, -200f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f,10f, 200f));
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);

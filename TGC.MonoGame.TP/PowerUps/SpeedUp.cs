@@ -6,7 +6,7 @@ public class SpeedUp : PowerUp
 {
     private const float SpeedIncrement = 70f;
     public SpeedUp(Vector3 position, float scale)
-        : base(new BoundingBox(new Vector3(-2, -7, -16) + position, new Vector3(2, 20, 23) + position))
+        : base(new BoundingBox(new Vector3(-2, -14, -16) + position, new Vector3(2, 20, 23) + position))
     {
         Position = position;
         Scale = scale;
