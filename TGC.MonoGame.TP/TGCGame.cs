@@ -259,51 +259,29 @@ namespace TGC.MonoGame.TP
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             base.Draw(gameTime);
         }
+        
+        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
+            SetBlinnPhongParameters(effect, material, Vector2.One * 5f, worldMatrix, TargetCamera);
+            foreach (var mesh in model.Meshes)
+            {   
+                mesh.Draw();
+            }
+        }
 
         private void DrawPlatforms(Effect effect, Material material)
         {
             foreach (var platformWorld in Prefab.PlatformMatrices)
             {
-                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
-                effect.Parameters["World"].SetValue(platformWorld);
-                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(platformWorld)));
-                effect.Parameters["WorldViewProjection"].SetValue(platformWorld * TargetCamera.View * TargetCamera.Projection);
-            
-                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
-                effect.Parameters["NormalTexture"].SetValue(material.Normal);
-                effect.Parameters["Tiling"].SetValue(Vector2.One * 3f);
-                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
-                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
-                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
-                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
-                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
-                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
-                effect.Parameters["shininess"].SetValue(material.Shininess);
-
+                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, platformWorld, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
         }
-        
+
         private void DrawRamps(Effect effect, Material material)
         {
             foreach (var rampWorld in Prefab.RampMatrices)
             {
-                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
-                effect.Parameters["World"].SetValue(rampWorld);
-                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(rampWorld)));
-                effect.Parameters["WorldViewProjection"].SetValue(rampWorld * TargetCamera.View * TargetCamera.Projection);
-            
-                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
-                effect.Parameters["NormalTexture"].SetValue(material.Normal);
-                effect.Parameters["Tiling"].SetValue(Vector2.One * 2f);
-                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
-                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
-                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
-                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
-                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
-                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
-                effect.Parameters["shininess"].SetValue(material.Shininess);
-
+                SetBlinnPhongParameters(effect, material,Vector2.One * 2f, rampWorld, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
         }
@@ -313,25 +291,28 @@ namespace TGC.MonoGame.TP
             foreach (var movingPlatform in Prefab.MovingPlatforms)
             {
                 var movingPlatformWorld = movingPlatform.World;
-                
-                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
-                effect.Parameters["World"].SetValue(movingPlatformWorld);
-                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(movingPlatformWorld)));
-                effect.Parameters["WorldViewProjection"].SetValue(movingPlatformWorld * TargetCamera.View * TargetCamera.Projection);
-            
-                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
-                effect.Parameters["NormalTexture"].SetValue(material.Normal);
-                effect.Parameters["Tiling"].SetValue(Vector2.One * 3f);
-                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
-                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
-                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
-                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
-                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
-                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
-                effect.Parameters["shininess"].SetValue(material.Shininess);
-
+                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
+        }
+        
+        private static void SetBlinnPhongParameters(Effect effect, Material material, Vector2 tiling, Matrix worldMatrix, 
+            Camera camera)
+        {
+            effect.CurrentTechnique = effect.Techniques["NormalMapping"];
+            effect.Parameters["World"].SetValue(worldMatrix);
+            effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
+            effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * camera.View * camera.Projection);
+            effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+            effect.Parameters["NormalTexture"].SetValue(material.Normal);
+            effect.Parameters["Tiling"].SetValue(tiling);
+            effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+            effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+            effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+            effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+            effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+            effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+            effect.Parameters["shininess"].SetValue(material.Shininess);
         }
 
         private void DrawGizmos()
@@ -384,29 +365,6 @@ namespace TGC.MonoGame.TP
             {
                 var meshMatrix = mesh.ParentBone.Transform;
                 effect.Parameters["World"].SetValue(meshMatrix * world);
-                mesh.Draw();
-            }
-        }
-        
-        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
-            effect.CurrentTechnique = effect.Techniques["NormalMapping"];
-            effect.Parameters["World"].SetValue(worldMatrix);
-            effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
-            effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * TargetCamera.View * TargetCamera.Projection);
-            
-            effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
-            effect.Parameters["NormalTexture"]?.SetValue(material.Normal);
-            effect.Parameters["Tiling"].SetValue(Vector2.One * 5f);
-            effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
-            effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
-            effect.Parameters["specularColor"].SetValue(material.SpecularColor);
-            effect.Parameters["KAmbient"].SetValue(material.KAmbient);
-            effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
-            effect.Parameters["KSpecular"].SetValue(material.KSpecular);
-            effect.Parameters["shininess"].SetValue(material.Shininess);
-            
-            foreach (var mesh in model.Meshes)
-            {   
                 mesh.Draw();
             }
         }
