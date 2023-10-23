@@ -87,17 +87,17 @@
 /processorParam:DebugMode=Auto
 /build:Effects/PlatformShader.fx
 
+#begin Effects/PowerUpShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/PowerUpShader.fx
+
 #begin Effects/SkyBox.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/SkyBox.fx
-
-#begin Effects/StarShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/StarShader.fx
 
 #begin Models/collectibles/Gold_Star.FBX
 /importer:FbxImporter

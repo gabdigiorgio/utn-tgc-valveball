@@ -67,7 +67,7 @@ namespace TGC.MonoGame.TP
 
         // Effects
         private Effect BlinnPhongEffect { get; set; }
-        private Effect StarShader { get; set; }
+        private Effect PowerUpShader { get; set; }
 
         // Models
         private Model StarModel { get; set; }
@@ -174,11 +174,8 @@ namespace TGC.MonoGame.TP
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
             
             // Collectibles
-            StarModel = Content.Load<Model>(ContentFolder3D + "collectibles/Gold_Star");
-            SpeedModel = Content.Load<Model>(ContentFolder3D + "collectibles/speed_power");
-            StarShader = Content.Load<Effect>(ContentFolderEffects + "StarShader");
-            loadEffectOnMesh(StarModel, StarShader);
-            loadEffectOnMesh(SpeedModel, StarShader);
+            PowerUpShader = Content.Load<Effect>(ContentFolderEffects + "PowerUpShader");
+            LoadPowerUps(PowerUpShader);
             
             // Sphere
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
@@ -196,6 +193,23 @@ namespace TGC.MonoGame.TP
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
+        }
+
+        private void LoadPowerUps(Effect effect)
+        {
+            var powerUpModels = new Dictionary<Type, Model>
+            {
+                { typeof(LowGravityStar), Content.Load<Model>(ContentFolder3D + "collectibles/Gold_Star") },
+                { typeof(SpeedUp), Content.Load<Model>(ContentFolder3D + "collectibles/speed_power") },
+            };
+            
+            foreach (var powerUp in _powerUps)
+            {
+                if (!powerUpModels.TryGetValue(powerUp.GetType(), out var model)) continue;
+                powerUp.Model = model;
+                powerUp.Shader = effect;
+                loadEffectOnMesh(powerUp.Model, powerUp.Shader);
+            }
         }
 
         /// <summary>
@@ -383,7 +397,7 @@ namespace TGC.MonoGame.TP
             foreach (var powerUp in powerUps)
             {
                 if (!powerUp.ShouldDraw) continue;
-                DrawModel(powerUp.World, SpeedModel, StarShader, gameTime);
+                DrawModel(powerUp.World, powerUp.Model, powerUp.Shader, gameTime);
                 var center = BoundingVolumesExtensions.GetCenter(powerUp.BoundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(powerUp.BoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.Red);

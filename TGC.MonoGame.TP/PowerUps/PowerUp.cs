@@ -15,7 +15,8 @@ public abstract class PowerUp
     protected Vector3 Position { get; set; }
     protected float Scale { get; init; }       
     public Matrix World { get; protected set; }
-    public Model Model { get; protected set; }
+    public Model Model { get; set; }
+    public Effect Shader { get; set; }
     
     private const float Amplitude = 0.15f;
     private const float MaxVerticalSpeed = 2f;
@@ -26,11 +27,6 @@ public abstract class PowerUp
         ShouldDraw = true;
         IsPowerUpActive = false;
         Model = null;
-    }
-    
-    protected PowerUp(BoundingBox boundingBox, Model model) : this(boundingBox)
-    {
-        Model = model;
     }
     
     public void Update(GameTime gameTime, Player player)
