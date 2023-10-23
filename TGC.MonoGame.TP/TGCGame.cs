@@ -71,7 +71,7 @@ namespace TGC.MonoGame.TP
         // Models
         private Model StarModel { get; set; }
         private Model SphereModel { get; set; }
-        private Player _player;
+        public static Player Player;
         
         // Collectibles
         private readonly List<Star> _stars = new();
@@ -107,12 +107,12 @@ namespace TGC.MonoGame.TP
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 250);
             
             // Player
-            _player = new Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
+            Player = new Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
             
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = false
+                Enabled = true
             };
             
             // Stars
@@ -198,14 +198,14 @@ namespace TGC.MonoGame.TP
             var mouseState = Mouse.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
-            SphereWorld = _player.Update(time, keyboardState);
+            SphereWorld = Player.Update(time, keyboardState);
 
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 Exit();
             }
 
-            TargetCamera.Update(_player.SpherePosition, _player.Yaw, mouseState);
+            TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
             
             SetLightPosition(new Vector3(150f, 750f, 0f));
 
@@ -246,7 +246,7 @@ namespace TGC.MonoGame.TP
 
             DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
 
-            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
+            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, Player.CurrentSphereMaterial.Material);
 
             DrawStars(_stars, gameTime);
             
@@ -364,7 +364,7 @@ namespace TGC.MonoGame.TP
                 Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
             }
             
-            Gizmos.DrawSphere(_player.BoundingSphere.Center, _player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
+            Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
         private void DrawStars(List<Star> stars, GameTime gameTime)

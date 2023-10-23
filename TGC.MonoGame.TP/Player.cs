@@ -11,6 +11,7 @@ public class Player
 {
     public Vector3 SpherePosition;
     public float Yaw { get; private set; }
+    public float Gravity { private get;  set; } = MaxGravity;
     private readonly Matrix _sphereScale;
     private float _pitch;
     private float _roll;
@@ -36,12 +37,11 @@ public class Player
     private const float YawMaxSpeed = 5.8f;
     private const float PitchAcceleration = 5f;
     private const float YawAcceleration = 5f;
-    private const float Gravity = 175f;
+    private const float MaxGravity = 175f;
 
     public Matrix Update(float time, KeyboardState keyboardState)
     {
         ChangeSphereMaterial(keyboardState);
-
         HandleJumping(keyboardState);
         HandleFalling(time);
         HandleYaw(time, keyboardState);
@@ -78,6 +78,11 @@ public class Player
         BoundingSphere.Center = TGCGame.InitialSpherePosition; // TODO: checkpoint
         Yaw = TGCGame.InitialSphereYaw;
         SetSpeedToZero();
+    }
+    
+    public void ResetGravity()
+    {
+        Gravity = MaxGravity;
     }
 
     private void SetSpeedToZero()
