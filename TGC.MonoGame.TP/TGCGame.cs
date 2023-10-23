@@ -67,16 +67,10 @@ namespace TGC.MonoGame.TP
 
         // Effects
         private Effect BlinnPhongEffect { get; set; }
-        private Effect PowerUpShader { get; set; }
 
         // Models
-        private Model StarModel { get; set; }
-        private Model SpeedModel { get; set; }
         private Model SphereModel { get; set; }
-        public static Player Player { get; private set; }
-        
-        // Collectibles
-        private readonly List<PowerUp> _powerUps = new();
+        private static Player Player { get; set; }
         
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
@@ -118,12 +112,12 @@ namespace TGC.MonoGame.TP
             };
             
             // PowerUps
-            CreatePowerUp<LowGravityStar>(new Vector3(150f, 5f, 0f));
-            CreatePowerUp<LowGravityStar>(new Vector3(-450f, 5f, 0f));
-            CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, -200f));
-            CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, 200f));
-            CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, -200f));
-            CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, 200f));
+            PowerUpManager.CreatePowerUp<LowGravityStar>(new Vector3(150f, 5f, 0f));
+            PowerUpManager.CreatePowerUp<LowGravityStar>(new Vector3(-450f, 5f, 0f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, -200f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, 200f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, -200f));
+            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, 200f));
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
@@ -132,12 +126,6 @@ namespace TGC.MonoGame.TP
             Prefab.CreateSwitchbackRamp();
             
             base.Initialize();
-        }
-
-        private void CreatePowerUp<T>(Vector3 position) where T : PowerUp
-        {
-            const float scale = 0.5f;
-            _powerUps.Add((T)Activator.CreateInstance(typeof(T), position, scale));
         }
 
         /// <summary>
@@ -174,8 +162,7 @@ namespace TGC.MonoGame.TP
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
             
             // Collectibles
-            PowerUpShader = Content.Load<Effect>(ContentFolderEffects + "PowerUpShader");
-            LoadPowerUps(PowerUpShader);
+            PowerUpManager.LoadPowerUps(Content);
             
             // Sphere
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
@@ -193,23 +180,6 @@ namespace TGC.MonoGame.TP
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
-        }
-
-        private void LoadPowerUps(Effect effect)
-        {
-            var powerUpModels = new Dictionary<Type, Model>
-            {
-                { typeof(LowGravityStar), Content.Load<Model>(ContentFolder3D + "collectibles/Gold_Star") },
-                { typeof(SpeedUp), Content.Load<Model>(ContentFolder3D + "collectibles/speed_power") },
-            };
-            
-            foreach (var powerUp in _powerUps)
-            {
-                if (!powerUpModels.TryGetValue(powerUp.GetType(), out var model)) continue;
-                powerUp.Model = model;
-                powerUp.Shader = effect;
-                loadEffectOnMesh(powerUp.Model, powerUp.Shader);
-            }
         }
 
         /// <summary>
@@ -249,9 +219,9 @@ namespace TGC.MonoGame.TP
             BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
         }
 
-        private void UpdatePowerUps(GameTime gameTime)
+        private static void UpdatePowerUps(GameTime gameTime)
         {
-            foreach (var powerUp in _powerUps)
+            foreach (var powerUp in PowerUpManager.PowerUps)
             {
                 powerUp.Update(gameTime, Player);
             }
@@ -273,7 +243,7 @@ namespace TGC.MonoGame.TP
 
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, Player.CurrentSphereMaterial.Material);
 
-            DrawPowerUps(_powerUps, gameTime);
+            DrawPowerUps(PowerUpManager.PowerUps, gameTime);
             
             DrawGizmos();
             Gizmos.Draw();
@@ -452,7 +422,7 @@ namespace TGC.MonoGame.TP
             base.UnloadContent();
         }
 
-        private static void loadEffectOnMesh(Model model,Effect effect)
+        public static void loadEffectOnMesh(Model model,Effect effect)
         {
             foreach (var mesh in model.Meshes)
             {
