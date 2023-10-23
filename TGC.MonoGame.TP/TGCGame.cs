@@ -121,6 +121,8 @@ namespace TGC.MonoGame.TP
             CreatePowerUp<LowGravityStar>(new Vector3(-450f, 5f, 0f));
             CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, -200f));
             CreatePowerUp<SpeedUp>(new Vector3(150f, 5f, 200f));
+            CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, -200f));
+            CreatePowerUp<SpeedUp>(new Vector3(-450f, 5f, 200f));
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
