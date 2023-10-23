@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.TP.PowerUps;
 
@@ -14,6 +15,8 @@ public abstract class PowerUp
     protected Vector3 Position { get; set; }
     protected float Scale { get; init; }       
     public Matrix World { get; protected set; }
+    public Model Model { get; protected set; }
+    
     private const float Amplitude = 0.15f;
     private const float MaxVerticalSpeed = 2f;
     protected PowerUp(BoundingBox boundingBox)
@@ -22,6 +25,12 @@ public abstract class PowerUp
         CanInteract = true;
         ShouldDraw = true;
         IsPowerUpActive = false;
+        Model = null;
+    }
+    
+    protected PowerUp(BoundingBox boundingBox, Model model) : this(boundingBox)
+    {
+        Model = model;
     }
     
     public void Update(GameTime gameTime, Player player)
