@@ -372,6 +372,7 @@ namespace TGC.MonoGame.TP
         {
             foreach (var star in stars)
             {
+                if (!star.ShouldDraw) continue;
                 DrawModel(star.World, StarModel, StarShader, gameTime);
                 var center = BoundingVolumesExtensions.GetCenter(star.BoundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(star.BoundingBox);
