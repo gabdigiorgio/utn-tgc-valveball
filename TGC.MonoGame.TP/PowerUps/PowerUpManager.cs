@@ -9,7 +9,6 @@ namespace TGC.MonoGame.TP.PowerUps;
 public static class PowerUpManager
 {
     public static readonly List<PowerUp> PowerUps = new();
-    private static Dictionary<Type, Model> _powerUpModels = new Dictionary<Type, Model>();
     
     public static void CreatePowerUp<T>(Vector3 position) where T : PowerUp
     {
