@@ -2,9 +2,9 @@
 
 public class SphereMaterial
 {
-    public float Acceleration { get; private set; }
+    public float Acceleration { get; set; }
     public float MaxJumpHeight { get; private set; }
-    public float MaxSpeed { get; private set; }
+    public float MaxSpeed { get; set; }
     public Material Material { get; private set; }
 
     private SphereMaterial(Material material, float acceleration = 60f, float maxJumpHeight = 35f, float maxSpeed = 180f)

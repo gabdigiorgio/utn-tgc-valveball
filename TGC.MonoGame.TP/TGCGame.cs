@@ -72,10 +72,10 @@ namespace TGC.MonoGame.TP
         // Models
         private Model StarModel { get; set; }
         private Model SphereModel { get; set; }
-        public static Player Player;
+        public static Player Player { get; private set; }
         
         // Collectibles
-        private readonly List<Star> _stars = new();
+        private readonly List<PowerUp> _powerUps = new();
         
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
@@ -116,20 +116,30 @@ namespace TGC.MonoGame.TP
                 Enabled = true
             };
             
-            // Stars
-            var offset = 0f;
-            for (var index = 0; index < 2; index++)
-            {
-                _stars.Add(new Star(new Vector3(150f + offset, 5f, 0f), 0.5f));
-                offset -= 600f;
-            }
+            // PowerUps
+            CreateLowGravityStar(new Vector3(150f, 5f, 0f));
+            CreateLowGravityStar(new Vector3(-450f, 5f, 0f));
+            CreateSpeedUp(new Vector3(150f, 5f, -200f));
+            CreateSpeedUp(new Vector3(150f, 5f, 200f));
             
+            // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
             Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
             Prefab.CreateBridge();
             Prefab.CreateSwitchbackRamp();
             
             base.Initialize();
+        }
+
+        private void CreateLowGravityStar(Vector3 position)
+        {
+            const float scale = 0.5f;
+            _powerUps.Add(new LowGravityStar(position, scale));
+        }
+        private void CreateSpeedUp(Vector3 position)
+        {
+            const float scale = 0.5f;
+            _powerUps.Add(new SpeedUp(position, scale));
         }
 
         /// <summary>
@@ -227,9 +237,9 @@ namespace TGC.MonoGame.TP
 
         private void UpdateStars(GameTime gameTime)
         {
-            foreach (var star in _stars)
+            foreach (var star in _powerUps)
             {
-                star.Update(gameTime);
+                star.Update(gameTime, Player);
             }
         }
 
@@ -249,7 +259,7 @@ namespace TGC.MonoGame.TP
 
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, Player.CurrentSphereMaterial.Material);
 
-            DrawStars(_stars, gameTime);
+            DrawPowerUps(_powerUps, gameTime);
             
             DrawGizmos();
             Gizmos.Draw();
@@ -368,14 +378,14 @@ namespace TGC.MonoGame.TP
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
-        private void DrawStars(List<Star> stars, GameTime gameTime)
+        private void DrawPowerUps(List<PowerUp> powerUps, GameTime gameTime)
         {
-            foreach (var star in stars)
+            foreach (var powerUp in powerUps)
             {
-                if (!star.ShouldDraw) continue;
-                DrawModel(star.World, StarModel, StarShader, gameTime);
-                var center = BoundingVolumesExtensions.GetCenter(star.BoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(star.BoundingBox);
+                if (!powerUp.ShouldDraw) continue;
+                DrawModel(powerUp.World, StarModel, StarShader, gameTime);
+                var center = BoundingVolumesExtensions.GetCenter(powerUp.BoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(powerUp.BoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.Red);
             }
         }
