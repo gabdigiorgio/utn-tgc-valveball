@@ -113,36 +113,10 @@ namespace TGC.MonoGame.TP
             };
             
             // Collectibles
-            
-            // PowerUps
-            CollectibleManager.CreateCollectible<LowGravity>(150f, 5f, 0f);
-            CollectibleManager.CreateCollectible<LowGravity>(-450f, 5f, 0f);
-            CollectibleManager.CreateCollectible<SpeedUp>(150f, 10f, -200f);
-            CollectibleManager.CreateCollectible<SpeedUp>(150f, 10f, 200f);
-            CollectibleManager.CreateCollectible<SpeedUp>(-450f,10f, -200f);
-            CollectibleManager.CreateCollectible<SpeedUp>(-450f,10f, 200f);
-            
-            // Coins
-            CollectibleManager.CreateCollectible<Coin>(300f, 13f, 50f);
-            CollectibleManager.CreateCollectible<Coin>(300f, 13f, 75f);
-            CollectibleManager.CreateCollectible<Coin>(300f, 13f, 95f);
-            
-            CollectibleManager.CreateCollectible<Coin>(300f, 13f, -50f);
-            CollectibleManager.CreateCollectible<Coin>(300f, 13f, -75f);
-            CollectibleManager.CreateCollectible<Coin>(300f, 13f, -95f);
-            
-            // Parable
-            CollectibleManager.CreateCollectible<Coin>(230f, 23f, 0f);
-            CollectibleManager.CreateCollectible<Coin>(210f, 28f, 0f);
-            CollectibleManager.CreateCollectible<Coin>(190f, 33f, 0f);
-            CollectibleManager.CreateCollectible<Coin>(170f, 38f, 0f);
-            CollectibleManager.CreateCollectible<Coin>(150f, 38f, 0f);
+            CreatePowerUps();
+            CreateCoins(0, 0, 0);
+            CreateCoins(-600, 0, 0);
 
-            CollectibleManager.CreateCollectible<Coin>(70f, 23f, 0f);
-            CollectibleManager.CreateCollectible<Coin>(90f, 28f, 0f);
-            CollectibleManager.CreateCollectible<Coin>(110f, 33f, 0f);
-            CollectibleManager.CreateCollectible<Coin>(130f, 38f, 0f);
-            
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
             Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
@@ -150,6 +124,45 @@ namespace TGC.MonoGame.TP
             Prefab.CreateSwitchbackRamp();
             
             base.Initialize();
+        }
+
+        private static void CreateCoins(float xOffset, float yOffset, float zOffset)
+        {
+            // Side
+            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 50f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 75f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 95f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -50f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -75f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -95f + zOffset);
+            
+            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 50f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 75f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 95f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -50f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -75f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -95f + zOffset);
+
+            // Parable
+            CollectibleManager.CreateCollectible<Coin>(230f + xOffset, 23f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(210f + xOffset, 28f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(190f + xOffset, 33f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(170f + xOffset, 38f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(150f + xOffset, 38f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(70f + xOffset, 23f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(90f + xOffset, 28f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(110f + xOffset, 33f + yOffset, 0f + zOffset);
+            CollectibleManager.CreateCollectible<Coin>(130f + xOffset, 38f + yOffset, 0f + zOffset);
+        }
+
+        private static void CreatePowerUps()
+        {
+            CollectibleManager.CreateCollectible<LowGravity>(150f, 5f, 0f);
+            CollectibleManager.CreateCollectible<LowGravity>(-450f, 5f, 0f);
+            CollectibleManager.CreateCollectible<SpeedUp>(150f, 10f, -200f);
+            CollectibleManager.CreateCollectible<SpeedUp>(150f, 10f, 200f);
+            CollectibleManager.CreateCollectible<SpeedUp>(-450f, 10f, -200f);
+            CollectibleManager.CreateCollectible<SpeedUp>(-450f, 10f, 200f);
         }
 
         /// <summary>
