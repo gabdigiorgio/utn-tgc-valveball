@@ -394,6 +394,12 @@ namespace TGC.MonoGame.TP
             var zoomMessagePosition = new Vector2(GraphicsDevice.Viewport.Width - zoomMessageSize.X - 10,
                 GraphicsDevice.Viewport.Height - zoomMessageSize.Y - 10);
             SpriteBatch.DrawString(_font, zoomMessage, zoomMessagePosition, Color.White);
+            
+            const string restartMessage = "Press R to restart from last checkpoint";
+            var restartMessageSize = _font.MeasureString(restartMessage);
+            var restartMessagePosition = new Vector2((GraphicsDevice.Viewport.Width - restartMessageSize.X) / 2,
+                GraphicsDevice.Viewport.Height - restartMessageSize.Y - 30);
+            SpriteBatch.DrawString(_font, restartMessage, restartMessagePosition, Color.White);
 
             SpriteBatch.End();
         }
