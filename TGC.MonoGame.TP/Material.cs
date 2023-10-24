@@ -31,7 +31,7 @@ public class Material
     public static readonly Material Rubber = new(0.7f, 0.670f, 0.240f, 3.930f);
     public static readonly Material Metal = new(0.310f, 0.830f, 1.0f, 64.0f);
     public static readonly Material Platform = new(0.4f, 0.320f, 0.340f, 12.820f);
-    public static readonly Material MovingPlatform = new(0.4f, 0.820f, 0.340f, 3.820f);
+    public static readonly Material MovingPlatform = new(0.3f, 0.620f, 0.340f, 1.820f);
 
     public void LoadTexture(Texture2D diffuseTexture, Texture2D normalTexture)
     {
