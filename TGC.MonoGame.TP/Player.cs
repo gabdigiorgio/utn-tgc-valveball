@@ -12,7 +12,7 @@ public class Player
     public Vector3 SpherePosition;
     public float Yaw { get; private set; }
     public float Gravity { private get;  set; } = MaxGravity;
-    private int Score { get; set; }
+    public int Score { get; private set; }
     private readonly Matrix _sphereScale;
     private float _pitch;
     private float _roll;

@@ -44,6 +44,7 @@ namespace TGC.MonoGame.TP
         // Graphics
         private GraphicsDeviceManager Graphics { get; }
         private SpriteBatch SpriteBatch { get; set; }
+        public SpriteFont font;
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -173,6 +174,7 @@ namespace TGC.MonoGame.TP
         protected override void LoadContent()
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
+            font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             // Diffuse
             var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
@@ -271,6 +273,7 @@ namespace TGC.MonoGame.TP
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
             DrawPlatforms(BlinnPhongEffect, Material.Platform);
             
@@ -293,7 +296,11 @@ namespace TGC.MonoGame.TP
             SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, new Vector3(0f,0f,0f));
             GraphicsDevice.RasterizerState = originalRasterizerState;
             
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            SpriteBatch.Begin();
+            SpriteBatch.DrawString(font, "Score:" + Player.Score, new Vector2(10, 10),
+                Color.White);
+            SpriteBatch.End();
+            
             base.Draw(gameTime);
         }
         
