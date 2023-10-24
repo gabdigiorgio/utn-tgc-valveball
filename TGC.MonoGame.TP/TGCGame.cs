@@ -109,7 +109,7 @@ namespace TGC.MonoGame.TP
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = true
+                Enabled = false
             };
             
             // Collectibles
@@ -142,7 +142,6 @@ namespace TGC.MonoGame.TP
             CollectibleManager.CreateCollectible<Coin>(new Vector3(90f, 28f, 0f));
             CollectibleManager.CreateCollectible<Coin>(new Vector3(110f, 33f, 0f));
             CollectibleManager.CreateCollectible<Coin>(new Vector3(130f, 38f, 0f));
-            
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
@@ -384,7 +383,7 @@ namespace TGC.MonoGame.TP
             effect.Parameters["View"].SetValue(TargetCamera.View);
             effect.Parameters["Projection"].SetValue(TargetCamera.Projection);
             effect.Parameters["DiffuseColor"]?.SetValue(Color.Yellow.ToVector3());
-            effect.Parameters["Time"].SetValue((float)gameTime.TotalGameTime.TotalSeconds);
+            effect.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
 
             foreach (var mesh in model.Meshes)
             {

@@ -12,7 +12,6 @@ public static class CollectibleManager
     
     public static void CreateCollectible<T>(Vector3 position) where T : Collectible
     {
-        const float scale = 0.5f;
         Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
     }
     
@@ -25,13 +24,14 @@ public static class CollectibleManager
             { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/coin") }
         };
         
-        var collectibleEffect = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
+        var powerUpEffect = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
+        var basicShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "BasicShader");
 
         foreach (var collectible in Collectibles)
         {
             if (!collectibleModels.TryGetValue(collectible.GetType(), out var model)) continue;
             collectible.Model = model;
-            collectible.Shader = collectibleEffect;
+            collectible.Shader = collectible is Coin ? basicShader : powerUpEffect;
             TGCGame.loadEffectOnMesh(collectible.Model, collectible.Shader);
         }
     }
