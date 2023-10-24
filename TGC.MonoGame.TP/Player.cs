@@ -22,6 +22,7 @@ public class Player
     private float _jumpSpeed;
     private bool _isJumping;
     private bool _onGround;
+    private bool _isRollingSoundPlaying = false;
     public BoundingSphere BoundingSphere;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)

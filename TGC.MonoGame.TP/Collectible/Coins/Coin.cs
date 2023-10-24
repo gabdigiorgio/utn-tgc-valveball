@@ -16,6 +16,7 @@ public class Coin : Collectible
 
     protected override void OnCollected(Player player)
     {
+        TGCGame.CoinSound.Play();
         player.IncreaseScore(Value);
     }
 }

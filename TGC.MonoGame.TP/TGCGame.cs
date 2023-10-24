@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -56,7 +55,8 @@ namespace TGC.MonoGame.TP
         
         // Sounds
         public static SoundEffect JumpSound { get; private set; }
-        //private SoundEffectInstance Instance { get; set; }
+        public static SoundEffect CoinSound { get; private set; }
+        public static SoundEffectInstance Instance { get; set; }
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -229,6 +229,7 @@ namespace TGC.MonoGame.TP
             
             // Sounds
             JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
+            CoinSound = Content.Load<SoundEffect>(ContentFolderSounds + "coin");
             
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
