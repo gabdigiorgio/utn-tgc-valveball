@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.TP.Collectible.Coins;
+using TGC.MonoGame.TP.Collectible.PowerUps;
 
-namespace TGC.MonoGame.TP.Collectible.PowerUps;
+namespace TGC.MonoGame.TP.Collectible;
 
 public static class CollectibleManager
 {

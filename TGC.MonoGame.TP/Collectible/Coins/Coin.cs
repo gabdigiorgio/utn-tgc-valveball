@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace TGC.MonoGame.TP.Collectible;
+namespace TGC.MonoGame.TP.Collectible.Coins;
 
 public class Coin : Collectible
 {
