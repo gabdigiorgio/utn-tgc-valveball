@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TGC.MonoGame.TP.PowerUps;
+namespace TGC.MonoGame.TP.Collectible.PowerUps;
 
 public static class PowerUpManager
 {
@@ -20,7 +20,7 @@ public static class PowerUpManager
     {
         var powerUpModels = new Dictionary<Type, Model>
         {
-            { typeof(LowGravityStar), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/Gold_Star") },
+            { typeof(LowGravity), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/Gold_Star") },
             { typeof(SpeedUp), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/speed_power") },
         };
         

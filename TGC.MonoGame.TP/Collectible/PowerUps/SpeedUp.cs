@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace TGC.MonoGame.TP.PowerUps;
+namespace TGC.MonoGame.TP.Collectible.PowerUps;
 
 public class SpeedUp : PowerUp
 {

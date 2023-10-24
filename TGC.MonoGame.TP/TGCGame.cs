@@ -4,10 +4,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Cameras;
+using TGC.MonoGame.TP.Collectible.PowerUps;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
 using TGC.MonoGame.TP.Platform;
-using TGC.MonoGame.TP.PowerUps;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace TGC.MonoGame.TP
@@ -112,8 +112,8 @@ namespace TGC.MonoGame.TP
             };
             
             // PowerUps
-            PowerUpManager.CreatePowerUp<LowGravityStar>(new Vector3(150f, 5f, 0f));
-            PowerUpManager.CreatePowerUp<LowGravityStar>(new Vector3(-450f, 5f, 0f));
+            PowerUpManager.CreatePowerUp<LowGravity>(new Vector3(150f, 5f, 0f));
+            PowerUpManager.CreatePowerUp<LowGravity>(new Vector3(-450f, 5f, 0f));
             PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 10f, -200f));
             PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 10f, 200f));
             PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f,10f, -200f));
