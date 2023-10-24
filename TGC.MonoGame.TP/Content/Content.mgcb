@@ -219,6 +219,12 @@
 /processorParam:Quality=Best
 /build:Sounds/coin.mp3
 
+#begin Sounds/gravity_change.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/gravity_change.mp3
+
 #begin Sounds/jump.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor

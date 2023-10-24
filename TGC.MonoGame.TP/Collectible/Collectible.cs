@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.TP.Collectible;
@@ -14,6 +15,7 @@ public abstract class Collectible
     public Matrix World { get; protected set; }
     public Model Model { get; set; }
     public Effect Shader { get; set; }
+    public SoundEffect Sound { get; set; }
     
     private const float Amplitude = 0.15f;
     private const float VerticalSpeed = 2f;
@@ -46,6 +48,7 @@ public abstract class Collectible
     private void HandleCollection(Player player)
     {
         if (!CanInteract || !player.BoundingSphere.Intersects(BoundingBox)) return;
+        Sound.Play();
         OnCollected(player);
         ShouldDraw = false;
         CanInteract = false;
