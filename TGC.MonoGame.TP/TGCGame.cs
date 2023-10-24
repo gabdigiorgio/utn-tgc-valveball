@@ -359,6 +359,13 @@ namespace TGC.MonoGame.TP
             
             SpriteBatch.DrawString(_font, "Score:" + Player.Score, new Vector2(10, 10), Color.White);
             
+            var sphereNames = new List<string> { "MarbleSphere", "RubberSphere", "MetalSphere" };
+            for (var i = 0; i < sphereNames.Count; i++)
+            {
+                var spherePosition = new Vector2(GraphicsDevice.Viewport.Width - 220, 10 + i * 20);
+                SpriteBatch.DrawString(_font, (i + 1) + ": " + sphereNames[i], spherePosition, Color.White);
+            }
+            
             SpriteBatch.End();
             
             base.Draw(gameTime);
