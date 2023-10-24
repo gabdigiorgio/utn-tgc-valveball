@@ -115,6 +115,7 @@ public class Player
     
     private void StartJump()
     {
+        TGCGame.JumpSound.Play();
         _isJumping = true;
         _onGround = false;
         _jumpSpeed += CalculateJumpSpeed();

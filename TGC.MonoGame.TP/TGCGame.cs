@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -48,9 +50,13 @@ namespace TGC.MonoGame.TP
         private SpriteFont _font;
         
         // GUI
-        private bool _isMenuOpen = false;
+        private bool _isMenuOpen;
         private MenuState _menuState = MenuState.Resume;
         private TimeSpan _gameTimer = TimeSpan.Zero;
+        
+        // Sounds
+        public static SoundEffect JumpSound { get; private set; }
+        //private SoundEffectInstance Instance { get; set; }
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -220,6 +226,9 @@ namespace TGC.MonoGame.TP
             var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
+            
+            // Sounds
+            JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
             
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
