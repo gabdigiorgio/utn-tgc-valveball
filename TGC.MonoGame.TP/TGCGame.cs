@@ -44,7 +44,11 @@ namespace TGC.MonoGame.TP
         // Graphics
         private GraphicsDeviceManager Graphics { get; }
         private SpriteBatch SpriteBatch { get; set; }
-        public SpriteFont font;
+        private SpriteFont _font;
+        
+        // GUI
+        private bool _isMenuOpen = false;
+        private MenuState _menuState = MenuState.Resume;
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -174,7 +178,7 @@ namespace TGC.MonoGame.TP
         protected override void LoadContent()
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-            font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
+            _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             // Diffuse
             var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
@@ -234,10 +238,12 @@ namespace TGC.MonoGame.TP
 
             SphereWorld = Player.Update(time, keyboardState);
 
-            if (keyboardState.IsKeyDown(Keys.Escape))
+            if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
             {
-                Exit();
+                _isMenuOpen = true;
             }
+            
+            UpdateMenuSelection(keyboardState);
 
             TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
             
@@ -250,6 +256,36 @@ namespace TGC.MonoGame.TP
             Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
             base.Update(gameTime);
+        }
+
+        private void UpdateMenuSelection(KeyboardState keyboardState)
+        {
+            if (!_isMenuOpen) return;
+            if (keyboardState.IsKeyDown(Keys.Up))
+            {
+                if (_menuState > MenuState.Resume)
+                {
+                    _menuState--;
+                }
+            }
+            else if (keyboardState.IsKeyDown(Keys.Down))
+            {
+                if (_menuState < MenuState.Exit)
+                {
+                    _menuState++;
+                }
+            }
+
+            if (!keyboardState.IsKeyDown(Keys.Enter)) return;
+            switch (_menuState)
+            {
+                case MenuState.Resume:
+                    _isMenuOpen = false;
+                    break;
+                case MenuState.Exit:
+                    Exit();
+                    break;
+            }
         }
 
         private void SetLightPosition(Vector3 lightPosition)
@@ -295,9 +331,21 @@ namespace TGC.MonoGame.TP
             
             SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, new Vector3(0f,0f,0f));
             GraphicsDevice.RasterizerState = originalRasterizerState;
+
+            const int menuHeight = 60;
+            var center = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
+            if (_isMenuOpen)
+            {
+                SpriteBatch.Begin();
+                var position = center - new Vector2(30, menuHeight / 2f);
+                SpriteBatch.DrawString(_font, "Resume", position, _menuState == MenuState.Resume ? Color.Yellow : Color.White);
+                position.Y += 30;
+                SpriteBatch.DrawString(_font, "Exit", position, _menuState == MenuState.Exit ? Color.Yellow : Color.White);
+                SpriteBatch.End();
+            }
             
             SpriteBatch.Begin();
-            SpriteBatch.DrawString(font, "Score:" + Player.Score, new Vector2(10, 10),
+            SpriteBatch.DrawString(_font, "Score:" + Player.Score, new Vector2(10, 10),
                 Color.White);
             SpriteBatch.End();
             
