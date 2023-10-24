@@ -272,7 +272,7 @@ namespace TGC.MonoGame.TP
 
                 Prefab.UpdateMovingPlatforms();
 
-                UpdatePowerUps(gameTime);
+                UpdateCollectibles(gameTime);
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
                 MediaPlayer.Resume();
@@ -336,11 +336,11 @@ namespace TGC.MonoGame.TP
             BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
         }
 
-        private static void UpdatePowerUps(GameTime gameTime)
+        private static void UpdateCollectibles(GameTime gameTime)
         {
-            foreach (var powerUp in CollectibleManager.Collectibles)
+            foreach (var collectible in CollectibleManager.Collectibles)
             {
-                powerUp.Update(gameTime, Player);
+                collectible.Update(gameTime, Player);
             }
         }
 
