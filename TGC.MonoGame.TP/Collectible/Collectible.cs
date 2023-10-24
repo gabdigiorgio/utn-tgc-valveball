@@ -7,8 +7,8 @@ namespace TGC.MonoGame.TP.Collectible;
 public abstract class Collectible
 {
     public BoundingBox BoundingBox { get; private set; }
-    protected bool CanInteract { get; set; }
-    public bool ShouldDraw { get; protected set; }
+    private bool CanInteract { get; set; }
+    public bool ShouldDraw { get; private set; }
     protected Vector3 Position { get; set; }
     protected float Scale { get; init; }
     public Matrix World { get; protected set; }
@@ -45,12 +45,10 @@ public abstract class Collectible
 
     private void HandleCollection(Player player)
     {
-        if (CanInteract && player.BoundingSphere.Intersects(BoundingBox))
-        {
-            OnCollected(player);
-            ShouldDraw = false;
-            CanInteract = false;
-        }
+        if (!CanInteract || !player.BoundingSphere.Intersects(BoundingBox)) return;
+        OnCollected(player);
+        ShouldDraw = false;
+        CanInteract = false;
     }
 
     protected abstract void OnCollected(Player player);

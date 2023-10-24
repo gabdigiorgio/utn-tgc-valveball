@@ -12,6 +12,7 @@ public class Player
     public Vector3 SpherePosition;
     public float Yaw { get; private set; }
     public float Gravity { private get;  set; } = MaxGravity;
+    private int Score { get; set; }
     private readonly Matrix _sphereScale;
     private float _pitch;
     private float _roll;
@@ -83,6 +84,11 @@ public class Player
     public void ResetGravity()
     {
         Gravity = MaxGravity;
+    }
+
+    public void IncreaseScore(int value)
+    {
+        Score += value;
     }
 
     private void SetSpeedToZero()

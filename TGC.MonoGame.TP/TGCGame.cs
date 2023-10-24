@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Cameras;
+using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.PowerUps;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
@@ -67,6 +68,9 @@ namespace TGC.MonoGame.TP
 
         // Effects
         private Effect BlinnPhongEffect { get; set; }
+        
+        // Coin
+        private Coin CoinTest { get; set; }
 
         // Models
         private Model SphereModel { get; set; }
@@ -111,13 +115,15 @@ namespace TGC.MonoGame.TP
                 Enabled = true
             };
             
-            // PowerUps
-            PowerUpManager.CreatePowerUp<LowGravity>(new Vector3(150f, 5f, 0f));
-            PowerUpManager.CreatePowerUp<LowGravity>(new Vector3(-450f, 5f, 0f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 10f, -200f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(150f, 10f, 200f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f,10f, -200f));
-            PowerUpManager.CreatePowerUp<SpeedUp>(new Vector3(-450f,10f, 200f));
+            // Collectibles
+            CollectibleManager.CreateCollectible<LowGravity>(new Vector3(150f, 5f, 0f));
+            CollectibleManager.CreateCollectible<LowGravity>(new Vector3(-450f, 5f, 0f));
+            CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(150f, 10f, -200f));
+            CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(150f, 10f, 200f));
+            CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(-450f,10f, -200f));
+            CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(-450f,10f, 200f));
+            
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(200f, 15f, 0f));
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
@@ -162,7 +168,7 @@ namespace TGC.MonoGame.TP
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
             
             // Collectibles
-            PowerUpManager.LoadPowerUps(Content);
+            CollectibleManager.LoadCollectibles(Content);
             
             // Sphere
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
@@ -221,7 +227,7 @@ namespace TGC.MonoGame.TP
 
         private static void UpdatePowerUps(GameTime gameTime)
         {
-            foreach (var powerUp in PowerUpManager.PowerUps)
+            foreach (var powerUp in CollectibleManager.Collectibles)
             {
                 powerUp.Update(gameTime, Player);
             }
@@ -243,7 +249,7 @@ namespace TGC.MonoGame.TP
 
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, Player.CurrentSphereMaterial.Material);
 
-            DrawPowerUps(PowerUpManager.PowerUps, gameTime);
+            DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
             DrawGizmos();
             Gizmos.Draw();
@@ -343,14 +349,14 @@ namespace TGC.MonoGame.TP
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
-        private void DrawPowerUps(List<PowerUp> powerUps, GameTime gameTime)
+        private void DrawCollectibles(List<Collectible.Collectible> collectibles, GameTime gameTime)
         {
-            foreach (var powerUp in powerUps)
+            foreach (var collectible in collectibles)
             {
-                if (!powerUp.ShouldDraw) continue;
-                DrawModel(powerUp.World, powerUp.Model, powerUp.Shader, gameTime);
-                var center = BoundingVolumesExtensions.GetCenter(powerUp.BoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(powerUp.BoundingBox);
+                if (!collectible.ShouldDraw) continue;
+                DrawModel(collectible.World, collectible.Model, collectible.Shader, gameTime);
+                var center = BoundingVolumesExtensions.GetCenter(collectible.BoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(collectible.BoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.Red);
             }
         }
