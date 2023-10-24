@@ -31,8 +31,6 @@ public abstract class PowerUp : Collectible
     private void ActivatePowerUp(Player player)
     {
         SetPowerUp(player);
-        ShouldDraw = false;
-        CanInteract = false;
         IsPowerUpActive = true;
     }
 

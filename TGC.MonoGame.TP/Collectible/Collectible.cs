@@ -48,6 +48,8 @@ public abstract class Collectible
         if (CanInteract && player.BoundingSphere.Intersects(BoundingBox))
         {
             OnCollected(player);
+            ShouldDraw = false;
+            CanInteract = false;
         }
     }
 
