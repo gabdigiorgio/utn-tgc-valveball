@@ -289,9 +289,9 @@ namespace TGC.MonoGame.TP
                 UpdateCollectibles(gameTime);
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
+                
                 MediaPlayer.Resume();
             }
-            MediaPlayer.Resume();
             base.Update(gameTime);
         }
 
