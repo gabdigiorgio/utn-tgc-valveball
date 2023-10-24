@@ -57,6 +57,8 @@ namespace TGC.MonoGame.TP
         // Sounds
         public static SoundEffect JumpSound { get; private set; }
         private static SoundEffect OpenMenuSound { get; set; }
+        private static SoundEffect SelectMenuSound { get; set; }
+        private static SoundEffect ClickMenuSound { get; set; }
         private static Song Song { get; set; }
         
         // Skybox
@@ -230,6 +232,8 @@ namespace TGC.MonoGame.TP
             // Sounds
             JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
             OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
+            SelectMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "select_menu");
+            ClickMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "click_menu");
             Song = Content.Load<Song>(ContentFolderMusic + "classic_vibe");
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(Song);
@@ -293,6 +297,7 @@ namespace TGC.MonoGame.TP
                 {
                     _menuState--;
                     _wasKeyPressed = true;
+                    SelectMenuSound.Play();
                 }
             }
             else if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
@@ -301,6 +306,7 @@ namespace TGC.MonoGame.TP
                 {
                     _menuState++;
                     _wasKeyPressed = true;
+                    SelectMenuSound.Play();
                 }
             }
             else
@@ -308,10 +314,9 @@ namespace TGC.MonoGame.TP
                 _wasKeyPressed = false;
             }
 
-            if (keyboardState.IsKeyDown(Keys.Enter))
-            {
-                HandleMenuSelection();
-            }
+            if (!keyboardState.IsKeyDown(Keys.Enter)) return;
+            ClickMenuSound.Play();
+            HandleMenuSelection();
         }
 
         private void HandleMenuSelection()

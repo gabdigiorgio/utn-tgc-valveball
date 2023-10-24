@@ -219,6 +219,12 @@
 /processorParam:Quality=Best
 /build:Music/classic_vibe.mp3
 
+#begin Sounds/click_menu.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/click_menu.mp3
+
 #begin Sounds/coin.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -248,6 +254,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/roll_marble.mp3
+
+#begin Sounds/select_menu.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/select_menu.mp3
 
 #begin Sounds/speed_up.mp3
 /importer:Mp3Importer
