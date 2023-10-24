@@ -13,7 +13,7 @@ public static class CollectibleManager
     public static void CreateCollectible<T>(Vector3 position) where T : Collectible
     {
         const float scale = 0.5f;
-        Collectibles.Add((T)Activator.CreateInstance(typeof(T), position, scale));
+        Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
     }
     
     public static void LoadCollectibles(ContentManager content)

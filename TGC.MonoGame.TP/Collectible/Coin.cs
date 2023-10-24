@@ -5,12 +5,13 @@ namespace TGC.MonoGame.TP.Collectible;
 public class Coin : Collectible
 {
     private const int Value = 1;
+    private const float DefaultScale = 0.1f;
 
-    public Coin(Vector3 position, float scale) 
-        : base(new BoundingBox(new Vector3(-2, -14, -16) + position, new Vector3(2, 20, 23) + position)) // TODO: ajustar boundingBox
+    public Coin(Vector3 position) 
+        : base(new BoundingBox(new Vector3(-4, -8, -6) + position, new Vector3(4, 8, 6) + position))
     {
         Position = position;
-        Scale = scale;
+        Scale = DefaultScale;
     }
 
     protected override void OnCollected(Player player)

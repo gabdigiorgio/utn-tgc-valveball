@@ -68,9 +68,6 @@ namespace TGC.MonoGame.TP
 
         // Effects
         private Effect BlinnPhongEffect { get; set; }
-        
-        // Coin
-        private Coin CoinTest { get; set; }
 
         // Models
         private Model SphereModel { get; set; }
@@ -123,7 +120,7 @@ namespace TGC.MonoGame.TP
             CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(-450f,10f, -200f));
             CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(-450f,10f, 200f));
             
-            CollectibleManager.CreateCollectible<Coin>(new Vector3(200f, 15f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 15f, 100f));
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
