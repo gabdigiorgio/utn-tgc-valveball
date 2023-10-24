@@ -231,11 +231,23 @@
 /processorParam:Quality=Best
 /build:Sounds/jump.mp3
 
+#begin Sounds/open_menu.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/open_menu.mp3
+
 #begin Sounds/roll_marble.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/roll_marble.mp3
+
+#begin Sounds/speed_up.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/speed_up.mp3
 
 #begin SpriteFonts/CascadiaCode/CascadiaCodePL.spritefont
 /importer:FontDescriptionImporter

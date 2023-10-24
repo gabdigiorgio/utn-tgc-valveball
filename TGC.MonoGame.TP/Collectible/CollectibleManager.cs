@@ -31,7 +31,7 @@ public static class CollectibleManager
         var collectibleSounds = new Dictionary<Type, SoundEffect>
         {
             { typeof(LowGravity), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "gravity_change") },
-            { typeof(SpeedUp), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "coin") },
+            { typeof(SpeedUp), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "speed_up") },
             { typeof(Coin), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "coin") }
         };
         

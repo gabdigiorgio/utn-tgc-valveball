@@ -55,6 +55,7 @@ namespace TGC.MonoGame.TP
         
         // Sounds
         public static SoundEffect JumpSound { get; private set; }
+        public static SoundEffect OpenMenuSound { get; private set; }
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -86,7 +87,6 @@ namespace TGC.MonoGame.TP
         
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
-
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -227,6 +227,7 @@ namespace TGC.MonoGame.TP
             
             // Sounds
             JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
+            OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
             
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
@@ -247,6 +248,7 @@ namespace TGC.MonoGame.TP
 
             if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
             {
+                OpenMenuSound.Play();
                 _isMenuOpen = true;
             }
             
