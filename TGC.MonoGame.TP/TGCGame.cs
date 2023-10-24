@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -55,7 +56,8 @@ namespace TGC.MonoGame.TP
         
         // Sounds
         public static SoundEffect JumpSound { get; private set; }
-        public static SoundEffect OpenMenuSound { get; private set; }
+        private static SoundEffect OpenMenuSound { get; set; }
+        private static Song Song { get; set; }
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -228,6 +230,9 @@ namespace TGC.MonoGame.TP
             // Sounds
             JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
             OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
+            Song = Content.Load<Song>(ContentFolderMusic + "classic_vibe");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(Song);
             
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
@@ -248,6 +253,7 @@ namespace TGC.MonoGame.TP
 
             if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
             {
+                MediaPlayer.Pause();
                 OpenMenuSound.Play();
                 _isMenuOpen = true;
             }
@@ -269,34 +275,54 @@ namespace TGC.MonoGame.TP
                 UpdatePowerUps(gameTime);
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
+                MediaPlayer.Resume();
             }
 
             base.Update(gameTime);
         }
 
+        private bool _wasKeyPressed;
+
         private void UpdateMenuSelection(KeyboardState keyboardState)
         {
             if (!_isMenuOpen) return;
-            if (keyboardState.IsKeyDown(Keys.Up))
+
+            if (keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W))
             {
-                if (_menuState > MenuState.Resume)
+                if (!_wasKeyPressed && _menuState > MenuState.Resume)
                 {
                     _menuState--;
+                    _wasKeyPressed = true;
                 }
             }
-            else if (keyboardState.IsKeyDown(Keys.Down))
+            else if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
             {
-                if (_menuState < MenuState.Exit)
+                if (!_wasKeyPressed && _menuState < MenuState.Exit)
                 {
                     _menuState++;
+                    _wasKeyPressed = true;
                 }
             }
+            else
+            {
+                _wasKeyPressed = false;
+            }
 
-            if (!keyboardState.IsKeyDown(Keys.Enter)) return;
+            if (keyboardState.IsKeyDown(Keys.Enter))
+            {
+                HandleMenuSelection();
+            }
+        }
+
+        private void HandleMenuSelection()
+        {
             switch (_menuState)
             {
                 case MenuState.Resume:
                     _isMenuOpen = false;
+                    break;
+                case MenuState.StopMusic:
+                    MediaPlayer.Stop();
                     break;
                 case MenuState.Exit:
                     Exit();
@@ -363,10 +389,16 @@ namespace TGC.MonoGame.TP
         private void DrawMenu(Vector2 center, int menuHeight)
         {
             SpriteBatch.Begin();
+            
             var position = center - new Vector2(30, menuHeight / 2f);
             SpriteBatch.DrawString(_font, "Resume", position, _menuState == MenuState.Resume ? Color.Yellow : Color.White);
             position.Y += 30;
+            
+            SpriteBatch.DrawString(_font, "Stop Music", position, _menuState == MenuState.StopMusic ? Color.Yellow : Color.White);
+            position.Y += 30;
+            
             SpriteBatch.DrawString(_font, "Exit", position, _menuState == MenuState.Exit ? Color.Yellow : Color.White);
+            
             SpriteBatch.End();
         }
 

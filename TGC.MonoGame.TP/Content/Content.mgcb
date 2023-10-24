@@ -213,6 +213,12 @@
 /processorParam:TextureFormat=Compressed
 /build:Models/tgc-logo/tgc-logo.fbx
 
+#begin Music/classic_vibe.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/classic_vibe.mp3
+
 #begin Sounds/coin.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor

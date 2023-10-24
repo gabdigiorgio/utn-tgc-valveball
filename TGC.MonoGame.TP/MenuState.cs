@@ -3,5 +3,6 @@
 public enum MenuState
 {
     Resume,
+    StopMusic,
     Exit
 }
