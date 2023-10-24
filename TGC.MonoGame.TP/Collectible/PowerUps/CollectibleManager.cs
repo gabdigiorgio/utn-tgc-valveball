@@ -10,8 +10,9 @@ public static class CollectibleManager
 {
     public static readonly List<Collectible> Collectibles = new();
     
-    public static void CreateCollectible<T>(Vector3 position) where T : Collectible
+    public static void CreateCollectible<T>(float x, float y, float z) where T : Collectible
     {
+        var position = new Vector3(x, y, z);
         Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
     }
     
