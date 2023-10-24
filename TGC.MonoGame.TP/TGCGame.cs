@@ -49,6 +49,7 @@ namespace TGC.MonoGame.TP
         // GUI
         private bool _isMenuOpen = false;
         private MenuState _menuState = MenuState.Resume;
+        private TimeSpan _gameTimer = TimeSpan.Zero;
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -245,6 +246,8 @@ namespace TGC.MonoGame.TP
 
             if (!_isMenuOpen)
             {
+                _gameTimer += gameTime.ElapsedGameTime;
+                
                 SphereWorld = Player.Update(time, keyboardState);
                 
                 TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
@@ -348,8 +351,14 @@ namespace TGC.MonoGame.TP
             }
             
             SpriteBatch.Begin();
-            SpriteBatch.DrawString(_font, "Score:" + Player.Score, new Vector2(10, 10),
-                Color.White);
+            
+            var timerText = _gameTimer.ToString(@"mm\:ss");
+            var timerSize = _font.MeasureString(timerText);
+            var timerPosition = new Vector2((GraphicsDevice.Viewport.Width - timerSize.X) / 2, 10);
+            SpriteBatch.DrawString(_font, timerText, timerPosition, Color.White);
+            
+            SpriteBatch.DrawString(_font, "Score:" + Player.Score, new Vector2(10, 10), Color.White);
+            
             SpriteBatch.End();
             
             base.Draw(gameTime);
