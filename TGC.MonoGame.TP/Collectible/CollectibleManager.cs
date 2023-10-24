@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -27,6 +28,13 @@ public static class CollectibleManager
             { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/coin") }
         };
         
+        var collectibleSounds = new Dictionary<Type, SoundEffect>
+        {
+            { typeof(LowGravity), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "gravity_change") },
+            { typeof(SpeedUp), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "speed_up") },
+            { typeof(Coin), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "coin") }
+        };
+        
         var powerUpEffect = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
         var basicShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "BasicShader");
 
@@ -36,6 +44,10 @@ public static class CollectibleManager
             collectible.Model = model;
             collectible.Shader = collectible is Coin ? basicShader : powerUpEffect;
             TGCGame.loadEffectOnMesh(collectible.Model, collectible.Shader);
+            if (collectibleSounds.TryGetValue(collectible.GetType(), out var sound))
+            {
+                collectible.Sound = sound;
+            }
         }
     }
 }

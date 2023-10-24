@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -48,9 +50,16 @@ namespace TGC.MonoGame.TP
         private SpriteFont _font;
         
         // GUI
-        private bool _isMenuOpen = false;
+        private bool _isMenuOpen;
         private MenuState _menuState = MenuState.Resume;
         private TimeSpan _gameTimer = TimeSpan.Zero;
+        
+        // Sounds
+        public static SoundEffect JumpSound { get; private set; }
+        private static SoundEffect OpenMenuSound { get; set; }
+        private static SoundEffect SelectMenuSound { get; set; }
+        private static SoundEffect ClickMenuSound { get; set; }
+        private static Song Song { get; set; }
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -82,7 +91,6 @@ namespace TGC.MonoGame.TP
         
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
-
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -221,6 +229,15 @@ namespace TGC.MonoGame.TP
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
             
+            // Sounds
+            JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
+            OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
+            SelectMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "select_menu");
+            ClickMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "click_menu");
+            Song = Content.Load<Song>(ContentFolderMusic + "classic_vibe");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(Song);
+            
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
 
@@ -240,6 +257,8 @@ namespace TGC.MonoGame.TP
 
             if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
             {
+                MediaPlayer.Pause();
+                OpenMenuSound.Play();
                 _isMenuOpen = true;
             }
             
@@ -257,37 +276,58 @@ namespace TGC.MonoGame.TP
 
                 Prefab.UpdateMovingPlatforms();
 
-                UpdatePowerUps(gameTime);
+                UpdateCollectibles(gameTime);
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
+                MediaPlayer.Resume();
             }
 
             base.Update(gameTime);
         }
 
+        private bool _wasKeyPressed;
+
         private void UpdateMenuSelection(KeyboardState keyboardState)
         {
             if (!_isMenuOpen) return;
-            if (keyboardState.IsKeyDown(Keys.Up))
+
+            if (keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W))
             {
-                if (_menuState > MenuState.Resume)
+                if (!_wasKeyPressed && _menuState > MenuState.Resume)
                 {
                     _menuState--;
+                    _wasKeyPressed = true;
+                    SelectMenuSound.Play();
                 }
             }
-            else if (keyboardState.IsKeyDown(Keys.Down))
+            else if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
             {
-                if (_menuState < MenuState.Exit)
+                if (!_wasKeyPressed && _menuState < MenuState.Exit)
                 {
                     _menuState++;
+                    _wasKeyPressed = true;
+                    SelectMenuSound.Play();
                 }
+            }
+            else
+            {
+                _wasKeyPressed = false;
             }
 
             if (!keyboardState.IsKeyDown(Keys.Enter)) return;
+            ClickMenuSound.Play();
+            HandleMenuSelection();
+        }
+
+        private void HandleMenuSelection()
+        {
             switch (_menuState)
             {
                 case MenuState.Resume:
                     _isMenuOpen = false;
+                    break;
+                case MenuState.StopMusic:
+                    MediaPlayer.Stop();
                     break;
                 case MenuState.Exit:
                     Exit();
@@ -301,11 +341,11 @@ namespace TGC.MonoGame.TP
             BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
         }
 
-        private static void UpdatePowerUps(GameTime gameTime)
+        private static void UpdateCollectibles(GameTime gameTime)
         {
-            foreach (var powerUp in CollectibleManager.Collectibles)
+            foreach (var collectible in CollectibleManager.Collectibles)
             {
-                powerUp.Update(gameTime, Player);
+                collectible.Update(gameTime, Player);
             }
         }
 
@@ -354,10 +394,16 @@ namespace TGC.MonoGame.TP
         private void DrawMenu(Vector2 center, int menuHeight)
         {
             SpriteBatch.Begin();
+            
             var position = center - new Vector2(30, menuHeight / 2f);
             SpriteBatch.DrawString(_font, "Resume", position, _menuState == MenuState.Resume ? Color.Yellow : Color.White);
             position.Y += 30;
+            
+            SpriteBatch.DrawString(_font, "Stop Music", position, _menuState == MenuState.StopMusic ? Color.Yellow : Color.White);
+            position.Y += 30;
+            
             SpriteBatch.DrawString(_font, "Exit", position, _menuState == MenuState.Exit ? Color.Yellow : Color.White);
+            
             SpriteBatch.End();
         }
 
@@ -384,6 +430,12 @@ namespace TGC.MonoGame.TP
             var zoomMessagePosition = new Vector2(GraphicsDevice.Viewport.Width - zoomMessageSize.X - 10,
                 GraphicsDevice.Viewport.Height - zoomMessageSize.Y - 10);
             SpriteBatch.DrawString(_font, zoomMessage, zoomMessagePosition, Color.White);
+            
+            const string restartMessage = "Press R to restart from last checkpoint";
+            var restartMessageSize = _font.MeasureString(restartMessage);
+            var restartMessagePosition = new Vector2((GraphicsDevice.Viewport.Width - restartMessageSize.X) / 2,
+                GraphicsDevice.Viewport.Height - restartMessageSize.Y - 30);
+            SpriteBatch.DrawString(_font, restartMessage, restartMessagePosition, Color.White);
 
             SpriteBatch.End();
         }
