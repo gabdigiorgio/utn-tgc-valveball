@@ -283,6 +283,8 @@ namespace TGC.MonoGame.TP
                 SetLightPosition(new Vector3(150f, 750f, 0f));
 
                 Prefab.UpdateMovingPlatforms();
+                
+                Prefab.UpdateMovingObstacles(gameTime);
 
                 UpdateCollectibles(gameTime);
 
