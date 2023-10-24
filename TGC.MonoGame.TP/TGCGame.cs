@@ -67,11 +67,15 @@ namespace TGC.MonoGame.TP
         // Effects
         private Effect BlinnPhongEffect { get; set; }
         private Effect StarShader { get; set; }
+        private Effect BoxShader { get; set; }
 
         // Models
         private Model StarModel { get; set; }
         private Model SphereModel { get; set; }
         private Player _player;
+
+        //Obstacles
+        private Model BoxModel { get; set; }
         
         // Collectibles
         private readonly List<Star> _stars = new();
@@ -127,6 +131,12 @@ namespace TGC.MonoGame.TP
             Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
             Prefab.CreateBridge();
             Prefab.CreateSwitchbackRamp();
+
+            // Obstacles
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, 260f));
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f));
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, 260f));
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, -140f));
             
             base.Initialize();
         }
@@ -163,7 +173,7 @@ namespace TGC.MonoGame.TP
             
             // Platform
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
-            
+
             // Star
             StarModel = Content.Load<Model>(ContentFolder3D + "star/Gold_Star");
             StarShader = Content.Load<Effect>(ContentFolderEffects + "StarShader");
@@ -192,6 +202,7 @@ namespace TGC.MonoGame.TP
         ///     Se debe escribir toda la logica de computo del modelo, asi como tambien verificar entradas del usuario y reacciones
         ///     ante ellas.
         /// </summary>
+
         protected override void Update(GameTime gameTime)
         {
             var keyboardState = Keyboard.GetState();
@@ -212,6 +223,8 @@ namespace TGC.MonoGame.TP
             Prefab.UpdateMovingPlatforms();
 
             UpdateStars(gameTime);
+
+            Prefab.UpdateMovingObstacles(gameTime);
 
             Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
 
@@ -245,6 +258,8 @@ namespace TGC.MonoGame.TP
             DrawRamps(BlinnPhongEffect, Material.Platform); 
 
             DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
+
+            DrawMovingObstacles(BlinnPhongEffect, Material.Metal);
 
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, _player.CurrentSphereMaterial.Material);
 
@@ -339,6 +354,32 @@ namespace TGC.MonoGame.TP
             }
         }
 
+        private void DrawMovingObstacles(Effect effect, Material material)
+        {
+            foreach (var movingObstacle in Prefab.MovingObstacles)
+            {
+                var movingPlatformWorld = movingObstacle.World;
+                
+                effect.CurrentTechnique = effect.Techniques["NormalMapping"];
+                effect.Parameters["World"].SetValue(movingPlatformWorld);
+                effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(movingPlatformWorld)));
+                effect.Parameters["WorldViewProjection"].SetValue(movingPlatformWorld * TargetCamera.View * TargetCamera.Projection);
+            
+                effect.Parameters["ModelTexture"].SetValue(material.Diffuse);
+                effect.Parameters["NormalTexture"].SetValue(material.Normal);
+                effect.Parameters["Tiling"].SetValue(Vector2.One * 3f);
+                effect.Parameters["ambientColor"].SetValue(material.AmbientColor);
+                effect.Parameters["diffuseColor"].SetValue(material.DiffuseColor);
+                effect.Parameters["specularColor"].SetValue(material.SpecularColor);
+                effect.Parameters["KAmbient"].SetValue(material.KAmbient);
+                effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
+                effect.Parameters["KSpecular"].SetValue(material.KSpecular);
+                effect.Parameters["shininess"].SetValue(material.Shininess);
+
+                BoxPrimitive.Draw(effect);
+            }
+        }
+
         private void DrawGizmos()
         {
             foreach (var boundingBox in Prefab.PlatformAabb)
@@ -359,6 +400,14 @@ namespace TGC.MonoGame.TP
             foreach (var movingPlatform in Prefab.MovingPlatforms)
             {
                 var movingBoundingBox = movingPlatform.MovingBoundingBox;
+                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
+            }
+
+            foreach (var movingObstacle in Prefab.MovingObstacles)
+            {
+                var movingBoundingBox = movingObstacle.MovingBoundingBox;
                 var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
