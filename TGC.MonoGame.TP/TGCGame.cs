@@ -113,6 +113,8 @@ namespace TGC.MonoGame.TP
             };
             
             // Collectibles
+            
+            // PowerUps
             CollectibleManager.CreateCollectible<LowGravity>(new Vector3(150f, 5f, 0f));
             CollectibleManager.CreateCollectible<LowGravity>(new Vector3(-450f, 5f, 0f));
             CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(150f, 10f, -200f));
@@ -120,7 +122,27 @@ namespace TGC.MonoGame.TP
             CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(-450f,10f, -200f));
             CollectibleManager.CreateCollectible<SpeedUp>(new Vector3(-450f,10f, 200f));
             
-            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 15f, 100f));
+            // Coins
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 13f, 50f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 13f, 75f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 13f, 95f));
+            
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 13f, -50f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 13f, -75f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(300f, 13f, -95f));
+            
+            // Parable
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(230f, 23f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(210f, 28f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(190f, 33f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(170f, 38f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(150f, 38f, 0f));
+            
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(70f, 23f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(90f, 28f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(110f, 33f, 0f));
+            CollectibleManager.CreateCollectible<Coin>(new Vector3(130f, 38f, 0f));
+            
             
             // Map
             Prefab.CreateSquareCircuit(Vector3.Zero);
