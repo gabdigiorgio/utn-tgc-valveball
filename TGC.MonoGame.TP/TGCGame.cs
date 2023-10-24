@@ -236,8 +236,6 @@ namespace TGC.MonoGame.TP
             var mouseState = Mouse.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
 
-            SphereWorld = Player.Update(time, keyboardState);
-
             if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
             {
                 _isMenuOpen = true;
@@ -245,16 +243,21 @@ namespace TGC.MonoGame.TP
             
             UpdateMenuSelection(keyboardState);
 
-            TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
+            if (!_isMenuOpen)
+            {
+                SphereWorld = Player.Update(time, keyboardState);
+                
+                TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
             
-            SetLightPosition(new Vector3(150f, 750f, 0f));
+                SetLightPosition(new Vector3(150f, 750f, 0f));
 
-            Prefab.UpdateMovingPlatforms();
+                Prefab.UpdateMovingPlatforms();
 
-            UpdatePowerUps(gameTime);
+                UpdatePowerUps(gameTime);
 
-            Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
-
+                Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
+            }
+            
             base.Update(gameTime);
         }
 
