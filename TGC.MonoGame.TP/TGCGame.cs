@@ -366,6 +366,12 @@ namespace TGC.MonoGame.TP
                 SpriteBatch.DrawString(_font, (i + 1) + ": " + sphereNames[i], spherePosition, Color.White);
             }
             
+            const string zoomMessage = "Zoom: Use mouse wheel";
+            var zoomMessageSize = _font.MeasureString(zoomMessage);
+            var zoomMessagePosition = new Vector2(GraphicsDevice.Viewport.Width - zoomMessageSize.X - 10, 
+                GraphicsDevice.Viewport.Height - zoomMessageSize.Y - 10);
+            SpriteBatch.DrawString(_font, zoomMessage, zoomMessagePosition, Color.White);
+            
             SpriteBatch.End();
             
             base.Draw(gameTime);
