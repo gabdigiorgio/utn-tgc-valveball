@@ -248,11 +248,11 @@ namespace TGC.MonoGame.TP
             if (!_isMenuOpen)
             {
                 _gameTimer += gameTime.ElapsedGameTime;
-                
+
                 SphereWorld = Player.Update(time, keyboardState);
-                
+
                 TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
-            
+
                 SetLightPosition(new Vector3(150f, 750f, 0f));
 
                 Prefab.UpdateMovingPlatforms();
@@ -261,7 +261,7 @@ namespace TGC.MonoGame.TP
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
             }
-            
+
             base.Update(gameTime);
         }
 
@@ -343,41 +343,51 @@ namespace TGC.MonoGame.TP
             var center = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
             if (_isMenuOpen)
             {
-                SpriteBatch.Begin();
-                var position = center - new Vector2(30, menuHeight / 2f);
-                SpriteBatch.DrawString(_font, "Resume", position, _menuState == MenuState.Resume ? Color.Yellow : Color.White);
-                position.Y += 30;
-                SpriteBatch.DrawString(_font, "Exit", position, _menuState == MenuState.Exit ? Color.Yellow : Color.White);
-                SpriteBatch.End();
+                DrawMenu(center, menuHeight);
             }
             
+            DrawGui();
+
+            base.Draw(gameTime);
+        }
+        
+        private void DrawMenu(Vector2 center, int menuHeight)
+        {
             SpriteBatch.Begin();
-            
+            var position = center - new Vector2(30, menuHeight / 2f);
+            SpriteBatch.DrawString(_font, "Resume", position, _menuState == MenuState.Resume ? Color.Yellow : Color.White);
+            position.Y += 30;
+            SpriteBatch.DrawString(_font, "Exit", position, _menuState == MenuState.Exit ? Color.Yellow : Color.White);
+            SpriteBatch.End();
+        }
+
+        private void DrawGui()
+        {
+            SpriteBatch.Begin();
+
             var timerText = _gameTimer.ToString(@"mm\:ss");
             var timerSize = _font.MeasureString(timerText);
             var timerPosition = new Vector2((GraphicsDevice.Viewport.Width - timerSize.X) / 2, 10);
             SpriteBatch.DrawString(_font, timerText, timerPosition, Color.White);
-            
+
             SpriteBatch.DrawString(_font, "Score:" + Player.Score, new Vector2(10, 10), Color.White);
-            
+
             var sphereNames = new List<string> { "MarbleSphere", "RubberSphere", "MetalSphere" };
             for (var i = 0; i < sphereNames.Count; i++)
             {
                 var spherePosition = new Vector2(GraphicsDevice.Viewport.Width - 220, 10 + i * 20);
                 SpriteBatch.DrawString(_font, (i + 1) + ": " + sphereNames[i], spherePosition, Color.White);
             }
-            
+
             const string zoomMessage = "Zoom: Use mouse wheel";
             var zoomMessageSize = _font.MeasureString(zoomMessage);
-            var zoomMessagePosition = new Vector2(GraphicsDevice.Viewport.Width - zoomMessageSize.X - 10, 
+            var zoomMessagePosition = new Vector2(GraphicsDevice.Viewport.Width - zoomMessageSize.X - 10,
                 GraphicsDevice.Viewport.Height - zoomMessageSize.Y - 10);
             SpriteBatch.DrawString(_font, zoomMessage, zoomMessagePosition, Color.White);
-            
+
             SpriteBatch.End();
-            
-            base.Draw(gameTime);
         }
-        
+
         private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
             SetBlinnPhongParameters(effect, material, Vector2.One * 5f, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
