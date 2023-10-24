@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -92,6 +93,7 @@ namespace TGC.MonoGame.TP
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
 
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aqui el codigo de inicializacion: el procesamiento que podemos pre calcular para nuestro juego.
@@ -137,6 +139,12 @@ namespace TGC.MonoGame.TP
             Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
             Prefab.CreateBridge();
             Prefab.CreateSwitchbackRamp();
+
+            // Obstacles
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, 260f));
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f));
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, 260f));
+            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, -140f));
             
             base.Initialize();
         }
@@ -281,7 +289,7 @@ namespace TGC.MonoGame.TP
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
                 MediaPlayer.Resume();
             }
-
+            MediaPlayer.Resume();
             base.Update(gameTime);
         }
 
@@ -363,7 +371,9 @@ namespace TGC.MonoGame.TP
             DrawRamps(BlinnPhongEffect, Material.Platform); 
 
             DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
-
+            
+            DrawMovingObstacles(BlinnPhongEffect, Material.Metal);
+            
             DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, Player.CurrentSphereMaterial.Material);
 
             DrawCollectibles(CollectibleManager.Collectibles, gameTime);
@@ -476,6 +486,16 @@ namespace TGC.MonoGame.TP
             }
         }
         
+        private void DrawMovingObstacles(Effect effect, Material material)
+        {
+            foreach (var movingObstacle in Prefab.MovingObstacles)
+            {
+                var movingPlatformWorld = movingObstacle.World;
+                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
+                BoxPrimitive.Draw(effect);
+            }
+        }
+        
         private static void SetBlinnPhongParameters(Effect effect, Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
@@ -515,6 +535,14 @@ namespace TGC.MonoGame.TP
             foreach (var movingPlatform in Prefab.MovingPlatforms)
             {
                 var movingBoundingBox = movingPlatform.MovingBoundingBox;
+                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
+                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
+                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
+            }
+
+            foreach (var movingObstacle in Prefab.MovingObstacles)
+            {
+                var movingBoundingBox = movingObstacle.MovingBoundingBox;
                 var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);

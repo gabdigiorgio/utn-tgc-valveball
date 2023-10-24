@@ -252,6 +252,8 @@ public class Player
         
         DetectMovingCollisions(sphereCenter, collisions);
 
+
+
         // Solve first near collisions
         collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
         
@@ -304,6 +306,22 @@ public class Player
             var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
             var distance = Vector3.Distance(closestPoint, sphereCenter);
             var platformMovement = movingPlatform.Position - movingPlatform.PreviousPosition;
+            collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
+
+            if (!(sphereCenter.Y > collider.Max.Y)) continue;
+            _onGround = true;
+            EndJump();
+        }
+
+        foreach (var movingObstacle in Prefab.MovingObstacles)
+        {
+            var collider = movingObstacle.MovingBoundingBox;
+
+            if (!collider.Intersects(BoundingSphere)) continue;
+
+            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
+            var distance = Vector3.Distance(closestPoint, sphereCenter);
+            var platformMovement = movingObstacle.Position - movingObstacle.PreviousPosition;
             collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
 
             if (!(sphereCenter.Y > collider.Max.Y)) continue;

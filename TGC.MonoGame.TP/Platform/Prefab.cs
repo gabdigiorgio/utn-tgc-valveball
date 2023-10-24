@@ -11,6 +11,7 @@ public static class Prefab
     public static readonly List<BoundingBox> PlatformAabb =  new();
     public static readonly List<OrientedBoundingBox> RampObb =  new();
     public static readonly List<MovingPlatform> MovingPlatforms =  new();
+    public static readonly List<MovingObstacle> MovingObstacles =  new();
     
     public static void CreateSquareCircuit(Vector3 offset)
     {
@@ -32,6 +33,21 @@ public static class Prefab
         CreateMovingPlatform(new Vector3(50f, 6f, 100f), new Vector3(150f, 0f, 0f) + offset);
             
         CreateRamps(offset);
+    }
+
+    public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
+        var obstacleWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
+        var obstacleBoundingBox = BoundingVolumesExtensions.FromMatrix(obstacleWorld);
+        var movingObstacle = new MovingObstacle(obstacleWorld, scale, position, obstacleBoundingBox);
+        MovingObstacles.Add(movingObstacle);
+    }
+
+    public static void UpdateMovingObstacles(GameTime gameTime)
+    {
+        foreach (var movingObstacle in MovingObstacles)
+        {
+            movingObstacle.Update(gameTime);
+        }
     }
 
     private static void CreateMovingPlatform(Vector3 scale, Vector3 position)
