@@ -27,7 +27,7 @@ public class Player
     
     private SoundEffectInstance _rollingSoundInstance;
     private SoundEffectInstance _bumpSoundInstance;
-    private Random random = new Random();
+    private readonly Random _random = new();
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -54,7 +54,7 @@ public class Player
         var rotationY = Matrix.CreateRotationY(Yaw);
         var forward = rotationY.Forward;
         HandleMovement(time, keyboardState, forward);
-        RollingSound();
+        PlayRollingSound();
         var rotationX = Matrix.CreateRotationX(_pitch);
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
@@ -79,7 +79,7 @@ public class Player
         }
     }
     
-    private void RollingSound()
+    private void PlayRollingSound()
     {
         const float quietThreshold = 0.01f;
 
@@ -324,13 +324,22 @@ public class Player
                 + collision.ColliderMovement;
         }
 
-        if (wasOnGround || !_onGround) return;
-        if (_bumpSoundInstance != null && _bumpSoundInstance.State != SoundState.Stopped) return;
-        var randomIndex = random.Next(TGCGame.BumpSounds.Count);
+        PlayBumpSound(wasOnGround);
+    }
+
+    private void PlayBumpSound(bool wasOnGround)
+    {
+        if (!ShouldPlayBumpSound(wasOnGround)) return;
+        var randomIndex = _random.Next(TGCGame.BumpSounds.Count);
         _bumpSoundInstance = TGCGame.BumpSounds[randomIndex].CreateInstance();
         _bumpSoundInstance.Play();
     }
     
+    private bool ShouldPlayBumpSound(bool wasOnGround)
+    {
+        return !wasOnGround && _onGround && (_bumpSoundInstance == null || _bumpSoundInstance.State == SoundState.Stopped);
+    }
+
     private void DetectAabbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
         foreach (var collider in Prefab.PlatformAabb)
