@@ -469,7 +469,7 @@ namespace TGC.MonoGame.TP
         }
 
         private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
-            SetBlinnPhongParameters(effect, material, Vector2.One * 5f, worldMatrix, TargetCamera);
+            SetBlinnPhongParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
             {   
                 mesh.Draw();
