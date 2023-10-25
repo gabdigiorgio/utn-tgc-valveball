@@ -27,6 +27,7 @@ public class Player
     
     private SoundEffectInstance _rollingSoundInstance;
     private SoundEffectInstance _bumpSoundInstance;
+    private Random random = new Random();
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -301,7 +302,8 @@ public class Player
 
         if (wasOnGround || !_onGround) return;
         if (_bumpSoundInstance != null && _bumpSoundInstance.State != SoundState.Stopped) return;
-        _bumpSoundInstance = TGCGame.BumpSound.CreateInstance();
+        var randomIndex = random.Next(TGCGame.BumpSounds.Count);
+        _bumpSoundInstance = TGCGame.BumpSounds[randomIndex].CreateInstance();
         _bumpSoundInstance.Play();
     }
     

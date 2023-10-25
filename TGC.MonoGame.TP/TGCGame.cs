@@ -59,7 +59,7 @@ namespace TGC.MonoGame.TP
         // Player
         public static SoundEffect JumpSound { get; private set; }
         public static SoundEffect RollingSound { get; private set; }
-        public static SoundEffect BumpSound { get; private set; }
+        public static List<SoundEffect> BumpSounds { get; } = new ();
         
         //Menu
         private static SoundEffect OpenMenuSound { get; set; }
@@ -246,7 +246,10 @@ namespace TGC.MonoGame.TP
             // Player
             JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
             RollingSound = Content.Load<SoundEffect>(ContentFolderSounds + "rolling_hard");
-            BumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "bounce_hard1");
+            BumpSounds.Add(Content.Load<SoundEffect>(ContentFolderSounds + "bounce_hard1"));
+            BumpSounds.Add(Content.Load<SoundEffect>(ContentFolderSounds + "bounce_hard2"));
+            BumpSounds.Add(Content.Load<SoundEffect>(ContentFolderSounds + "bounce_hard3"));
+            BumpSounds.Add(Content.Load<SoundEffect>(ContentFolderSounds + "bounce_hard4"));
             
             // Menu
             OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
