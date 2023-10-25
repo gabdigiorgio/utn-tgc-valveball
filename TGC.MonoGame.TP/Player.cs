@@ -26,6 +26,7 @@ public class Player
     public BoundingSphere BoundingSphere;
     
     private SoundEffectInstance _rollingSoundInstance;
+    private SoundEffectInstance _bumpSoundInstance;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -56,7 +57,6 @@ public class Player
         var rotationX = Matrix.CreateRotationX(_pitch);
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
-        Console.WriteLine(_pitchSpeed);
         return _sphereScale * rotationX * rotationY * translation;
     }
 
@@ -99,12 +99,10 @@ public class Player
         }
         else
         {
-            if (_rollingSoundInstance != null)
-            {
-                _rollingSoundInstance.Stop();
-                _rollingSoundInstance.Dispose();
-                _rollingSoundInstance = null;
-            }
+            if (_rollingSoundInstance == null) return;
+            _rollingSoundInstance.Stop();
+            _rollingSoundInstance.Dispose();
+            _rollingSoundInstance = null;
         }
     }
 
@@ -155,7 +153,7 @@ public class Player
         _onGround = false;
         _jumpSpeed += CalculateJumpSpeed();
     }
-
+    
     private void EndJump()
     {
         _isJumping = false;
@@ -282,6 +280,7 @@ public class Player
         var sphereCenter = BoundingSphere.Center;
         var radius = BoundingSphere.Radius;
         var collisions = new List<CollisionInfo>();
+        var wasOnGround = _onGround;
 
         _onGround = false;
         
@@ -291,8 +290,6 @@ public class Player
         
         DetectMovingCollisions(sphereCenter, collisions);
 
-
-
         // Solve first near collisions
         collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
         
@@ -301,6 +298,11 @@ public class Player
             BoundingSphere.Center = SolveCollisionPosition(BoundingSphere.Center, collision.ClosestPoint, radius, collision.Distance)
                 + collision.ColliderMovement;
         }
+
+        if (wasOnGround || !_onGround) return;
+        if (_bumpSoundInstance != null && _bumpSoundInstance.State != SoundState.Stopped) return;
+        _bumpSoundInstance = TGCGame.BumpSound.CreateInstance();
+        _bumpSoundInstance.Play();
     }
     
     private void DetectAabbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)

@@ -219,6 +219,30 @@
 /processorParam:Quality=Best
 /build:Music/classic_vibe.mp3
 
+#begin Sounds/bounce_hard1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard1.wav
+
+#begin Sounds/bounce_hard2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard2.wav
+
+#begin Sounds/bounce_hard3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard3.wav
+
+#begin Sounds/bounce_hard4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard4.wav
+
 #begin Sounds/click_menu.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor

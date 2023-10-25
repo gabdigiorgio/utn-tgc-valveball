@@ -56,8 +56,12 @@ namespace TGC.MonoGame.TP
         private TimeSpan _gameTimer = TimeSpan.Zero;
         
         // Sounds
+        // Player
         public static SoundEffect JumpSound { get; private set; }
         public static SoundEffect RollingSound { get; private set; }
+        public static SoundEffect BumpSound { get; private set; }
+        
+        //Menu
         private static SoundEffect OpenMenuSound { get; set; }
         private static SoundEffect SelectMenuSound { get; set; }
         private static SoundEffect ClickMenuSound { get; set; }
@@ -239,8 +243,12 @@ namespace TGC.MonoGame.TP
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
             
             // Sounds
+            // Player
             JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
             RollingSound = Content.Load<SoundEffect>(ContentFolderSounds + "rolling_hard");
+            BumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "bounce_hard1");
+            
+            // Menu
             OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
             SelectMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "select_menu");
             ClickMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "click_menu");
