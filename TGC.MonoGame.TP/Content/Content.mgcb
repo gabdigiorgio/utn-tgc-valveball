@@ -249,11 +249,11 @@
 /processorParam:Quality=Best
 /build:Sounds/open_menu.mp3
 
-#begin Sounds/roll_marble.mp3
-/importer:Mp3Importer
+#begin Sounds/rolling_hard.wav
+/importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:Sounds/roll_marble.mp3
+/build:Sounds/rolling_hard.wav
 
 #begin Sounds/select_menu.mp3
 /importer:Mp3Importer

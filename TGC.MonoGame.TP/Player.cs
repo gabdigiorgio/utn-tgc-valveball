@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Platform;
@@ -22,8 +23,9 @@ public class Player
     private float _jumpSpeed;
     private bool _isJumping;
     private bool _onGround;
-    private bool _isRollingSoundPlaying = false;
     public BoundingSphere BoundingSphere;
+    
+    private SoundEffectInstance _rollingSoundInstance;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -50,9 +52,11 @@ public class Player
         var rotationY = Matrix.CreateRotationY(Yaw);
         var forward = rotationY.Forward;
         HandleMovement(time, keyboardState, forward);
+        RollingSound();
         var rotationX = Matrix.CreateRotationX(_pitch);
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
+        Console.WriteLine(_pitchSpeed);
         return _sphereScale * rotationX * rotationY * translation;
     }
 
@@ -71,6 +75,36 @@ public class Player
         if (keyboardState.IsKeyDown(Keys.D3))
         {
             CurrentSphereMaterial = SphereMaterial.SphereMetal;
+        }
+    }
+    
+    private void RollingSound()
+    {
+        var quietThreshold = 0.01f;
+
+        if (Math.Abs(_pitchSpeed) > quietThreshold && _onGround)
+        {
+            if (_rollingSoundInstance == null)
+            {
+                _rollingSoundInstance = TGCGame.RollingSound.CreateInstance();
+                _rollingSoundInstance.IsLooped = true;
+                _rollingSoundInstance.Play();
+            }
+
+            var volume = MathHelper.Clamp(Math.Abs(_pitchSpeed) / PitchMaxSpeed, 0, 1);
+            _rollingSoundInstance.Volume = volume;
+            
+            var pitch = MathHelper.Clamp(Math.Abs(_pitchSpeed) * 0.1f, 0.0f, 1.0f);
+            _rollingSoundInstance.Pitch = pitch;
+        }
+        else
+        {
+            if (_rollingSoundInstance != null)
+            {
+                _rollingSoundInstance.Stop();
+                _rollingSoundInstance.Dispose();
+                _rollingSoundInstance = null;
+            }
         }
     }
 
@@ -214,6 +248,11 @@ public class Player
     {
         _pitchSpeed = MathHelper.Clamp(_pitchSpeed, -PitchMaxSpeed, PitchMaxSpeed);
         _pitch += _pitchSpeed * time;
+        
+        if (Math.Abs(_pitchSpeed) < 0.0001f)
+        {
+            _pitchSpeed = 0f;
+        }
     }
 
     private void AcceleratePitch(float pitchAcceleration,float time)

@@ -57,6 +57,7 @@ namespace TGC.MonoGame.TP
         
         // Sounds
         public static SoundEffect JumpSound { get; private set; }
+        public static SoundEffect RollingSound { get; private set; }
         private static SoundEffect OpenMenuSound { get; set; }
         private static SoundEffect SelectMenuSound { get; set; }
         private static SoundEffect ClickMenuSound { get; set; }
@@ -239,12 +240,14 @@ namespace TGC.MonoGame.TP
             
             // Sounds
             JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
+            RollingSound = Content.Load<SoundEffect>(ContentFolderSounds + "rolling_hard");
             OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
             SelectMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "select_menu");
             ClickMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "click_menu");
             Song = Content.Load<Song>(ContentFolderMusic + "classic_vibe");
             MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(Song);
+            //MediaPlayer.Play(Song);
+            MediaPlayer.Volume = 0.1f;
             
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
@@ -324,7 +327,7 @@ namespace TGC.MonoGame.TP
                 _wasKeyPressed = false;
             }
 
-            if (!keyboardState.IsKeyDown(Keys.Enter)) return;
+            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space)) return;
             ClickMenuSound.Play();
             HandleMenuSelection();
         }
