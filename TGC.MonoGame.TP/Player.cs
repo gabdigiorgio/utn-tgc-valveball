@@ -37,7 +37,7 @@ public class Player
         Yaw = yaw;
     }
 
-    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereRubber;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
 
     private const float PitchMaxSpeed = 15f;
     private const float YawMaxSpeed = 5.8f;
