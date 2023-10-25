@@ -81,30 +81,54 @@ public class Player
     
     private void RollingSound()
     {
-        var quietThreshold = 0.01f;
+        const float quietThreshold = 0.01f;
 
-        if (Math.Abs(_pitchSpeed) > quietThreshold && _onGround)
+        if (ShouldPlayRollingSound(quietThreshold))
         {
-            if (_rollingSoundInstance == null)
-            {
-                _rollingSoundInstance = TGCGame.RollingSound.CreateInstance();
-                _rollingSoundInstance.IsLooped = true;
-                _rollingSoundInstance.Play();
-            }
-
-            var volume = MathHelper.Clamp(Math.Abs(_pitchSpeed) / PitchMaxSpeed, 0, 1);
+            InitializeRollingSoundInstance();
+            
+            var volume = CalculateVolumeSound();
             _rollingSoundInstance.Volume = volume;
             
-            var pitch = MathHelper.Clamp(Math.Abs(_pitchSpeed) * 0.1f, 0.0f, 1.0f);
+            var pitch = CalculatePitchSound();
             _rollingSoundInstance.Pitch = pitch;
         }
         else
         {
-            if (_rollingSoundInstance == null) return;
-            _rollingSoundInstance.Stop();
-            _rollingSoundInstance.Dispose();
-            _rollingSoundInstance = null;
+            StopRollingSoundInstance();
         }
+    }
+
+    private bool ShouldPlayRollingSound(float threshold)
+    {
+        return Math.Abs(_pitchSpeed) > threshold && _onGround;
+    }
+
+    private void InitializeRollingSoundInstance()
+    {
+        if (_rollingSoundInstance != null) return;
+        _rollingSoundInstance = TGCGame.RollingSound.CreateInstance();
+        _rollingSoundInstance.IsLooped = true;
+        _rollingSoundInstance.Play();
+    }
+
+    private float CalculateVolumeSound()
+    {
+        return MathHelper.Clamp(Math.Abs(_pitchSpeed) / PitchMaxSpeed, 0, 1);
+    }
+
+    private float CalculatePitchSound()
+    {
+        const float pitchScaleFactor = 0.1f;
+        return MathHelper.Clamp(Math.Abs(_pitchSpeed) * pitchScaleFactor, 0.0f, 1.0f);
+    }
+
+    private void StopRollingSoundInstance()
+    {
+        if (_rollingSoundInstance == null) return;
+        _rollingSoundInstance.Stop();
+        _rollingSoundInstance.Dispose();
+        _rollingSoundInstance = null;
     }
 
     private void RestartPosition(KeyboardState keyboardState)
