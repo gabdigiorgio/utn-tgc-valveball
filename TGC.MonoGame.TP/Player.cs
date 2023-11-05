@@ -14,6 +14,9 @@ public class Player
     public float Yaw { get; private set; }
     public float Gravity { private get;  set; } = MaxGravity;
     public int Score { get; private set; }
+    public BoundingSphere BoundingSphere;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
+    
     private readonly Matrix _sphereScale;
     private float _pitch;
     private float _roll;
@@ -23,11 +26,15 @@ public class Player
     private float _jumpSpeed;
     private bool _isJumping;
     private bool _onGround;
-    public BoundingSphere BoundingSphere;
-    
     private SoundEffectInstance _rollingSoundInstance;
     private SoundEffectInstance _bumpSoundInstance;
     private readonly Random _random = new();
+    
+    private const float PitchMaxSpeed = 15f;
+    private const float YawMaxSpeed = 5.8f;
+    private const float PitchAcceleration = 5f;
+    private const float YawAcceleration = 5f;
+    private const float MaxGravity = 175f;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -36,14 +43,6 @@ public class Player
         BoundingSphere = boundingSphere;
         Yaw = yaw;
     }
-
-    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
-
-    private const float PitchMaxSpeed = 15f;
-    private const float YawMaxSpeed = 5.8f;
-    private const float PitchAcceleration = 5f;
-    private const float YawAcceleration = 5f;
-    private const float MaxGravity = 175f;
 
     public Matrix Update(float time, KeyboardState keyboardState)
     {
@@ -87,11 +86,9 @@ public class Player
         {
             InitializeRollingSoundInstance();
             
-            var volume = CalculateVolumeSound();
-            _rollingSoundInstance.Volume = volume;
+            _rollingSoundInstance.Volume = CalculateVolumeSound(_pitchSpeed, PitchMaxSpeed);
             
-            var pitch = CalculatePitchSound();
-            _rollingSoundInstance.Pitch = pitch;
+            _rollingSoundInstance.Pitch = CalculatePitchSound();
         }
         else
         {
@@ -112,9 +109,9 @@ public class Player
         _rollingSoundInstance.Play();
     }
 
-    private float CalculateVolumeSound()
+    private float CalculateVolumeSound(float speed, float maxSpeed)
     {
-        return MathHelper.Clamp(Math.Abs(_pitchSpeed) / PitchMaxSpeed, 0, 1);
+        return MathHelper.Clamp(Math.Abs(speed) / maxSpeed, 0, 1);
     }
 
     private float CalculatePitchSound()
@@ -306,6 +303,7 @@ public class Player
         var radius = BoundingSphere.Radius;
         var collisions = new List<CollisionInfo>();
         var wasOnGround = _onGround;
+        var lastJumpSpeed = _jumpSpeed;
 
         _onGround = false;
         
@@ -324,14 +322,15 @@ public class Player
                 + collision.ColliderMovement;
         }
 
-        PlayBumpSound(wasOnGround);
+        PlayBumpSound(wasOnGround, lastJumpSpeed);
     }
 
-    private void PlayBumpSound(bool wasOnGround)
+    private void PlayBumpSound(bool wasOnGround, float lastJumpSpeed)
     {
         if (!ShouldPlayBumpSound(wasOnGround)) return;
         var randomIndex = _random.Next(TGCGame.BumpSounds.Count);
         _bumpSoundInstance = TGCGame.BumpSounds[randomIndex].CreateInstance();
+        _bumpSoundInstance.Volume = CalculateVolumeSound(lastJumpSpeed, MaxGravity);
         _bumpSoundInstance.Play();
     }
     
