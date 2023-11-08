@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -241,22 +242,8 @@ namespace TGC.MonoGame.TP
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
             
-            // Sounds
-            // Player
-            JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
-            RollingSound = Content.Load<SoundEffect>(ContentFolderSounds + "rolling_hard");
-            for (var i = 1; i <= 4; i++)
-            {
-                var soundName = $"bounce_hard{i}";
-                var sound = Content.Load<SoundEffect>(ContentFolderSounds + soundName);
-                BumpSounds.Add(sound);
-            }
+            AudioManager.LoadSounds(Content);
             
-            // Menu
-            OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
-            SelectMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "select_menu");
-            ClickMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "click_menu");
-            Song = Content.Load<Song>(ContentFolderMusic + "classic_vibe");
             //MediaPlayer.IsRepeating = true;
             //MediaPlayer.Play(Song);
             //MediaPlayer.Volume = 0.1f;

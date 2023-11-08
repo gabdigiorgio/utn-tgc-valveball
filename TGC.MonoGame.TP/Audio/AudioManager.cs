@@ -11,7 +11,6 @@ public class AudioManager
     public static SoundEffect JumpSound { get; private set; }
     public static SoundEffect RollingSound { get; private set; }
     public static List<SoundEffect> BumpSounds { get; private set; }
-    
     public static SoundEffect OpenMenuSound { get; private set; }
     public static SoundEffect SelectMenuSound { get; private set; }
     public static SoundEffect ClickMenuSound { get; private set; }

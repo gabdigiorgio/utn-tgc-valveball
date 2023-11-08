@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
+using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Platform;
 
@@ -104,7 +105,7 @@ public class Player
     private void InitializeRollingSoundInstance()
     {
         if (_rollingSoundInstance != null) return;
-        _rollingSoundInstance = TGCGame.RollingSound.CreateInstance();
+        _rollingSoundInstance = AudioManager.RollingSound.CreateInstance();
         _rollingSoundInstance.IsLooped = true;
         _rollingSoundInstance.Play();
     }
@@ -170,7 +171,7 @@ public class Player
     
     private void StartJump()
     {
-        TGCGame.JumpSound.Play();
+        AudioManager.JumpSound.Play();
         _isJumping = true;
         _onGround = false;
         _jumpSpeed += CalculateJumpSpeed();
@@ -328,8 +329,8 @@ public class Player
     private void PlayBumpSound(bool wasOnGround, float lastJumpSpeed)
     {
         if (!ShouldPlayBumpSound(wasOnGround)) return;
-        var randomIndex = _random.Next(TGCGame.BumpSounds.Count);
-        _bumpSoundInstance = TGCGame.BumpSounds[randomIndex].CreateInstance();
+        var randomIndex = _random.Next(AudioManager.BumpSounds.Count);
+        _bumpSoundInstance = AudioManager.BumpSounds[randomIndex].CreateInstance();
         _bumpSoundInstance.Volume = CalculateVolumeSound(lastJumpSpeed, MaxGravity);
         _bumpSoundInstance.Play();
     }
