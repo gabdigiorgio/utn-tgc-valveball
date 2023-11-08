@@ -34,6 +34,16 @@ public class AudioManager
         MediaPlayer.Volume = Math.Clamp(volume, 0.0f, 1.0f);
     }
     
+    public static void PauseBackgroundMusic()
+    {
+        MediaPlayer.Pause();
+    }
+
+    public static void ResumeBackgroundMusic()
+    {
+        MediaPlayer.Resume();
+    }
+    
     private static T LoadAudio<T>(ContentManager contentManager, string audioName)
     {
         var audioTypeMappings = new Dictionary<Type, string>

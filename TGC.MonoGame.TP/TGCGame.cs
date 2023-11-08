@@ -55,18 +55,6 @@ namespace TGC.MonoGame.TP
         private MenuState _menuState = MenuState.Resume;
         private TimeSpan _gameTimer = TimeSpan.Zero;
         
-        // Sounds
-        // Player
-        public static SoundEffect JumpSound { get; private set; }
-        public static SoundEffect RollingSound { get; private set; }
-        public static List<SoundEffect> BumpSounds { get; } = new ();
-        
-        //Menu
-        private static SoundEffect OpenMenuSound { get; set; }
-        private static SoundEffect SelectMenuSound { get; set; }
-        private static SoundEffect ClickMenuSound { get; set; }
-        private static Song Song { get; set; }
-        
         // Skybox
         private SkyBox SkyBox { get; set; }
         
@@ -264,8 +252,8 @@ namespace TGC.MonoGame.TP
 
             if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
             {
-                MediaPlayer.Pause();
-                OpenMenuSound.Play();
+                AudioManager.PauseBackgroundMusic();
+                AudioManager.OpenMenuSound.Play();
                 _isMenuOpen = true;
             }
             
@@ -289,7 +277,7 @@ namespace TGC.MonoGame.TP
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
                 
-                MediaPlayer.Resume();
+                AudioManager.ResumeBackgroundMusic();
             }
             base.Update(gameTime);
         }
@@ -306,7 +294,7 @@ namespace TGC.MonoGame.TP
                 {
                     _menuState--;
                     _wasKeyPressed = true;
-                    SelectMenuSound.Play();
+                    AudioManager.SelectMenuSound.Play();
                 }
             }
             else if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
@@ -315,7 +303,7 @@ namespace TGC.MonoGame.TP
                 {
                     _menuState++;
                     _wasKeyPressed = true;
-                    SelectMenuSound.Play();
+                    AudioManager.SelectMenuSound.Play();
                 }
             }
             else
@@ -324,7 +312,7 @@ namespace TGC.MonoGame.TP
             }
 
             if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space)) return;
-            ClickMenuSound.Play();
+            AudioManager.ClickMenuSound.Play();
             HandleMenuSelection();
         }
 
