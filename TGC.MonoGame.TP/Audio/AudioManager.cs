@@ -8,17 +8,16 @@ namespace TGC.MonoGame.TP.Audio;
 
 public class AudioManager
 {
-    public SoundEffect JumpSound { get; private set; }
-    public SoundEffect RollingSound { get; private set; }
-    public List<SoundEffect> BumpSounds { get; private set; }
+    public static SoundEffect JumpSound { get; private set; }
+    public static SoundEffect RollingSound { get; private set; }
+    public static List<SoundEffect> BumpSounds { get; private set; }
     
-    public SoundEffect OpenMenuSound { get; private set; }
-    public SoundEffect SelectMenuSound { get; private set; }
-    public SoundEffect ClickMenuSound { get; private set; }
+    public static SoundEffect OpenMenuSound { get; private set; }
+    public static SoundEffect SelectMenuSound { get; private set; }
+    public static SoundEffect ClickMenuSound { get; private set; }
+    public static Song BackgroundMusic { get; private set; }
     
-    public Song BackgroundMusic { get; private set; }
-    
-    public void LoadSounds(ContentManager contentManager)
+    public static void LoadSounds(ContentManager contentManager)
     {
         JumpSound = LoadAudio<SoundEffect>(contentManager, "jump");
         RollingSound = LoadAudio<SoundEffect>(contentManager, "rolling_hard");
@@ -31,7 +30,18 @@ public class AudioManager
     
     private static T LoadAudio<T>(ContentManager contentManager, string audioName)
     {
-        return contentManager.Load<T>(audioName);
+        var audioTypeMappings = new Dictionary<Type, string>
+        {
+            { typeof(SoundEffect), TGCGame.ContentFolderSounds },
+            { typeof(Song), TGCGame.ContentFolderMusic }
+        };
+
+        if (audioTypeMappings.TryGetValue(typeof(T), out var contentFolder))
+        {
+            return contentManager.Load<T>(contentFolder + audioName);
+        }
+
+        throw new NotSupportedException("Audio type not supported!!!");
     }
     
     private static List<T> LoadAudioList<T>(ContentManager contentManager, int count, Func<int, string> soundNameFunc)
