@@ -245,10 +245,6 @@ namespace TGC.MonoGame.TP
             AudioManager.LoadSounds(Content);
             AudioManager.PlayBackgroundMusic(0.1f, true);
             
-            //MediaPlayer.IsRepeating = true;
-            //MediaPlayer.Play(Song);
-            //MediaPlayer.Volume = 0.1f;
-            
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
 
