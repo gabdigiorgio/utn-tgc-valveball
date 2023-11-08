@@ -14,7 +14,7 @@ public class AudioManager
     public static SoundEffect OpenMenuSound { get; private set; }
     public static SoundEffect SelectMenuSound { get; private set; }
     public static SoundEffect ClickMenuSound { get; private set; }
-    public static Song BackgroundMusic { get; private set; }
+    private static Song BackgroundMusic { get; set; }
     
     public static void LoadSounds(ContentManager contentManager)
     {
@@ -25,6 +25,13 @@ public class AudioManager
         SelectMenuSound = LoadAudio<SoundEffect>(contentManager, "select_menu");
         ClickMenuSound = LoadAudio<SoundEffect>(contentManager, "click_menu");
         BackgroundMusic = LoadAudio<Song>(contentManager, "classic_vibe");
+    }
+    
+    public static void PlayBackgroundMusic(float volume, bool isRepeating)
+    {
+        MediaPlayer.IsRepeating = isRepeating;
+        MediaPlayer.Play(BackgroundMusic);
+        MediaPlayer.Volume = Math.Clamp(volume, 0.0f, 1.0f);
     }
     
     private static T LoadAudio<T>(ContentManager contentManager, string audioName)

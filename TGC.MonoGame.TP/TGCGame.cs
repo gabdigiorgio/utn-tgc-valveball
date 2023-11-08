@@ -243,6 +243,7 @@ namespace TGC.MonoGame.TP
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
             
             AudioManager.LoadSounds(Content);
+            AudioManager.PlayBackgroundMusic(0.1f, true);
             
             //MediaPlayer.IsRepeating = true;
             //MediaPlayer.Play(Song);
