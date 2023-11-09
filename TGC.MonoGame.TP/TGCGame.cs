@@ -191,6 +191,9 @@ namespace TGC.MonoGame.TP
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
+            AudioManager.LoadSounds(Content);
+            AudioManager.PlayBackgroundMusic(0.1f, true);
+            
             // Diffuse
             var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
             var platformOrangeDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_orange_diffuse");
@@ -229,9 +232,6 @@ namespace TGC.MonoGame.TP
             var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
-            
-            AudioManager.LoadSounds(Content);
-            AudioManager.PlayBackgroundMusic(0.1f, true);
             
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);

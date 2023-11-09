@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
+using TGC.MonoGame.TP.Collectible.Coins;
+using TGC.MonoGame.TP.Collectible.PowerUps;
 
 namespace TGC.MonoGame.TP.Audio;
 
-public class AudioManager
+public static class AudioManager
 {
     public static SoundEffect JumpSound { get; private set; }
     public static SoundEffect RollingSound { get; private set; }
@@ -14,6 +16,7 @@ public class AudioManager
     public static SoundEffect OpenMenuSound { get; private set; }
     public static SoundEffect SelectMenuSound { get; private set; }
     public static SoundEffect ClickMenuSound { get; private set; }
+    public static Dictionary<Type, SoundEffect> CollectibleSounds { get; } = new();
     private static Song BackgroundMusic { get; set; }
     
     public static void LoadSounds(ContentManager contentManager)
@@ -24,6 +27,9 @@ public class AudioManager
         OpenMenuSound = LoadAudio<SoundEffect>(contentManager, "open_menu");
         SelectMenuSound = LoadAudio<SoundEffect>(contentManager, "select_menu");
         ClickMenuSound = LoadAudio<SoundEffect>(contentManager, "click_menu");
+        CollectibleSounds[typeof(Coin)] = LoadAudio<SoundEffect>(contentManager, "coin");
+        CollectibleSounds[typeof(SpeedUp)] = LoadAudio<SoundEffect>(contentManager, "speed_up");
+        CollectibleSounds[typeof(LowGravity)] = LoadAudio<SoundEffect>(contentManager, "gravity_change");
         BackgroundMusic = LoadAudio<Song>(contentManager, "classic_vibe");
     }
     
