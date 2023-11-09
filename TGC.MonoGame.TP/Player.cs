@@ -342,7 +342,7 @@ public class Player
 
     private void DetectAabbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
-        foreach (var collider in Prefab.PlatformAabb)
+        foreach (var collider in PrefabManager.PlatformAabb)
         {
             if (!collider.Intersects(BoundingSphere)) continue;
 
@@ -358,7 +358,7 @@ public class Player
     
     private void DetectObbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
-        foreach (var collider in Prefab.RampObb)
+        foreach (var collider in PrefabManager.RampObb)
         {
             if (!collider.Intersects(BoundingSphere, out _, out _)) continue;
 
@@ -373,7 +373,7 @@ public class Player
 
     private void DetectMovingCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
-        foreach (var movingPlatform in Prefab.MovingPlatforms)
+        foreach (var movingPlatform in PrefabManager.MovingPlatforms)
         {
             var collider = movingPlatform.MovingBoundingBox;
 
@@ -389,7 +389,7 @@ public class Player
             EndJump();
         }
 
-        foreach (var movingObstacle in Prefab.MovingObstacles)
+        foreach (var movingObstacle in PrefabManager.MovingObstacles)
         {
             var collider = movingObstacle.MovingBoundingBox;
 

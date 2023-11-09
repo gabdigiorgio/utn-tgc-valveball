@@ -127,16 +127,16 @@ namespace TGC.MonoGame.TP
             CreateCoins(-600, 0, 0);
 
             // Map
-            Prefab.CreateSquareCircuit(Vector3.Zero);
-            Prefab.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
-            Prefab.CreateBridge();
-            Prefab.CreateSwitchbackRamp();
+            PrefabManager.CreateSquareCircuit(Vector3.Zero);
+            PrefabManager.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
+            PrefabManager.CreateBridge();
+            PrefabManager.CreateSwitchbackRamp();
 
             // Obstacles
-            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, 260f));
-            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f));
-            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, 260f));
-            Prefab.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, -140f));
+            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, 260f));
+            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f));
+            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, 260f));
+            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, -140f));
             
             base.Initialize();
         }
@@ -268,9 +268,9 @@ namespace TGC.MonoGame.TP
 
                 SetLightPosition(new Vector3(150f, 750f, 0f));
 
-                Prefab.UpdateMovingPlatforms();
+                PrefabManager.UpdateMovingPlatforms();
                 
-                Prefab.UpdateMovingObstacles(gameTime);
+                PrefabManager.UpdateMovingObstacles(gameTime);
 
                 UpdateCollectibles(gameTime);
 
@@ -448,7 +448,7 @@ namespace TGC.MonoGame.TP
 
         private void DrawPlatforms(Effect effect, Material material)
         {
-            foreach (var platformWorld in Prefab.PlatformMatrices)
+            foreach (var platformWorld in PrefabManager.PlatformMatrices)
             {
                 SetBlinnPhongParameters(effect, material, Vector2.One * 3f, platformWorld, TargetCamera);
                 BoxPrimitive.Draw(effect);
@@ -457,7 +457,7 @@ namespace TGC.MonoGame.TP
 
         private void DrawRamps(Effect effect, Material material)
         {
-            foreach (var rampWorld in Prefab.RampMatrices)
+            foreach (var rampWorld in PrefabManager.RampMatrices)
             {
                 SetBlinnPhongParameters(effect, material,Vector2.One * 2f, rampWorld, TargetCamera);
                 BoxPrimitive.Draw(effect);
@@ -466,7 +466,7 @@ namespace TGC.MonoGame.TP
         
         private void DrawMovingPlatforms(Effect effect, Material material)
         {
-            foreach (var movingPlatform in Prefab.MovingPlatforms)
+            foreach (var movingPlatform in PrefabManager.MovingPlatforms)
             {
                 var movingPlatformWorld = movingPlatform.World;
                 SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
@@ -476,7 +476,7 @@ namespace TGC.MonoGame.TP
         
         private void DrawMovingObstacles(Effect effect, Material material)
         {
-            foreach (var movingObstacle in Prefab.MovingObstacles)
+            foreach (var movingObstacle in PrefabManager.MovingObstacles)
             {
                 var movingPlatformWorld = movingObstacle.World;
                 SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
@@ -505,14 +505,14 @@ namespace TGC.MonoGame.TP
 
         private void DrawGizmos()
         {
-            foreach (var boundingBox in Prefab.PlatformAabb)
+            foreach (var boundingBox in PrefabManager.PlatformAabb)
             {
                 var center = BoundingVolumesExtensions.GetCenter(boundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.Red);
             }
 
-            foreach (var orientedBoundingBox in Prefab.RampObb)
+            foreach (var orientedBoundingBox in PrefabManager.RampObb)
             {
                 var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f)
                                                * orientedBoundingBox.Orientation *
@@ -520,7 +520,7 @@ namespace TGC.MonoGame.TP
                 Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
             }
 
-            foreach (var movingPlatform in Prefab.MovingPlatforms)
+            foreach (var movingPlatform in PrefabManager.MovingPlatforms)
             {
                 var movingBoundingBox = movingPlatform.MovingBoundingBox;
                 var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
@@ -528,7 +528,7 @@ namespace TGC.MonoGame.TP
                 Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
             }
 
-            foreach (var movingObstacle in Prefab.MovingObstacles)
+            foreach (var movingObstacle in PrefabManager.MovingObstacles)
             {
                 var movingBoundingBox = movingObstacle.MovingBoundingBox;
                 var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);

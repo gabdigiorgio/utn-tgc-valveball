@@ -119,7 +119,7 @@ namespace TGC.MonoGame.TP.Cameras
             var normalizedDifference = difference / distanceToPlayer;
             var cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
             
-            foreach (var collider in Prefab.PlatformAabb)
+            foreach (var collider in PrefabManager.PlatformAabb)
             {
                 var distance = cameraToPlayerRay.Intersects(collider);
                 if (distance < distanceToPlayer)

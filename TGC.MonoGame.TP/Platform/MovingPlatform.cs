@@ -33,7 +33,7 @@ public class MovingPlatform
 
     private void SolveXCollisions()
     {
-        foreach (var boundingBox in Prefab.PlatformAabb)
+        foreach (var boundingBox in PrefabManager.PlatformAabb)
         {
             if (!MovingBoundingBox.Intersects(boundingBox)) continue;
             _direction *= -1;
