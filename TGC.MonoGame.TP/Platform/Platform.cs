@@ -7,7 +7,7 @@ public class Platform : Prefab
 {
     public BoundingBox BoundingBox { get; set; }
 
-    public Platform(Vector3 scale, Vector3 position) : base(scale, position)
+    public Platform(Vector3 scale, Vector3 position, Material material) : base(scale, position, material)
     {
         BoundingBox = BoundingVolumesExtensions.FromMatrix(World);
     }
