@@ -37,6 +37,7 @@ public class Material
         Tiling = Vector2.One * tiling;
     }
     
+    public static readonly Material Default = new(1f, 1f, 1f, 1f, 1f);
     public static readonly Material Marble = new(0.5f, 0.430f, 0.880f, 32.820f, 1f);
     public static readonly Material Rubber = new(0.7f, 0.670f, 0.240f, 3.930f, 5f);
     public static readonly Material Metal = new(0.310f, 0.830f, 1.0f, 64.0f, 5f);

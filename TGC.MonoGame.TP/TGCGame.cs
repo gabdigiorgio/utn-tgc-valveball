@@ -194,6 +194,7 @@ namespace TGC.MonoGame.TP
             AudioManager.PlayBackgroundMusic(0.1f, true);
             
             // Diffuse
+            var defaultDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "default_diffuse");
             var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
             var platformOrangeDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_orange_diffuse");
             var marbleDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_diffuse");
@@ -201,6 +202,7 @@ namespace TGC.MonoGame.TP
             var metalDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
             
             // Normals
+            var defaultNormal = Content.Load<Texture2D>(ContentFolderTextures + "default_normal");
             var platformSquareNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_square_normal");
             var platformNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_normal");
             var plainNormal = Content.Load<Texture2D>(ContentFolderTextures + "plain_normal");
@@ -208,6 +210,7 @@ namespace TGC.MonoGame.TP
             var metalNormal = Content.Load<Texture2D>(ContentFolderTextures + "metal_normal");
             
             // Materials
+            Material.Default.LoadTexture(defaultDiffuse, defaultNormal);
             Material.Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
             Material.MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
             Material.Marble.LoadTexture(marbleDiffuse, plainNormal);
