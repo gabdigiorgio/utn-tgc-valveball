@@ -51,19 +51,17 @@ public static class PrefabManager
         }
     }
 
-    private static void CreateMovingPlatform(Vector3 scale, Vector3 position)
+    private static void CreateMovingPlatform(Vector3 scale, Vector3 position, Material material = null)
     {
-        var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        var platformBoundingBox = BoundingVolumesExtensions.FromMatrix(platformWorld);
-        var movingPlatform = new MovingPlatform(platformWorld, scale, position, platformBoundingBox);
-        MovingPlatforms.Add(movingPlatform);
+        var movingPlatform = new MovingPlatform(scale, position, material);
+        Prefabs.Add(movingPlatform);
     }
 
     public static void UpdateMovingPlatforms()
     {
-        foreach (var movingPlatform in MovingPlatforms)
+        foreach (var prefab in Prefabs)
         {
-            movingPlatform.Update();
+            prefab.Update();
         }
     }
     

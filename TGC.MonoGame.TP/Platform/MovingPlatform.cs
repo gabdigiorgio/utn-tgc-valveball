@@ -1,42 +1,36 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace TGC.MonoGame.TP.Platform;
 
-public class MovingPlatform
+public class MovingPlatform : Platform
 {
-    public Matrix World;
-    public Vector3 Position;
-    public Vector3 PreviousPosition;
-    public BoundingBox MovingBoundingBox;
     private Vector3 _direction = Vector3.Forward;
-    private readonly Vector3 _scale;
-
     private const float MaxHorizontalSpeed = 1.3f;
 
-    public MovingPlatform(Matrix world, Vector3 scale, Vector3 position, BoundingBox movingBoundingBox)
+    public MovingPlatform(Vector3 scale, Vector3 position, Material material = null)
+        : base(scale, position, material)
     {
-        World = world;
-        Position = position;
-        MovingBoundingBox = movingBoundingBox;
-        _scale = scale;
     }
 
-    public void Update()
+    public override void Update()
     {
         SolveXCollisions();
         var increment = _direction * MaxHorizontalSpeed;
         PreviousPosition = Position;
         Position += increment;
-        MovingBoundingBox = new BoundingBox(MovingBoundingBox.Min + increment, MovingBoundingBox.Max + increment);
-        World = Matrix.CreateScale(_scale) * Matrix.CreateTranslation(Position);
+        BoundingBox = new BoundingBox(BoundingBox.Min + increment, BoundingBox.Max + increment);
+        World = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
     }
 
     private void SolveXCollisions()
     {
-        foreach (var boundingBox in PrefabManager.PlatformAabb)
+        foreach (var prefab in PrefabManager.Prefabs)
         {
-            if (!MovingBoundingBox.Intersects(boundingBox)) continue;
-            _direction *= -1;
+            if (prefab is Platform platform && prefab != this && Intersects(platform))
+            {
+                _direction *= -1;
+            }
         }
     }
 }

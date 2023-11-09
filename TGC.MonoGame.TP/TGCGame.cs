@@ -525,7 +525,7 @@ namespace TGC.MonoGame.TP
 
             foreach (var movingPlatform in PrefabManager.MovingPlatforms)
             {
-                var movingBoundingBox = movingPlatform.MovingBoundingBox;
+                var movingBoundingBox = movingPlatform.BoundingBox;
                 var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);

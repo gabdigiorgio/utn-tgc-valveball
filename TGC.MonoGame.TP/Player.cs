@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
@@ -310,8 +311,6 @@ public class Player
         
         DetectPrefabCollisions(sphereCenter, collisions);
         
-        //DetectObbCollisions(sphereCenter, collisions);
-        
         //DetectMovingCollisions(sphereCenter, collisions);
 
         // Solve first near collisions
@@ -319,8 +318,8 @@ public class Player
         
         foreach (var collision in collisions)
         {
-            BoundingSphere.Center = SolveCollisionPosition(BoundingSphere.Center, collision.ClosestPoint, radius, collision.Distance)
-                + collision.ColliderMovement;
+            BoundingSphere.Center = SolveCollisionPosition(BoundingSphere.Center, collision.ClosestPoint, radius,
+                collision.Distance) +  (collision.ColliderMovement ?? Vector3.Zero);
         }
 
         PlayBumpSound(wasOnGround, lastJumpSpeed);
@@ -348,12 +347,13 @@ public class Player
 
             var closestPoint = prefab.ClosestPoint(sphereCenter);
             var distance = Vector3.Distance(closestPoint, sphereCenter);
-            collisions.Add(new CollisionInfo(closestPoint, distance));
+            var platformMovement = prefab.Position - prefab.PreviousPosition;
+            collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
 
             switch (prefab)
             {
                 case Platform.Platform when !(sphereCenter.Y > prefab.MaxY()):
-                    continue;
+                    break;
                 case Platform.Platform:
                     _onGround = true;
                     EndJump();
@@ -365,23 +365,8 @@ public class Player
             }
         }
     }
-    
-    private void DetectObbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
-    {
-        foreach (var collider in PrefabManager.RampObb)
-        {
-            if (!collider.Intersects(BoundingSphere, out _, out _)) continue;
 
-            var closestPoint = collider.ClosestPoint(sphereCenter);
-            var distance = Vector3.Distance(closestPoint, sphereCenter);
-            collisions.Add(new CollisionInfo(closestPoint, distance));
-
-            _onGround = true;
-            EndJump();
-        }
-    }
-
-    private void DetectMovingCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
+    /*private void DetectMovingCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
         foreach (var movingPlatform in PrefabManager.MovingPlatforms)
         {
@@ -414,7 +399,7 @@ public class Player
             _onGround = true;
             EndJump();
         }
-    }
+    }*/
 
     private static Vector3 SolveCollisionPosition(Vector3 currentPosition, Vector3 closestPoint, float radius, float distance)
     {

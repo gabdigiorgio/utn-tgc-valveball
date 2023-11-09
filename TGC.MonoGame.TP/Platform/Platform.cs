@@ -7,7 +7,7 @@ public class Platform : Prefab
 {
     public BoundingBox BoundingBox { get; set; }
 
-    public Platform(Vector3 scale, Vector3 position, Material material = null) : base(scale, position, material)
+    public Platform(Vector3 scale, Vector3 position, Material material) : base(scale, position, material)
     {
         BoundingBox = BoundingVolumesExtensions.FromMatrix(World);
     }
@@ -26,8 +26,10 @@ public class Platform : Prefab
     {
         return BoundingBox.Max.Y;
     }
-    
-    public Platform(Vector3 scale, Vector3 position) : this(scale, position, Material.Default)
+
+    protected bool Intersects(Platform platform)
     {
+        return BoundingBox.Intersects(platform.BoundingBox);
     }
+    
 }

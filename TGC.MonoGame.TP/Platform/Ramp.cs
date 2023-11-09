@@ -16,7 +16,7 @@ public class Ramp : Prefab
         World = Matrix.CreateScale(scale) * Matrix.CreateRotationX(angleX) 
                                           * Matrix.CreateRotationZ(angleZ) * Matrix.CreateTranslation(position);
     }
-    
+
     public override bool Intersects(BoundingSphere sphere)
     {
         return OrientedBoundingBox.Intersects(sphere, out _, out _);
@@ -30,9 +30,5 @@ public class Ramp : Prefab
     public override float MaxY()
     {
         return 0;
-    }
-    
-    public Ramp(Vector3 scale, Vector3 position, float angleX, float angleZ) : this(scale, position, angleX, angleZ, Material.Default)
-    {
     }
 }
