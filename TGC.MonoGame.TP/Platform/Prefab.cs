@@ -6,11 +6,16 @@ public abstract class Prefab
 {
     public Matrix World;
     public Material Material { get; set; }
+    
+    public abstract bool Intersects(BoundingSphere sphere);
 
-    protected Prefab(Vector3 scale, Vector3 position, Material material)
+    protected Prefab(Vector3 scale, Vector3 position, Material material = null)
     {
         World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        Material = material;
+        Material = material ?? Material.Default;
     }
     
+    protected Prefab(Vector3 scale, Vector3 position) : this(scale, position, Material.Default)
+    {
+    }
 }

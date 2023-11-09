@@ -31,7 +31,6 @@ public static class PrefabManager
         CreatePlatform(new Vector3(50f, 6f, 80f), new Vector3(300f, 9.5f, 185f) + offset);
             
         // Center platform
-        // La idea sería que se vaya moviendo 
         CreateMovingPlatform(new Vector3(50f, 6f, 100f), new Vector3(150f, 0f, 0f) + offset);
             
         CreateRamps(offset);
@@ -268,29 +267,14 @@ public static class PrefabManager
         CreateRamp(new Vector3(40f, 6f, 50f), new Vector3(255f, 5f, 0f) + offset, 0f, -0.3f);
     }
 
-    private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ)
+    private static void CreatePlatform(Vector3 scale, Vector3 position, Material material = null)
     {
-        var temporaryCubeAabb = BoundingVolumesExtensions.FromMatrix(Matrix.CreateScale(scale) * Matrix.CreateTranslation(position));
-        var rampObb = OrientedBoundingBox.FromAABB(temporaryCubeAabb);
-        rampObb.Rotate(Matrix.CreateRotationX(angleX) * Matrix.CreateRotationZ(angleZ));
-        
-        RampObb.Add(rampObb);
+        Prefabs.Add(new Platform(scale, position, material));
+    }
 
-        var rampWorld = Matrix.CreateScale(scale) * Matrix.CreateRotationX(angleX) 
-                                                  * Matrix.CreateRotationZ(angleZ) * Matrix.CreateTranslation(position);
-        RampMatrices.Add(rampWorld);
-    }
-    
-    private static void CreatePlatform(Vector3 scale, Vector3 position)
+    private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ, Material material = null)
     {
-        var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        PlatformAabb.Add(BoundingVolumesExtensions.FromMatrix(platformWorld));
-        PlatformMatrices.Add(platformWorld);
+        Prefabs.Add(new Ramp(scale, position, angleX, angleZ, material));
     }
-    
-    private static void CreatePrefab<T>(Vector3 scale, Vector3 position, Material material) where T : Prefab
-    {
-        var prefab = (T)Activator.CreateInstance(typeof(T), scale, position, material);
-        Prefabs.Add(prefab);
-    }
+
 }

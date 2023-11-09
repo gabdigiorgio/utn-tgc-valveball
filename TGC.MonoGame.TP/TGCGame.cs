@@ -451,9 +451,9 @@ namespace TGC.MonoGame.TP
 
         private void DrawPlatforms(Effect effect, Material material)
         {
-            foreach (var platformWorld in PrefabManager.PlatformMatrices)
+            foreach (var prefab in PrefabManager.Prefabs)
             {
-                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, platformWorld, TargetCamera);
+                SetBlinnPhongParameters(effect, prefab.Material, Vector2.One * 3f, prefab.World, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
         }
