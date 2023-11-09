@@ -308,11 +308,11 @@ public class Player
 
         _onGround = false;
         
-        DetectAabbCollisions(sphereCenter, collisions);
+        DetectPrefabCollisions(sphereCenter, collisions);
         
-        DetectObbCollisions(sphereCenter, collisions);
+        //DetectObbCollisions(sphereCenter, collisions);
         
-        DetectMovingCollisions(sphereCenter, collisions);
+        //DetectMovingCollisions(sphereCenter, collisions);
 
         // Solve first near collisions
         collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
@@ -340,19 +340,29 @@ public class Player
         return !wasOnGround && _onGround && (_bumpSoundInstance == null || _bumpSoundInstance.State == SoundState.Stopped);
     }
 
-    private void DetectAabbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
+    private void DetectPrefabCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
-        foreach (var collider in PrefabManager.PlatformAabb)
+        foreach (var prefab in PrefabManager.Prefabs)
         {
-            if (!collider.Intersects(BoundingSphere)) continue;
+            if (!prefab.Intersects(BoundingSphere)) continue;
 
-            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
+            var closestPoint = prefab.ClosestPoint(sphereCenter);
             var distance = Vector3.Distance(closestPoint, sphereCenter);
             collisions.Add(new CollisionInfo(closestPoint, distance));
 
-            if (!(sphereCenter.Y > collider.Max.Y)) continue;
-            _onGround = true;
-            EndJump();
+            switch (prefab)
+            {
+                case Platform.Platform when !(sphereCenter.Y > prefab.MaxY()):
+                    continue;
+                case Platform.Platform:
+                    _onGround = true;
+                    EndJump();
+                    break;
+                case Ramp:
+                    _onGround = true;
+                    EndJump();
+                    break;
+            }
         }
     }
     

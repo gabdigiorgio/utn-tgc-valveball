@@ -17,6 +17,16 @@ public class Platform : Prefab
         return BoundingBox.Intersects(sphere);
     }
     
+    public override Vector3 ClosestPoint(Vector3 sphereCenter)
+    {
+        return BoundingVolumesExtensions.ClosestPoint(BoundingBox, sphereCenter);
+    }
+    
+    public override float MaxY()
+    {
+        return BoundingBox.Max.Y;
+    }
+    
     public Platform(Vector3 scale, Vector3 position) : this(scale, position, Material.Default)
     {
     }

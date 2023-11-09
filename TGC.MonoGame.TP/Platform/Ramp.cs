@@ -19,7 +19,17 @@ public class Ramp : Prefab
     
     public override bool Intersects(BoundingSphere sphere)
     {
-        return OrientedBoundingBox.Intersects(sphere);
+        return OrientedBoundingBox.Intersects(sphere, out _, out _);
+    }
+    
+    public override Vector3 ClosestPoint(Vector3 sphereCenter)
+    {
+        return OrientedBoundingBox.ClosestPoint(sphereCenter);
+    }
+    
+    public override float MaxY()
+    {
+        return 0;
     }
     
     public Ramp(Vector3 scale, Vector3 position, float angleX, float angleZ) : this(scale, position, angleX, angleZ, Material.Default)
