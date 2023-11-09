@@ -219,6 +219,30 @@
 /processorParam:Quality=Best
 /build:Music/classic_vibe.mp3
 
+#begin Sounds/bounce_hard1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard1.wav
+
+#begin Sounds/bounce_hard2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard2.wav
+
+#begin Sounds/bounce_hard3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard3.wav
+
+#begin Sounds/bounce_hard4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/bounce_hard4.wav
+
 #begin Sounds/click_menu.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -249,11 +273,11 @@
 /processorParam:Quality=Best
 /build:Sounds/open_menu.mp3
 
-#begin Sounds/roll_marble.mp3
-/importer:Mp3Importer
+#begin Sounds/rolling_hard.wav
+/importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:Sounds/roll_marble.mp3
+/build:Sounds/rolling_hard.wav
 
 #begin Sounds/select_menu.mp3
 /importer:Mp3Importer
@@ -292,6 +316,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/marble_black_diffuse.jpg
+
+#begin Textures/marble_diffuse.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/marble_diffuse.jpg
 
 #begin Textures/metal_diffuse.png
 /importer:TextureImporter

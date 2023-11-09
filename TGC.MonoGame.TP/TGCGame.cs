@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Media;
+using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collectible.Coins;
@@ -54,13 +53,6 @@ namespace TGC.MonoGame.TP
         private bool _isMenuOpen;
         private MenuState _menuState = MenuState.Resume;
         private TimeSpan _gameTimer = TimeSpan.Zero;
-        
-        // Sounds
-        public static SoundEffect JumpSound { get; private set; }
-        private static SoundEffect OpenMenuSound { get; set; }
-        private static SoundEffect SelectMenuSound { get; set; }
-        private static SoundEffect ClickMenuSound { get; set; }
-        private static Song Song { get; set; }
         
         // Skybox
         private SkyBox SkyBox { get; set; }
@@ -198,6 +190,9 @@ namespace TGC.MonoGame.TP
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
+            AudioManager.LoadSounds(Content);
+            AudioManager.PlayBackgroundMusic(0.1f, true);
+            
             // Diffuse
             var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
             var platformOrangeDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_orange_diffuse");
@@ -237,15 +232,6 @@ namespace TGC.MonoGame.TP
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
             
-            // Sounds
-            JumpSound = Content.Load<SoundEffect>(ContentFolderSounds + "jump");
-            OpenMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "open_menu");
-            SelectMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "select_menu");
-            ClickMenuSound = Content.Load<SoundEffect>(ContentFolderSounds + "click_menu");
-            Song = Content.Load<Song>(ContentFolderMusic + "classic_vibe");
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(Song);
-            
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
 
@@ -265,8 +251,8 @@ namespace TGC.MonoGame.TP
 
             if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
             {
-                MediaPlayer.Pause();
-                OpenMenuSound.Play();
+                AudioManager.PauseBackgroundMusic();
+                AudioManager.OpenMenuSound.Play();
                 _isMenuOpen = true;
             }
             
@@ -290,7 +276,7 @@ namespace TGC.MonoGame.TP
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
                 
-                MediaPlayer.Resume();
+                AudioManager.ResumeBackgroundMusic();
             }
             base.Update(gameTime);
         }
@@ -307,7 +293,7 @@ namespace TGC.MonoGame.TP
                 {
                     _menuState--;
                     _wasKeyPressed = true;
-                    SelectMenuSound.Play();
+                    AudioManager.SelectMenuSound.Play();
                 }
             }
             else if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
@@ -316,7 +302,7 @@ namespace TGC.MonoGame.TP
                 {
                     _menuState++;
                     _wasKeyPressed = true;
-                    SelectMenuSound.Play();
+                    AudioManager.SelectMenuSound.Play();
                 }
             }
             else
@@ -324,8 +310,8 @@ namespace TGC.MonoGame.TP
                 _wasKeyPressed = false;
             }
 
-            if (!keyboardState.IsKeyDown(Keys.Enter)) return;
-            ClickMenuSound.Play();
+            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space)) return;
+            AudioManager.ClickMenuSound.Play();
             HandleMenuSelection();
         }
 
@@ -453,7 +439,7 @@ namespace TGC.MonoGame.TP
         }
 
         private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
-            SetBlinnPhongParameters(effect, material, Vector2.One * 5f, worldMatrix, TargetCamera);
+            SetBlinnPhongParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
             {   
                 mesh.Draw();

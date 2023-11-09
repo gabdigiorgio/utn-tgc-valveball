@@ -7,7 +7,7 @@ public class SphereMaterial
     public float MaxSpeed { get; set; }
     public Material Material { get; private set; }
 
-    private SphereMaterial(Material material, float acceleration = 60f, float maxJumpHeight = 35f, float maxSpeed = 180f)
+    private SphereMaterial(Material material, float acceleration = 75f, float maxJumpHeight = 35f, float maxSpeed = 180f)
     {
         Material = material;
         Acceleration = acceleration;
@@ -15,7 +15,7 @@ public class SphereMaterial
         MaxSpeed = maxSpeed;
     }
 
-    public static readonly SphereMaterial SphereMarble = new(Material.Marble, acceleration: 30f);
+    public static readonly SphereMaterial SphereMarble = new(Material.Marble, acceleration: 50f);
     public static readonly SphereMaterial SphereRubber = new(Material.Rubber, maxJumpHeight: 40f);
     public static readonly SphereMaterial SphereMetal = new(Material.Metal, acceleration: 100f, maxSpeed: 230f);
 }

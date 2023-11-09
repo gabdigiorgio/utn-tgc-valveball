@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
+using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Platform;
 
@@ -13,6 +15,9 @@ public class Player
     public float Yaw { get; private set; }
     public float Gravity { private get;  set; } = MaxGravity;
     public int Score { get; private set; }
+    public BoundingSphere BoundingSphere;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
+    
     private readonly Matrix _sphereScale;
     private float _pitch;
     private float _roll;
@@ -22,8 +27,15 @@ public class Player
     private float _jumpSpeed;
     private bool _isJumping;
     private bool _onGround;
-    private bool _isRollingSoundPlaying = false;
-    public BoundingSphere BoundingSphere;
+    private SoundEffectInstance _rollingSoundInstance;
+    private SoundEffectInstance _bumpSoundInstance;
+    private readonly Random _random = new();
+    
+    private const float PitchMaxSpeed = 15f;
+    private const float YawMaxSpeed = 5.8f;
+    private const float PitchAcceleration = 5f;
+    private const float YawAcceleration = 5f;
+    private const float MaxGravity = 175f;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -32,14 +44,6 @@ public class Player
         BoundingSphere = boundingSphere;
         Yaw = yaw;
     }
-
-    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereRubber;
-
-    private const float PitchMaxSpeed = 15f;
-    private const float YawMaxSpeed = 5.8f;
-    private const float PitchAcceleration = 5f;
-    private const float YawAcceleration = 5f;
-    private const float MaxGravity = 175f;
 
     public Matrix Update(float time, KeyboardState keyboardState)
     {
@@ -50,6 +54,7 @@ public class Player
         var rotationY = Matrix.CreateRotationY(Yaw);
         var forward = rotationY.Forward;
         HandleMovement(time, keyboardState, forward);
+        PlayRollingSound();
         var rotationX = Matrix.CreateRotationX(_pitch);
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
@@ -72,6 +77,56 @@ public class Player
         {
             CurrentSphereMaterial = SphereMaterial.SphereMetal;
         }
+    }
+    
+    private void PlayRollingSound()
+    {
+        const float quietThreshold = 0.01f;
+
+        if (ShouldPlayRollingSound(quietThreshold))
+        {
+            InitializeRollingSoundInstance();
+            
+            _rollingSoundInstance.Volume = CalculateVolumeSound(_pitchSpeed, PitchMaxSpeed);
+            
+            _rollingSoundInstance.Pitch = CalculatePitchSound();
+        }
+        else
+        {
+            StopRollingSoundInstance();
+        }
+    }
+
+    private bool ShouldPlayRollingSound(float threshold)
+    {
+        return Math.Abs(_pitchSpeed) > threshold && _onGround;
+    }
+
+    private void InitializeRollingSoundInstance()
+    {
+        if (_rollingSoundInstance != null) return;
+        _rollingSoundInstance = AudioManager.RollingSound.CreateInstance();
+        _rollingSoundInstance.IsLooped = true;
+        _rollingSoundInstance.Play();
+    }
+
+    private float CalculateVolumeSound(float speed, float maxSpeed)
+    {
+        return MathHelper.Clamp(Math.Abs(speed) / maxSpeed, 0, 1);
+    }
+
+    private float CalculatePitchSound()
+    {
+        const float pitchScaleFactor = 0.1f;
+        return MathHelper.Clamp(Math.Abs(_pitchSpeed) * pitchScaleFactor, 0.0f, 1.0f);
+    }
+
+    private void StopRollingSoundInstance()
+    {
+        if (_rollingSoundInstance == null) return;
+        _rollingSoundInstance.Stop();
+        _rollingSoundInstance.Dispose();
+        _rollingSoundInstance = null;
     }
 
     private void RestartPosition(KeyboardState keyboardState)
@@ -116,12 +171,12 @@ public class Player
     
     private void StartJump()
     {
-        TGCGame.JumpSound.Play();
+        AudioManager.JumpSound.Play();
         _isJumping = true;
         _onGround = false;
         _jumpSpeed += CalculateJumpSpeed();
     }
-
+    
     private void EndJump()
     {
         _isJumping = false;
@@ -214,6 +269,11 @@ public class Player
     {
         _pitchSpeed = MathHelper.Clamp(_pitchSpeed, -PitchMaxSpeed, PitchMaxSpeed);
         _pitch += _pitchSpeed * time;
+        
+        if (Math.Abs(_pitchSpeed) < 0.0001f)
+        {
+            _pitchSpeed = 0f;
+        }
     }
 
     private void AcceleratePitch(float pitchAcceleration,float time)
@@ -243,6 +303,8 @@ public class Player
         var sphereCenter = BoundingSphere.Center;
         var radius = BoundingSphere.Radius;
         var collisions = new List<CollisionInfo>();
+        var wasOnGround = _onGround;
+        var lastJumpSpeed = _jumpSpeed;
 
         _onGround = false;
         
@@ -252,8 +314,6 @@ public class Player
         
         DetectMovingCollisions(sphereCenter, collisions);
 
-
-
         // Solve first near collisions
         collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
         
@@ -262,8 +322,24 @@ public class Player
             BoundingSphere.Center = SolveCollisionPosition(BoundingSphere.Center, collision.ClosestPoint, radius, collision.Distance)
                 + collision.ColliderMovement;
         }
+
+        PlayBumpSound(wasOnGround, lastJumpSpeed);
+    }
+
+    private void PlayBumpSound(bool wasOnGround, float lastJumpSpeed)
+    {
+        if (!ShouldPlayBumpSound(wasOnGround)) return;
+        var randomIndex = _random.Next(AudioManager.BumpSounds.Count);
+        _bumpSoundInstance = AudioManager.BumpSounds[randomIndex].CreateInstance();
+        _bumpSoundInstance.Volume = CalculateVolumeSound(lastJumpSpeed, MaxGravity);
+        _bumpSoundInstance.Play();
     }
     
+    private bool ShouldPlayBumpSound(bool wasOnGround)
+    {
+        return !wasOnGround && _onGround && (_bumpSoundInstance == null || _bumpSoundInstance.State == SoundState.Stopped);
+    }
+
     private void DetectAabbCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
     {
         foreach (var collider in Prefab.PlatformAabb)

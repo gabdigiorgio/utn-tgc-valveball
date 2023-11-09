@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Collectible.Coins;
 using TGC.MonoGame.TP.Collectible.PowerUps;
 
@@ -28,26 +29,27 @@ public static class CollectibleManager
             { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/coin") }
         };
         
-        var collectibleSounds = new Dictionary<Type, SoundEffect>
-        {
-            { typeof(LowGravity), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "gravity_change") },
-            { typeof(SpeedUp), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "speed_up") },
-            { typeof(Coin), content.Load<SoundEffect>(TGCGame.ContentFolderSounds + "coin") }
-        };
-        
         var powerUpEffect = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
         var basicShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "BasicShader");
 
         foreach (var collectible in Collectibles)
         {
-            if (!collectibleModels.TryGetValue(collectible.GetType(), out var model)) continue;
-            collectible.Model = model;
-            collectible.Shader = collectible is Coin ? basicShader : powerUpEffect;
-            TGCGame.loadEffectOnMesh(collectible.Model, collectible.Shader);
-            if (collectibleSounds.TryGetValue(collectible.GetType(), out var sound))
-            {
-                collectible.Sound = sound;
-            }
+            AssignModelAndShader(collectible, collectibleModels, basicShader, powerUpEffect);
+            AssignSound(collectible, AudioManager.CollectibleSounds);
         }
+    }
+    
+    private static void AssignModelAndShader(Collectible collectible, Dictionary<Type, Model> collectibleModels, Effect basicShader, Effect powerUpEffect)
+    {
+        if (!collectibleModels.TryGetValue(collectible.GetType(), out var model)) return;
+        collectible.Model = model;
+        collectible.Shader = collectible is Coin ? basicShader : powerUpEffect;
+        TGCGame.loadEffectOnMesh(collectible.Model, collectible.Shader);
+    }
+
+    private static void AssignSound(Collectible collectible, Dictionary<Type, SoundEffect> collectibleSounds)
+    {
+        if (!collectibleSounds.TryGetValue(collectible.GetType(), out var sound)) return;
+        collectible.Sound = sound;
     }
 }
