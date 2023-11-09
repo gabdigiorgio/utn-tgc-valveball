@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Collisions;
 
@@ -6,6 +7,7 @@ namespace TGC.MonoGame.TP.Platform;
 
 public static class PrefabManager
 {
+    public static readonly List<Prefab> Prefabs = new();
     public static readonly List<Matrix> PlatformMatrices =  new();
     public static readonly List<Matrix> RampMatrices =  new();
     public static readonly List<BoundingBox> PlatformAabb =  new();
@@ -284,5 +286,11 @@ public static class PrefabManager
         var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
         PlatformAabb.Add(BoundingVolumesExtensions.FromMatrix(platformWorld));
         PlatformMatrices.Add(platformWorld);
+    }
+    
+    private static void CreatePrefab<T>(Vector3 scale, Vector3 position, Material material) where T : Prefab
+    {
+        var prefab = (T)Activator.CreateInstance(typeof(T), scale, position, material);
+        Prefabs.Add(prefab);
     }
 }
