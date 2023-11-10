@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TGC.MonoGame.TP;
@@ -35,8 +36,35 @@ public class Material
     public static readonly Material Default = new(0.5f, 0.5f, 0.1f, 0.5f);
     public static readonly Material Platform = new(0.4f, 0.320f, 0.340f, 12.820f);
     public static readonly Material MovingPlatform = new(0.3f, 0.620f, 0.340f, 1.820f);
+    
+    public static void LoadMaterials(ContentManager content)
+    {
+        const string contentFolderTextures = TGCGame.ContentFolderTextures;
+        
+        var defaultDiffuse = content.Load<Texture2D>(contentFolderTextures + "default_diffuse");
+        var platformGreenDiffuse = content.Load<Texture2D>(contentFolderTextures + "platform_green_diffuse");
+        var platformOrangeDiffuse = content.Load<Texture2D>(contentFolderTextures + "platform_orange_diffuse");
+        var marbleDiffuse = content.Load<Texture2D>(contentFolderTextures + "marble_black_diffuse");
+        var rubberDiffuse = content.Load<Texture2D>(contentFolderTextures + "rubber_diffuse");
+        var metalDiffuse = content.Load<Texture2D>(contentFolderTextures + "metal_diffuse");
 
-    public void LoadTexture(Texture2D diffuseTexture, Texture2D normalTexture)
+        var defaultNormal = content.Load<Texture2D>(contentFolderTextures + "default_normal");
+        var platformSquareNormal = content.Load<Texture2D>(contentFolderTextures + "platform_square_normal");
+        var platformNormal = content.Load<Texture2D>(contentFolderTextures + "platform_normal");
+        var plainNormal = content.Load<Texture2D>(contentFolderTextures + "plain_normal");
+        var rubberNormal = content.Load<Texture2D>(contentFolderTextures + "rubber_normal");
+        var metalNormal = content.Load<Texture2D>(contentFolderTextures + "metal_normal");
+            
+        // Materials
+        Default.LoadTexture(defaultDiffuse, defaultNormal);
+        Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
+        MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
+        Marble.LoadTexture(marbleDiffuse, plainNormal);
+        Rubber.LoadTexture(rubberDiffuse, rubberNormal);
+        Metal.LoadTexture(metalDiffuse, metalNormal);
+    }
+
+    private void LoadTexture(Texture2D diffuseTexture, Texture2D normalTexture)
     {
         Diffuse = diffuseTexture;
         Normal = normalTexture;
