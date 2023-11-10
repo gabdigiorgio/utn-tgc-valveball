@@ -237,24 +237,24 @@ public static class PrefabManager
         CreateRamp(new Vector3(40f, 6f, 50f), new Vector3(255f, 5f, 0f) + offset, 0f, -0.3f);
     }
 
-    private static void CreatePlatform(Vector3 scale, Vector3 position, Material material = null)
+    private static void CreatePlatform(Vector3 scale, Vector3 position)
     {
-        Prefabs.Add(new TP.Prefab.Platform(scale, position, material));
+        Prefabs.Add(new Platform(scale, position, Material.Platform, 3f));
     }
 
-    private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ, Material material = null)
+    private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ)
     {
-        Prefabs.Add(new Ramp(scale, position, angleX, angleZ, material));
+        Prefabs.Add(new Ramp(scale, position, angleX, angleZ, Material.Platform, 2f));
     }
     
-    public static void CreateMovingObstacle(Vector3 scale, Vector3 position, Material material = null){
-        var movingObstacle = new MovingObstacle(scale, position, material);
-        Prefabs.Add(movingObstacle);
-    }
-
-    private static void CreateMovingPlatform(Vector3 scale, Vector3 position, Material material = null)
+    private static void CreateMovingPlatform(Vector3 scale, Vector3 position)
     {
-        var movingPlatform = new MovingPlatform(scale, position, material);
+        var movingPlatform = new MovingPlatform(scale, position, Material.MovingPlatform, 3f);
         Prefabs.Add(movingPlatform);
+    }
+    
+    public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
+        var movingObstacle = new MovingObstacle(scale, position, Material.Metal, 3f);
+        Prefabs.Add(movingObstacle);
     }
 }

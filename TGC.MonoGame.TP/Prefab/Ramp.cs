@@ -5,9 +5,9 @@ namespace TGC.MonoGame.TP.Prefab;
 
 public class Ramp : Prefab
 {
-    public OrientedBoundingBox OrientedBoundingBox { get; set; }
+    private OrientedBoundingBox OrientedBoundingBox { get; }
 
-    public Ramp(Vector3 scale, Vector3 position, float angleX, float angleZ, Material material) : base(scale, position, material)
+    public Ramp(Vector3 scale, Vector3 position, float angleX, float angleZ, Material material, float tiling) : base(scale, position, tiling, material)
     {
         var temporaryCubeAabb = BoundingVolumesExtensions.FromMatrix(Matrix.CreateScale(scale) * Matrix.CreateTranslation(position));
         var rampObb = OrientedBoundingBox.FromAABB(temporaryCubeAabb);

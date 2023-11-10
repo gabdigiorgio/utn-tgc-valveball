@@ -445,48 +445,10 @@ namespace TGC.MonoGame.TP
         {
             foreach (var prefab in prefabs)
             {
-                SetEffectParameters(effect, prefab.Material, prefab.Material.Tiling, prefab.World, TargetCamera);
+                SetEffectParameters(effect, prefab.Material, prefab.Tiling, prefab.World, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
         }
-        
-        /*private void DrawPlatforms(Effect effect, Material material)
-        {
-            foreach (var prefab in PrefabManager.Prefabs)
-            {
-                SetBlinnPhongParameters(effect, prefab.Material, Vector2.One * 3f, prefab.World, TargetCamera);
-                BoxPrimitive.Draw(effect);
-            }
-        }
-
-        private void DrawRamps(Effect effect, Material material)
-        {
-            foreach (var rampWorld in PrefabManager.RampMatrices)
-            {
-                SetBlinnPhongParameters(effect, material,Vector2.One * 2f, rampWorld, TargetCamera);
-                BoxPrimitive.Draw(effect);
-            }
-        }
-        
-        private void DrawMovingPlatforms(Effect effect, Material material)
-        {
-            foreach (var movingPlatform in PrefabManager.MovingPlatforms)
-            {
-                var movingPlatformWorld = movingPlatform.World;
-                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
-                BoxPrimitive.Draw(effect);
-            }
-        }
-        
-        private void DrawMovingObstacles(Effect effect, Material material)
-        {
-            foreach (var movingObstacle in PrefabManager.MovingObstacles)
-            {
-                var movingPlatformWorld = movingObstacle.World;
-                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
-                BoxPrimitive.Draw(effect);
-            }
-        }*/
         
         private static void SetEffectParameters(Effect effect, Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)

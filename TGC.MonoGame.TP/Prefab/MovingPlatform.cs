@@ -7,8 +7,8 @@ public class MovingPlatform : Platform
     protected Vector3 Direction = Vector3.Forward;
     private const float MaxHorizontalSpeed = 1.3f;
 
-    public MovingPlatform(Vector3 scale, Vector3 position, Material material = null)
-        : base(scale, position, material)
+    public MovingPlatform(Vector3 scale, Vector3 position, Material material, float tiling)
+        : base(scale, position, material, tiling)
     {
     }
 

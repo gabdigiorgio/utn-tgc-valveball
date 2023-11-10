@@ -5,9 +5,9 @@ namespace TGC.MonoGame.TP.Prefab;
 
 public class Platform : Prefab
 {
-    public BoundingBox BoundingBox { get; protected set; }
+    protected BoundingBox BoundingBox { get; set; }
 
-    public Platform(Vector3 scale, Vector3 position, Material material) : base(scale, position, material)
+    public Platform(Vector3 scale, Vector3 position, Material material, float tiling) : base(scale, position, tiling, material)
     {
         BoundingBox = BoundingVolumesExtensions.FromMatrix(World);
     }

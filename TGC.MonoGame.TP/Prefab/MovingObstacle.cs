@@ -5,8 +5,8 @@ namespace TGC.MonoGame.TP.Prefab;
 
 public class MovingObstacle : MovingPlatform
 {
-    public MovingObstacle(Vector3 scale, Vector3 position, Material material = null)
-        : base(scale, position, material)
+    public MovingObstacle(Vector3 scale, Vector3 position, Material material, float tiling)
+        : base(scale, position, material, tiling)
     {
     }
     

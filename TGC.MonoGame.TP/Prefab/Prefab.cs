@@ -4,18 +4,20 @@ namespace TGC.MonoGame.TP.Prefab;
 
 public abstract class Prefab
 {
-    public Matrix World;
     protected Vector3 Scale { get; }
-    public Vector3 Position { get; set; }
+    public Matrix World;
+    public Vector3 Position { get; protected set; }
     public Vector3? PreviousPosition { get; protected set; }
     public Material Material { get; }
+    public Vector2 Tiling { get; }
     
-    protected Prefab(Vector3 scale, Vector3 position, Material material = null)
+    protected Prefab(Vector3 scale, Vector3 position, float tiling, Material material = null)
     {
         Scale = scale;
         Position = position;
         World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
         Material = material ?? Material.Default;
+        Tiling = Vector2.One * tiling;
     }
     
     public abstract bool Intersects(BoundingSphere sphere);
