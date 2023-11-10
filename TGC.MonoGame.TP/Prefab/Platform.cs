@@ -17,13 +17,13 @@ public class Platform : Prefab
     {
         return BoundingBox.Intersects(sphere);
     }
-    
-    public override Vector3 GetCenter()
+
+    protected override Vector3 GetCenter()
     {
         return BoundingVolumesExtensions.GetCenter(BoundingBox);
     }
-    
-    public override Vector3 GetExtents()
+
+    protected override Vector3 GetExtents()
     {
         return BoundingVolumesExtensions.GetExtents(BoundingBox);
     }

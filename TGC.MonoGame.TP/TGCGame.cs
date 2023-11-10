@@ -83,7 +83,7 @@ namespace TGC.MonoGame.TP
         private static Player.Player Player { get; set; }
         
         // Colliders
-        private Gizmos.Gizmos Gizmos { get; set; }
+        public static Gizmos.Gizmos Gizmos { get; private set; }
 
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace TGC.MonoGame.TP
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = true
+                Enabled = false
             };
             
             // Collectibles
@@ -459,28 +459,13 @@ namespace TGC.MonoGame.TP
         {
             foreach (var prefab in PrefabManager.Prefabs)
             {
-                var center = prefab.GetCenter();
-                var extents = prefab.GetExtents();
-
-                switch (prefab)
-                {
-                    case MovingPlatform:
-                        Gizmos.DrawCube(center, extents * 2f, prefab.GizmosDrawColor);
-                        break;
-                    case Ramp rampPrefab:
-                    {
-                        var orientation = rampPrefab.GetOrientation();
-                        var orientedBoundingBoxWorld = Matrix.CreateScale(extents * 2f) * orientation * Matrix.CreateTranslation(center);
-                        Gizmos.DrawCube(orientedBoundingBoxWorld, prefab.GizmosDrawColor);
-                        break;
-                    }
-                }
+                prefab.DrawGizmos();
             }
             
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
-        private void DrawCollectibles(List<Collectible.Collectible> collectibles, GameTime gameTime)
+        private void DrawCollectibles(IEnumerable<Collectible.Collectible> collectibles, GameTime gameTime)
         {
             foreach (var collectible in collectibles)
             {

@@ -3,7 +3,7 @@ using TGC.MonoGame.TP.Collisions;
 
 namespace TGC.MonoGame.TP.Prefab;
 
-public class Ramp : Prefab
+public sealed class Ramp : Prefab
 {
     private OrientedBoundingBox OrientedBoundingBox { get; }
 
@@ -22,18 +22,18 @@ public class Ramp : Prefab
     {
         return OrientedBoundingBox.Intersects(sphere, out _, out _);
     }
-    
-    public override Vector3 GetCenter()
+
+    protected override Vector3 GetCenter()
     {
         return OrientedBoundingBox.Center;
     }
-    
-    public override Vector3 GetExtents()
+
+    protected override Vector3 GetExtents()
     {
         return OrientedBoundingBox.Extents;
     }
-    
-    public virtual Matrix GetOrientation()
+
+    private Matrix GetOrientation()
     {
         return OrientedBoundingBox.Orientation;
     }
@@ -41,6 +41,15 @@ public class Ramp : Prefab
     public override Vector3 ClosestPoint(Vector3 sphereCenter)
     {
         return OrientedBoundingBox.ClosestPoint(sphereCenter);
+    }
+    
+    public override void DrawGizmos()
+    {
+        var center = GetCenter();
+        var extents = GetExtents();
+        var orientation = GetOrientation();
+        var orientedBoundingBoxWorld = Matrix.CreateScale(extents * 2f) * orientation * Matrix.CreateTranslation(center);
+        TGCGame.Gizmos.DrawCube(orientedBoundingBoxWorld, GizmosDrawColor);
     }
     
     public override float MaxY()
