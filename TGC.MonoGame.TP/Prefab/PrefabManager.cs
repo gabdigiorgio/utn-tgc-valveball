@@ -6,13 +6,7 @@ namespace TGC.MonoGame.TP.Prefab;
 
 public static class PrefabManager
 {
-    public static readonly List<TP.Prefab.Prefab> Prefabs = new();
-    public static readonly List<Matrix> PlatformMatrices =  new();
-    public static readonly List<Matrix> RampMatrices =  new();
-    public static readonly List<BoundingBox> PlatformAabb =  new();
-    public static readonly List<OrientedBoundingBox> RampObb =  new();
-    public static readonly List<MovingPlatform> MovingPlatforms =  new();
-    public static readonly List<MovingObstacle> MovingObstacles =  new();
+    public static readonly List<Prefab> Prefabs = new();
     
     public static void CreateSquareCircuit(Vector3 offset)
     {

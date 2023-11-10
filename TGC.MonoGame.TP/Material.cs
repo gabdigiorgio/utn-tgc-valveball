@@ -20,15 +20,7 @@ public class Material
     // Between 1-64
     public float Shininess { get; private set; }
 
-    private Material(float kAmbient, float kDiffuse, float kSpecular, float shininess)
-    {
-        KAmbient = kAmbient;
-        KDiffuse = kDiffuse;
-        KSpecular = kSpecular;
-        Shininess = shininess;
-    }
-    
-    private Material(float kAmbient, float kDiffuse, float kSpecular, float shininess, float tiling)
+    private Material(float kAmbient, float kDiffuse, float kSpecular, float shininess, float tiling = 1f)
     {
         KAmbient = kAmbient;
         KDiffuse = kDiffuse;

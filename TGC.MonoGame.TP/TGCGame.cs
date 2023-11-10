@@ -354,16 +354,10 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            
-            DrawPlatforms(BlinnPhongEffect, Material.Platform);
-            
-            DrawRamps(BlinnPhongEffect, Material.Platform); 
 
-            DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
+            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
             
-            DrawMovingObstacles(BlinnPhongEffect, Material.Metal);
-            
-            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, Player.CurrentSphereMaterial.Material);
+            DrawModel(SphereWorld, BlinnPhongEffect, SphereModel, Player.CurrentSphereMaterial.Material);
 
             DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
@@ -439,15 +433,24 @@ namespace TGC.MonoGame.TP
             SpriteBatch.End();
         }
 
-        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
-            SetBlinnPhongParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
+        private void DrawModel(Matrix worldMatrix, Effect effect, Model model, Material material){
+            SetEffectParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
             {   
                 mesh.Draw();
             }
         }
 
-        private void DrawPlatforms(Effect effect, Material material)
+        private void DrawPrefabs(List<Prefab.Prefab> prefabs, Effect effect)
+        {
+            foreach (var prefab in prefabs)
+            {
+                SetEffectParameters(effect, prefab.Material, prefab.Material.Tiling, prefab.World, TargetCamera);
+                BoxPrimitive.Draw(effect);
+            }
+        }
+        
+        /*private void DrawPlatforms(Effect effect, Material material)
         {
             foreach (var prefab in PrefabManager.Prefabs)
             {
@@ -483,9 +486,9 @@ namespace TGC.MonoGame.TP
                 SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
-        }
+        }*/
         
-        private static void SetBlinnPhongParameters(Effect effect, Material material, Vector2 tiling, Matrix worldMatrix, 
+        private static void SetEffectParameters(Effect effect, Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
             effect.CurrentTechnique = effect.Techniques["NormalMapping"];
@@ -506,7 +509,7 @@ namespace TGC.MonoGame.TP
 
         private void DrawGizmos()
         {
-            foreach (var boundingBox in PrefabManager.PlatformAabb)
+            /*foreach (var boundingBox in PrefabManager.PlatformAabb)
             {
                 var center = BoundingVolumesExtensions.GetCenter(boundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
@@ -535,7 +538,7 @@ namespace TGC.MonoGame.TP
                 var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
-            }
+            }*/
             
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }

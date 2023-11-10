@@ -26,6 +26,11 @@ public class Platform : Prefab
     {
         return BoundingBox.Max.Y;
     }
+    
+    public override float? Intersects(Ray ray)
+    {
+        return ray.Intersects(BoundingBox);
+    }
 
     protected bool Intersects(Platform platform)
     {

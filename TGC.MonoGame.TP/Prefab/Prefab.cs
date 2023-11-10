@@ -10,12 +10,6 @@ public abstract class Prefab
     public Vector3? PreviousPosition { get; protected set; }
     public Material Material { get; }
     
-    public abstract bool Intersects(BoundingSphere sphere);
-    
-    public abstract Vector3 ClosestPoint(Vector3 sphereCenter);
-    
-    public abstract float MaxY();
-
     protected Prefab(Vector3 scale, Vector3 position, Material material = null)
     {
         Scale = scale;
@@ -23,7 +17,20 @@ public abstract class Prefab
         World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
         Material = material ?? Material.Default;
     }
+    
+    public abstract bool Intersects(BoundingSphere sphere);
+    
+    public abstract Vector3 ClosestPoint(Vector3 sphereCenter);
+    
+    public abstract float MaxY();
+    
     public virtual void Update(GameTime gameTime)
     {
     }
+
+    public virtual float? Intersects(Ray ray)
+    {
+        return null;
+    }
+    
 }
