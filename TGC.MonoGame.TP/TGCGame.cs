@@ -11,7 +11,7 @@ using TGC.MonoGame.TP.Collectible.Coins;
 using TGC.MonoGame.TP.Collectible.PowerUps;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
-using TGC.MonoGame.TP.Platform;
+using TGC.MonoGame.TP.Prefab;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace TGC.MonoGame.TP
@@ -271,9 +271,7 @@ namespace TGC.MonoGame.TP
 
                 SetLightPosition(new Vector3(150f, 750f, 0f));
 
-                PrefabManager.UpdateMovingPlatforms();
-                
-                PrefabManager.UpdateMovingObstacles(gameTime);
+                PrefabManager.UpdatePrefabs(gameTime);
 
                 UpdateCollectibles(gameTime);
 
@@ -533,7 +531,7 @@ namespace TGC.MonoGame.TP
 
             foreach (var movingObstacle in PrefabManager.MovingObstacles)
             {
-                var movingBoundingBox = movingObstacle.MovingBoundingBox;
+                var movingBoundingBox = movingObstacle.BoundingBox;
                 var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
                 var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
                 Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);

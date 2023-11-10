@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Collisions;
-using TGC.MonoGame.TP.Platform;
+using TGC.MonoGame.TP.Prefab;
 
 namespace TGC.MonoGame.TP;
 
@@ -311,7 +310,6 @@ public class Player
         
         DetectPrefabCollisions(sphereCenter, collisions);
         
-        //DetectMovingCollisions(sphereCenter, collisions);
 
         // Solve first near collisions
         collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
@@ -352,9 +350,9 @@ public class Player
 
             switch (prefab)
             {
-                case Platform.Platform when !(sphereCenter.Y > prefab.MaxY()):
+                case Platform when !(sphereCenter.Y > prefab.MaxY()):
                     break;
-                case Platform.Platform:
+                case Platform:
                     _onGround = true;
                     EndJump();
                     break;
@@ -365,41 +363,6 @@ public class Player
             }
         }
     }
-
-    /*private void DetectMovingCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
-    {
-        foreach (var movingPlatform in PrefabManager.MovingPlatforms)
-        {
-            var collider = movingPlatform.MovingBoundingBox;
-
-            if (!collider.Intersects(BoundingSphere)) continue;
-
-            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
-            var distance = Vector3.Distance(closestPoint, sphereCenter);
-            var platformMovement = movingPlatform.Position - movingPlatform.PreviousPosition;
-            collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
-
-            if (!(sphereCenter.Y > collider.Max.Y)) continue;
-            _onGround = true;
-            EndJump();
-        }
-
-        foreach (var movingObstacle in PrefabManager.MovingObstacles)
-        {
-            var collider = movingObstacle.MovingBoundingBox;
-
-            if (!collider.Intersects(BoundingSphere)) continue;
-
-            var closestPoint = BoundingVolumesExtensions.ClosestPoint(collider, sphereCenter);
-            var distance = Vector3.Distance(closestPoint, sphereCenter);
-            var platformMovement = movingObstacle.Position - movingObstacle.PreviousPosition;
-            collisions.Add(new CollisionInfo(closestPoint, distance, platformMovement));
-
-            if (!(sphereCenter.Y > collider.Max.Y)) continue;
-            _onGround = true;
-            EndJump();
-        }
-    }*/
 
     private static Vector3 SolveCollisionPosition(Vector3 currentPosition, Vector3 closestPoint, float radius, float distance)
     {

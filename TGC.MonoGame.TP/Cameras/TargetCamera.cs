@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using TGC.MonoGame.TP.Platform;
+using TGC.MonoGame.TP.Prefab;
 
 namespace TGC.MonoGame.TP.Cameras
 {

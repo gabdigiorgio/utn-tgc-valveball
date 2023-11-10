@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Collisions;
 
-namespace TGC.MonoGame.TP.Platform;
+namespace TGC.MonoGame.TP.Prefab;
 
 public class Ramp : Prefab
 {

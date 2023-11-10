@@ -1,11 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Collisions;
 
-namespace TGC.MonoGame.TP.Platform;
+namespace TGC.MonoGame.TP.Prefab;
 
 public class Platform : Prefab
 {
-    public BoundingBox BoundingBox { get; set; }
+    public BoundingBox BoundingBox { get; protected set; }
 
     public Platform(Vector3 scale, Vector3 position, Material material) : base(scale, position, material)
     {

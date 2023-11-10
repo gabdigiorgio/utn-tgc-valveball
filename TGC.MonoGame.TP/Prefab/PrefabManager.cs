@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Collisions;
 
-namespace TGC.MonoGame.TP.Platform;
+namespace TGC.MonoGame.TP.Prefab;
 
 public static class PrefabManager
 {
-    public static readonly List<Prefab> Prefabs = new();
+    public static readonly List<TP.Prefab.Prefab> Prefabs = new();
     public static readonly List<Matrix> PlatformMatrices =  new();
     public static readonly List<Matrix> RampMatrices =  new();
     public static readonly List<BoundingBox> PlatformAabb =  new();
@@ -36,32 +35,11 @@ public static class PrefabManager
         CreateRamps(offset);
     }
 
-    public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
-        var obstacleWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        var obstacleBoundingBox = BoundingVolumesExtensions.FromMatrix(obstacleWorld);
-        var movingObstacle = new MovingObstacle(obstacleWorld, scale, position, obstacleBoundingBox);
-        MovingObstacles.Add(movingObstacle);
-    }
-
-    public static void UpdateMovingObstacles(GameTime gameTime)
-    {
-        foreach (var movingObstacle in MovingObstacles)
-        {
-            movingObstacle.Update(gameTime);
-        }
-    }
-
-    private static void CreateMovingPlatform(Vector3 scale, Vector3 position, Material material = null)
-    {
-        var movingPlatform = new MovingPlatform(scale, position, material);
-        Prefabs.Add(movingPlatform);
-    }
-
-    public static void UpdateMovingPlatforms()
+    public static void UpdatePrefabs(GameTime gameTime)
     {
         foreach (var prefab in Prefabs)
         {
-            prefab.Update();
+            prefab.Update(gameTime);
         }
     }
     
@@ -267,12 +245,22 @@ public static class PrefabManager
 
     private static void CreatePlatform(Vector3 scale, Vector3 position, Material material = null)
     {
-        Prefabs.Add(new Platform(scale, position, material));
+        Prefabs.Add(new TP.Prefab.Platform(scale, position, material));
     }
 
     private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ, Material material = null)
     {
         Prefabs.Add(new Ramp(scale, position, angleX, angleZ, material));
     }
+    
+    public static void CreateMovingObstacle(Vector3 scale, Vector3 position, Material material = null){
+        var movingObstacle = new MovingObstacle(scale, position, material);
+        Prefabs.Add(movingObstacle);
+    }
 
+    private static void CreateMovingPlatform(Vector3 scale, Vector3 position, Material material = null)
+    {
+        var movingPlatform = new MovingPlatform(scale, position, material);
+        Prefabs.Add(movingPlatform);
+    }
 }

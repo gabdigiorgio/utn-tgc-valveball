@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace TGC.MonoGame.TP.Platform;
+namespace TGC.MonoGame.TP.Prefab;
 
 public abstract class Prefab
 {
@@ -23,7 +23,7 @@ public abstract class Prefab
         World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
         Material = material ?? Material.Default;
     }
-    public virtual void Update()
+    public virtual void Update(GameTime gameTime)
     {
     }
 }
