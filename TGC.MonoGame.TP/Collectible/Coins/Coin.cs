@@ -14,7 +14,7 @@ public class Coin : Collectible
         Scale = DefaultScale;
     }
 
-    protected override void OnCollected(Player player)
+    protected override void OnCollected(Player.Player player)
     {
         player.IncreaseScore(Value);
     }

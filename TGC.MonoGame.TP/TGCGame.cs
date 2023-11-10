@@ -11,7 +11,7 @@ using TGC.MonoGame.TP.Collectible.Coins;
 using TGC.MonoGame.TP.Collectible.PowerUps;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
-using TGC.MonoGame.TP.Platform;
+using TGC.MonoGame.TP.Prefab;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace TGC.MonoGame.TP
@@ -80,10 +80,10 @@ namespace TGC.MonoGame.TP
 
         // Models
         private Model SphereModel { get; set; }
-        private static Player Player { get; set; }
+        private static Player.Player Player { get; set; }
         
         // Colliders
-        private Gizmos.Gizmos Gizmos { get; set; }
+        public static Gizmos.Gizmos Gizmos { get; private set; }
 
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace TGC.MonoGame.TP
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 250);
             
             // Player
-            Player = new Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
+            Player = new Player.Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
             
             // Gizmos
             Gizmos = new Gizmos.Gizmos
@@ -191,51 +191,38 @@ namespace TGC.MonoGame.TP
             _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             AudioManager.LoadSounds(Content);
-            AudioManager.PlayBackgroundMusic(0.1f, true);
+            //AudioManager.PlayBackgroundMusic(0.1f, true);
             
-            // Diffuse
-            var platformGreenDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_green_diffuse");
-            var platformOrangeDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "platform_orange_diffuse");
-            var marbleDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "marble_black_diffuse");
-            var rubberDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "rubber_diffuse");
-            var metalDiffuse = Content.Load<Texture2D>(ContentFolderTextures + "metal_diffuse");
-            
-            // Normals
-            var platformSquareNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_square_normal");
-            var platformNormal = Content.Load<Texture2D>(ContentFolderTextures + "platform_normal");
-            var plainNormal = Content.Load<Texture2D>(ContentFolderTextures + "plain_normal");
-            var rubberNormal = Content.Load<Texture2D>(ContentFolderTextures + "rubber_normal");
-            var metalNormal = Content.Load<Texture2D>(ContentFolderTextures + "metal_normal");
-            
-            // Materials
-            Material.Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
-            Material.MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
-            Material.Marble.LoadTexture(marbleDiffuse, plainNormal);
-            Material.Rubber.LoadTexture(rubberDiffuse, rubberNormal);
-            Material.Metal.LoadTexture(metalDiffuse, metalNormal);
+            Material.Material.LoadMaterials(Content);
             
             // Platform
-            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, platformGreenDiffuse);
+            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, Material.Material.Default.Diffuse);
             
-            // Collectibles
             CollectibleManager.LoadCollectibles(Content);
             
-            // Sphere
-            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
-            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
-            SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
+            LoadSphere();
+
+            LoadSkyBox();
             
-            // SkyBox
+            Gizmos.LoadContent(GraphicsDevice, Content);
+
+            base.LoadContent();
+        }
+
+        private void LoadSkyBox()
+        {
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
             var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
-            
-            // Gizmos
-            Gizmos.LoadContent(GraphicsDevice, Content);
+        }
 
-            base.LoadContent();
+        private void LoadSphere()
+        {
+            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
+            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
+            SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
         }
 
         /// <summary>
@@ -268,9 +255,7 @@ namespace TGC.MonoGame.TP
 
                 SetLightPosition(new Vector3(150f, 750f, 0f));
 
-                PrefabManager.UpdateMovingPlatforms();
-                
-                PrefabManager.UpdateMovingObstacles(gameTime);
+                PrefabManager.UpdatePrefabs(gameTime);
 
                 UpdateCollectibles(gameTime);
 
@@ -353,20 +338,15 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            
-            DrawPlatforms(BlinnPhongEffect, Material.Platform);
-            
-            DrawRamps(BlinnPhongEffect, Material.Platform); 
 
-            DrawMovingPlatforms(BlinnPhongEffect, Material.MovingPlatform);
+            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
             
-            DrawMovingObstacles(BlinnPhongEffect, Material.Metal);
-            
-            DrawTexturedModel(SphereWorld, SphereModel, BlinnPhongEffect, Player.CurrentSphereMaterial.Material);
+            DrawModel(SphereWorld, BlinnPhongEffect, SphereModel, Player.CurrentSphereMaterial.Material);
 
             DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
             DrawGizmos();
+            
             Gizmos.Draw();
             
             var originalRasterizerState = GraphicsDevice.RasterizerState;
@@ -438,53 +418,24 @@ namespace TGC.MonoGame.TP
             SpriteBatch.End();
         }
 
-        private void DrawTexturedModel(Matrix worldMatrix, Model model, Effect effect, Material material){
-            SetBlinnPhongParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
+        private void DrawModel(Matrix worldMatrix, Effect effect, Model model, Material.Material material){
+            SetEffectParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
             {   
                 mesh.Draw();
             }
         }
 
-        private void DrawPlatforms(Effect effect, Material material)
+        private void DrawPrefabs(List<Prefab.Prefab> prefabs, Effect effect)
         {
-            foreach (var platformWorld in PrefabManager.PlatformMatrices)
+            foreach (var prefab in prefabs)
             {
-                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, platformWorld, TargetCamera);
-                BoxPrimitive.Draw(effect);
-            }
-        }
-
-        private void DrawRamps(Effect effect, Material material)
-        {
-            foreach (var rampWorld in PrefabManager.RampMatrices)
-            {
-                SetBlinnPhongParameters(effect, material,Vector2.One * 2f, rampWorld, TargetCamera);
+                SetEffectParameters(effect, prefab.Material, prefab.Tiling, prefab.World, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
         }
         
-        private void DrawMovingPlatforms(Effect effect, Material material)
-        {
-            foreach (var movingPlatform in PrefabManager.MovingPlatforms)
-            {
-                var movingPlatformWorld = movingPlatform.World;
-                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
-                BoxPrimitive.Draw(effect);
-            }
-        }
-        
-        private void DrawMovingObstacles(Effect effect, Material material)
-        {
-            foreach (var movingObstacle in PrefabManager.MovingObstacles)
-            {
-                var movingPlatformWorld = movingObstacle.World;
-                SetBlinnPhongParameters(effect, material, Vector2.One * 3f, movingPlatformWorld, TargetCamera);
-                BoxPrimitive.Draw(effect);
-            }
-        }
-        
-        private static void SetBlinnPhongParameters(Effect effect, Material material, Vector2 tiling, Matrix worldMatrix, 
+        private static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
             effect.CurrentTechnique = effect.Techniques["NormalMapping"];
@@ -505,41 +456,15 @@ namespace TGC.MonoGame.TP
 
         private void DrawGizmos()
         {
-            foreach (var boundingBox in PrefabManager.PlatformAabb)
+            foreach (var prefab in PrefabManager.Prefabs)
             {
-                var center = BoundingVolumesExtensions.GetCenter(boundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.Red);
-            }
-
-            foreach (var orientedBoundingBox in PrefabManager.RampObb)
-            {
-                var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f)
-                                               * orientedBoundingBox.Orientation *
-                                               Matrix.CreateTranslation(orientedBoundingBox.Center);
-                Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
-            }
-
-            foreach (var movingPlatform in PrefabManager.MovingPlatforms)
-            {
-                var movingBoundingBox = movingPlatform.MovingBoundingBox;
-                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
-            }
-
-            foreach (var movingObstacle in PrefabManager.MovingObstacles)
-            {
-                var movingBoundingBox = movingObstacle.MovingBoundingBox;
-                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
+                prefab.DrawGizmos();
             }
             
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }
 
-        private void DrawCollectibles(List<Collectible.Collectible> collectibles, GameTime gameTime)
+        private void DrawCollectibles(IEnumerable<Collectible.Collectible> collectibles, GameTime gameTime)
         {
             foreach (var collectible in collectibles)
             {

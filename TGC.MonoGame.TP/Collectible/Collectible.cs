@@ -31,7 +31,7 @@ public abstract class Collectible
         _totalElapsedTime = 0f;
     }
 
-    public virtual void Update(GameTime gameTime, Player player)
+    public virtual void Update(GameTime gameTime, Player.Player player)
     {
         HandleCollection(player);
         UpdateAnimation(gameTime);
@@ -50,7 +50,7 @@ public abstract class Collectible
         World = Matrix.CreateScale(Scale) * Matrix.CreateRotationY(rotationAngle) * Matrix.CreateTranslation(Position);
     }
 
-    private void HandleCollection(Player player)
+    private void HandleCollection(Player.Player player)
     {
         if (!CanInteract || !player.BoundingSphere.Intersects(BoundingBox)) return;
         Sound.Play();
@@ -59,5 +59,5 @@ public abstract class Collectible
         CanInteract = false;
     }
 
-    protected abstract void OnCollected(Player player);
+    protected abstract void OnCollected(Player.Player player);
 }

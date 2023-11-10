@@ -1,17 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using TGC.MonoGame.TP.Collisions;
 
-namespace TGC.MonoGame.TP.Platform;
+namespace TGC.MonoGame.TP.Prefab;
 
 public static class PrefabManager
 {
-    public static readonly List<Matrix> PlatformMatrices =  new();
-    public static readonly List<Matrix> RampMatrices =  new();
-    public static readonly List<BoundingBox> PlatformAabb =  new();
-    public static readonly List<OrientedBoundingBox> RampObb =  new();
-    public static readonly List<MovingPlatform> MovingPlatforms =  new();
-    public static readonly List<MovingObstacle> MovingObstacles =  new();
+    public static readonly List<Prefab> Prefabs = new();
     
     public static void CreateSquareCircuit(Vector3 offset)
     {
@@ -29,40 +23,16 @@ public static class PrefabManager
         CreatePlatform(new Vector3(50f, 6f, 80f), new Vector3(300f, 9.5f, 185f) + offset);
             
         // Center platform
-        // La idea sería que se vaya moviendo 
         CreateMovingPlatform(new Vector3(50f, 6f, 100f), new Vector3(150f, 0f, 0f) + offset);
             
         CreateRamps(offset);
     }
 
-    public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
-        var obstacleWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        var obstacleBoundingBox = BoundingVolumesExtensions.FromMatrix(obstacleWorld);
-        var movingObstacle = new MovingObstacle(obstacleWorld, scale, position, obstacleBoundingBox);
-        MovingObstacles.Add(movingObstacle);
-    }
-
-    public static void UpdateMovingObstacles(GameTime gameTime)
+    public static void UpdatePrefabs(GameTime gameTime)
     {
-        foreach (var movingObstacle in MovingObstacles)
+        foreach (var prefab in Prefabs)
         {
-            movingObstacle.Update(gameTime);
-        }
-    }
-
-    private static void CreateMovingPlatform(Vector3 scale, Vector3 position)
-    {
-        var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        var platformBoundingBox = BoundingVolumesExtensions.FromMatrix(platformWorld);
-        var movingPlatform = new MovingPlatform(platformWorld, scale, position, platformBoundingBox);
-        MovingPlatforms.Add(movingPlatform);
-    }
-
-    public static void UpdateMovingPlatforms()
-    {
-        foreach (var movingPlatform in MovingPlatforms)
-        {
-            movingPlatform.Update();
+            prefab.Update(gameTime);
         }
     }
     
@@ -266,23 +236,24 @@ public static class PrefabManager
         CreateRamp(new Vector3(40f, 6f, 50f), new Vector3(255f, 5f, 0f) + offset, 0f, -0.3f);
     }
 
-    private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ)
-    {
-        var temporaryCubeAabb = BoundingVolumesExtensions.FromMatrix(Matrix.CreateScale(scale) * Matrix.CreateTranslation(position));
-        var rampObb = OrientedBoundingBox.FromAABB(temporaryCubeAabb);
-        rampObb.Rotate(Matrix.CreateRotationX(angleX) * Matrix.CreateRotationZ(angleZ));
-        
-        RampObb.Add(rampObb);
-
-        var rampWorld = Matrix.CreateScale(scale) * Matrix.CreateRotationX(angleX) 
-                                                  * Matrix.CreateRotationZ(angleZ) * Matrix.CreateTranslation(position);
-        RampMatrices.Add(rampWorld);
-    }
-    
     private static void CreatePlatform(Vector3 scale, Vector3 position)
     {
-        var platformWorld = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        PlatformAabb.Add(BoundingVolumesExtensions.FromMatrix(platformWorld));
-        PlatformMatrices.Add(platformWorld);
+        Prefabs.Add(new Platform(scale, position, Material.Material.Platform, 3f));
+    }
+
+    private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ)
+    {
+        Prefabs.Add(new Ramp(scale, position, angleX, angleZ, Material.Material.Platform, 2f));
+    }
+    
+    private static void CreateMovingPlatform(Vector3 scale, Vector3 position)
+    {
+        var movingPlatform = new MovingPlatform(scale, position, Material.Material.MovingPlatform, 3f);
+        Prefabs.Add(movingPlatform);
+    }
+    
+    public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
+        var movingObstacle = new MovingObstacle(scale, position, Material.Material.Metal, 3f);
+        Prefabs.Add(movingObstacle);
     }
 }

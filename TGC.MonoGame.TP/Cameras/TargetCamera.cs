@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using TGC.MonoGame.TP.Platform;
+using TGC.MonoGame.TP.Prefab;
 
 namespace TGC.MonoGame.TP.Cameras
 {
@@ -119,9 +119,9 @@ namespace TGC.MonoGame.TP.Cameras
             var normalizedDifference = difference / distanceToPlayer;
             var cameraToPlayerRay = new Ray(cameraPosition, normalizedDifference);
             
-            foreach (var collider in PrefabManager.PlatformAabb)
+            foreach (var prefab in PrefabManager.Prefabs)
             {
-                var distance = cameraToPlayerRay.Intersects(collider);
+                var distance = prefab.Intersects(cameraToPlayerRay);
                 if (distance < distanceToPlayer)
                     return distance;
             }
