@@ -15,6 +15,7 @@ public class Ramp : Prefab
         OrientedBoundingBox = rampObb;
         World = Matrix.CreateScale(scale) * Matrix.CreateRotationX(angleX) 
                                           * Matrix.CreateRotationZ(angleZ) * Matrix.CreateTranslation(position);
+        GizmosDrawColor = Color.Red;
     }
 
     public override bool Intersects(BoundingSphere sphere)
@@ -32,7 +33,7 @@ public class Ramp : Prefab
         return OrientedBoundingBox.Extents;
     }
     
-    public override Matrix GetOrientation()
+    public virtual Matrix GetOrientation()
     {
         return OrientedBoundingBox.Orientation;
     }

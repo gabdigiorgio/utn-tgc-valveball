@@ -10,6 +10,7 @@ public abstract class Prefab
     public Vector3? PreviousPosition { get; protected set; }
     public Material.Material Material { get; }
     public Vector2 Tiling { get; }
+    public Color GizmosDrawColor { get; protected set; }
     
     protected Prefab(Vector3 scale, Vector3 position, float tiling, Material.Material material = null)
     {
@@ -29,9 +30,7 @@ public abstract class Prefab
     public abstract Vector3 GetCenter();
     
     public abstract Vector3 GetExtents();
-    
-    public abstract Matrix GetOrientation();
-    
+
     public virtual void Update(GameTime gameTime)
     {
     }

@@ -465,16 +465,13 @@ namespace TGC.MonoGame.TP
                 switch (prefab)
                 {
                     case MovingPlatform:
-                        Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
-                        break;
-                    case Platform:
-                        Gizmos.DrawCube(center, extents * 2f, Color.Red);
+                        Gizmos.DrawCube(center, extents * 2f, prefab.GizmosDrawColor);
                         break;
                     case Ramp rampPrefab:
                     {
                         var orientation = rampPrefab.GetOrientation();
                         var orientedBoundingBoxWorld = Matrix.CreateScale(extents * 2f) * orientation * Matrix.CreateTranslation(center);
-                        Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
+                        Gizmos.DrawCube(orientedBoundingBoxWorld, prefab.GizmosDrawColor);
                         break;
                     }
                 }

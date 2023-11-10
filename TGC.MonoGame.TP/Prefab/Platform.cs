@@ -10,6 +10,7 @@ public class Platform : Prefab
     public Platform(Vector3 scale, Vector3 position, Material.Material material, float tiling) : base(scale, position, tiling, material)
     {
         BoundingBox = BoundingVolumesExtensions.FromMatrix(World);
+        GizmosDrawColor = Color.Red;
     }
     
     public override bool Intersects(BoundingSphere sphere)
@@ -25,11 +26,6 @@ public class Platform : Prefab
     public override Vector3 GetExtents()
     {
         return BoundingVolumesExtensions.GetExtents(BoundingBox);
-    }
-
-    public override Matrix GetOrientation()
-    {
-        throw new System.NotImplementedException();
     }
 
     public override Vector3 ClosestPoint(Vector3 sphereCenter)

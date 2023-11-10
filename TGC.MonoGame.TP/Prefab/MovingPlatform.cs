@@ -10,6 +10,7 @@ public class MovingPlatform : Platform
     public MovingPlatform(Vector3 scale, Vector3 position, Material.Material material, float tiling)
         : base(scale, position, material, tiling)
     {
+        GizmosDrawColor = Color.GreenYellow;
     }
 
     public override void Update(GameTime gameTime)
