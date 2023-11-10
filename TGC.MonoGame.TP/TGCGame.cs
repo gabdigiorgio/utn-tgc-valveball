@@ -203,8 +203,7 @@ namespace TGC.MonoGame.TP
             LoadSphere();
 
             LoadSkyBox();
-
-            // Gizmos
+            
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();

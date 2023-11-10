@@ -10,7 +10,7 @@ public abstract class Prefab
     public Vector3? PreviousPosition { get; protected set; }
     public Material.Material Material { get; }
     public Vector2 Tiling { get; }
-    public Color GizmosDrawColor { get; protected init; }
+    protected Color GizmosDrawColor { get; init; }
     
     protected Prefab(Vector3 scale, Vector3 position, float tiling, Material.Material material = null)
     {
