@@ -7,7 +7,7 @@ using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Prefab;
 
-namespace TGC.MonoGame.TP;
+namespace TGC.MonoGame.TP.Player;
 
 public class Player
 {

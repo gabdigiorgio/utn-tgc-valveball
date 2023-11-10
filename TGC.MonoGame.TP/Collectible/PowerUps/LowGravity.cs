@@ -15,12 +15,12 @@ public class LowGravity : PowerUp
         World = Matrix.CreateScale(DefaultScale) * Matrix.CreateTranslation(position);
     }
 
-    protected override void SetPowerUp(Player player)
+    protected override void SetPowerUp(Player.Player player)
     {
         player.Gravity = 60f;
         player.CurrentSphereMaterial.MaxJumpHeight += 60f;
     }
-    protected override void ResetPowerUp(Player player)
+    protected override void ResetPowerUp(Player.Player player)
     {
         player.ResetGravity();
         player.CurrentSphereMaterial.MaxJumpHeight -= 60f;

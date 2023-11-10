@@ -14,34 +14,34 @@ public abstract class PowerUp : Collectible
         ElapsedTimeSinceActivation = 0f;
     }
 
-    public override void Update(GameTime gameTime, Player player)
+    public override void Update(GameTime gameTime, Player.Player player)
     {
         base.Update(gameTime, player);
         UpdatePowerUpState(gameTime, player);
     }
 
-    protected abstract void SetPowerUp(Player player);
-    protected abstract void ResetPowerUp(Player player);
+    protected abstract void SetPowerUp(Player.Player player);
+    protected abstract void ResetPowerUp(Player.Player player);
     
-    protected override void OnCollected(Player player)
+    protected override void OnCollected(Player.Player player)
     {
         ActivatePowerUp(player);
     }
 
-    private void ActivatePowerUp(Player player)
+    private void ActivatePowerUp(Player.Player player)
     {
         SetPowerUp(player);
         IsPowerUpActive = true;
     }
 
-    private void DeactivatePowerUp(Player player)
+    private void DeactivatePowerUp(Player.Player player)
     {
         ResetPowerUp(player);
         IsPowerUpActive = false;
         ElapsedTimeSinceActivation = 0f;
     }
     
-    private void UpdatePowerUpState(GameTime gameTime, Player player)
+    private void UpdatePowerUpState(GameTime gameTime, Player.Player player)
     {
         var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         if (!IsPowerUpActive) return;

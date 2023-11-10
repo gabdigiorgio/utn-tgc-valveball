@@ -239,22 +239,22 @@ public static class PrefabManager
 
     private static void CreatePlatform(Vector3 scale, Vector3 position)
     {
-        Prefabs.Add(new Platform(scale, position, Material.Platform, 3f));
+        Prefabs.Add(new Platform(scale, position, Material.Material.Platform, 3f));
     }
 
     private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ)
     {
-        Prefabs.Add(new Ramp(scale, position, angleX, angleZ, Material.Platform, 2f));
+        Prefabs.Add(new Ramp(scale, position, angleX, angleZ, Material.Material.Platform, 2f));
     }
     
     private static void CreateMovingPlatform(Vector3 scale, Vector3 position)
     {
-        var movingPlatform = new MovingPlatform(scale, position, Material.MovingPlatform, 3f);
+        var movingPlatform = new MovingPlatform(scale, position, Material.Material.MovingPlatform, 3f);
         Prefabs.Add(movingPlatform);
     }
     
     public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
-        var movingObstacle = new MovingObstacle(scale, position, Material.Metal, 3f);
+        var movingObstacle = new MovingObstacle(scale, position, Material.Material.Metal, 3f);
         Prefabs.Add(movingObstacle);
     }
 }

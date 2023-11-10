@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TGC.MonoGame.TP;
+namespace TGC.MonoGame.TP.Material;
 
 public class Material
 {

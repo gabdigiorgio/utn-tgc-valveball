@@ -80,7 +80,7 @@ namespace TGC.MonoGame.TP
 
         // Models
         private Model SphereModel { get; set; }
-        private static Player Player { get; set; }
+        private static Player.Player Player { get; set; }
         
         // Colliders
         private Gizmos.Gizmos Gizmos { get; set; }
@@ -113,7 +113,7 @@ namespace TGC.MonoGame.TP
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 250);
             
             // Player
-            Player = new Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
+            Player = new Player.Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
             
             // Gizmos
             Gizmos = new Gizmos.Gizmos
@@ -193,10 +193,10 @@ namespace TGC.MonoGame.TP
             AudioManager.LoadSounds(Content);
             AudioManager.PlayBackgroundMusic(0.1f, true);
             
-            Material.LoadMaterials(Content);
+            Material.Material.LoadMaterials(Content);
             
             // Platform
-            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, Material.Default.Diffuse);
+            BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, Material.Material.Default.Diffuse);
             
             // Collectibles
             CollectibleManager.LoadCollectibles(Content);
@@ -411,7 +411,7 @@ namespace TGC.MonoGame.TP
             SpriteBatch.End();
         }
 
-        private void DrawModel(Matrix worldMatrix, Effect effect, Model model, Material material){
+        private void DrawModel(Matrix worldMatrix, Effect effect, Model model, Material.Material material){
             SetEffectParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
             {   
@@ -428,7 +428,7 @@ namespace TGC.MonoGame.TP
             }
         }
         
-        private static void SetEffectParameters(Effect effect, Material material, Vector2 tiling, Matrix worldMatrix, 
+        private static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
             effect.CurrentTechnique = effect.Techniques["NormalMapping"];

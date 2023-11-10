@@ -15,12 +15,12 @@ public class SpeedUp : PowerUp
         World = Matrix.CreateScale(DefaultScale) * Matrix.CreateTranslation(position);
     }
 
-    protected override void SetPowerUp(Player player)
+    protected override void SetPowerUp(Player.Player player)
     {
         player.CurrentSphereMaterial.Acceleration += SpeedIncrement;
         player.CurrentSphereMaterial.MaxSpeed += SpeedIncrement;
     }
-    protected override void ResetPowerUp(Player player)
+    protected override void ResetPowerUp(Player.Player player)
     {
         player.CurrentSphereMaterial.Acceleration -= SpeedIncrement;
         player.CurrentSphereMaterial.MaxSpeed -= SpeedIncrement;

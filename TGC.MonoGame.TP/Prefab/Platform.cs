@@ -7,7 +7,7 @@ public class Platform : Prefab
 {
     protected BoundingBox BoundingBox { get; set; }
 
-    public Platform(Vector3 scale, Vector3 position, Material material, float tiling) : base(scale, position, tiling, material)
+    public Platform(Vector3 scale, Vector3 position, Material.Material material, float tiling) : base(scale, position, tiling, material)
     {
         BoundingBox = BoundingVolumesExtensions.FromMatrix(World);
     }

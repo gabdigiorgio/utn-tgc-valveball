@@ -8,15 +8,15 @@ public abstract class Prefab
     public Matrix World;
     public Vector3 Position { get; protected set; }
     public Vector3? PreviousPosition { get; protected set; }
-    public Material Material { get; }
+    public Material.Material Material { get; }
     public Vector2 Tiling { get; }
     
-    protected Prefab(Vector3 scale, Vector3 position, float tiling, Material material = null)
+    protected Prefab(Vector3 scale, Vector3 position, float tiling, Material.Material material = null)
     {
         Scale = scale;
         Position = position;
         World = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
-        Material = material ?? Material.Default;
+        Material = material ?? TP.Material.Material.Default;
         Tiling = Vector2.One * tiling;
     }
     
