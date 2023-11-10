@@ -93,6 +93,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/PowerUpShader.fx
 
+#begin Effects/ShadowMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ShadowMap.fx
+
 #begin Effects/SkyBox.fx
 /importer:EffectImporter
 /processor:EffectProcessor
