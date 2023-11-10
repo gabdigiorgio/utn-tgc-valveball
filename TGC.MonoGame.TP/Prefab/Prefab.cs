@@ -26,6 +26,12 @@ public abstract class Prefab
     
     public abstract float MaxY();
     
+    public abstract Vector3 GetCenter();
+    
+    public abstract Vector3 GetExtents();
+    
+    public abstract Matrix GetOrientation();
+    
     public virtual void Update(GameTime gameTime)
     {
     }
@@ -34,5 +40,4 @@ public abstract class Prefab
     {
         return null;
     }
-    
 }

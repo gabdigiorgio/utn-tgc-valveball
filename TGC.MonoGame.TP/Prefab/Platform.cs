@@ -17,6 +17,21 @@ public class Platform : Prefab
         return BoundingBox.Intersects(sphere);
     }
     
+    public override Vector3 GetCenter()
+    {
+        return BoundingVolumesExtensions.GetCenter(BoundingBox);
+    }
+    
+    public override Vector3 GetExtents()
+    {
+        return BoundingVolumesExtensions.GetExtents(BoundingBox);
+    }
+
+    public override Matrix GetOrientation()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override Vector3 ClosestPoint(Vector3 sphereCenter)
     {
         return BoundingVolumesExtensions.ClosestPoint(BoundingBox, sphereCenter);

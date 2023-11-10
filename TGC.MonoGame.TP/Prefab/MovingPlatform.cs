@@ -19,7 +19,7 @@ public class MovingPlatform : Platform
         UpdateBoundingBox(increment);
         UpdateWorldMatrix();
     }
-    
+
     protected virtual Vector3 Move(GameTime gameTime)
     {
         var increment = Direction * MaxHorizontalSpeed;

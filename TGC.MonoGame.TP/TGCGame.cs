@@ -118,7 +118,7 @@ namespace TGC.MonoGame.TP
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
-                Enabled = false
+                Enabled = true
             };
             
             // Collectibles
@@ -191,32 +191,39 @@ namespace TGC.MonoGame.TP
             _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             AudioManager.LoadSounds(Content);
-            AudioManager.PlayBackgroundMusic(0.1f, true);
+            //AudioManager.PlayBackgroundMusic(0.1f, true);
             
             Material.Material.LoadMaterials(Content);
             
             // Platform
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, Material.Material.Default.Diffuse);
             
-            // Collectibles
             CollectibleManager.LoadCollectibles(Content);
             
-            // Sphere
-            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
-            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
-            SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
-            
-            // SkyBox
-            var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
-            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
-            var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
-            SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
-            
+            LoadSphere();
+
+            LoadSkyBox();
+
             // Gizmos
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
+        }
+
+        private void LoadSkyBox()
+        {
+            var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
+            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
+            var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
+            SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
+        }
+
+        private void LoadSphere()
+        {
+            SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
+            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
+            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
+            SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
         }
 
         /// <summary>
@@ -340,6 +347,7 @@ namespace TGC.MonoGame.TP
             DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
             DrawGizmos();
+            
             Gizmos.Draw();
             
             var originalRasterizerState = GraphicsDevice.RasterizerState;
@@ -449,36 +457,28 @@ namespace TGC.MonoGame.TP
 
         private void DrawGizmos()
         {
-            /*foreach (var boundingBox in PrefabManager.PlatformAabb)
+            foreach (var prefab in PrefabManager.Prefabs)
             {
-                var center = BoundingVolumesExtensions.GetCenter(boundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(boundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.Red);
-            }
+                var center = prefab.GetCenter();
+                var extents = prefab.GetExtents();
 
-            foreach (var orientedBoundingBox in PrefabManager.RampObb)
-            {
-                var orientedBoundingBoxWorld = Matrix.CreateScale(orientedBoundingBox.Extents * 2f)
-                                               * orientedBoundingBox.Orientation *
-                                               Matrix.CreateTranslation(orientedBoundingBox.Center);
-                Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
+                switch (prefab)
+                {
+                    case MovingPlatform:
+                        Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
+                        break;
+                    case Platform:
+                        Gizmos.DrawCube(center, extents * 2f, Color.Red);
+                        break;
+                    case Ramp rampPrefab:
+                    {
+                        var orientation = rampPrefab.GetOrientation();
+                        var orientedBoundingBoxWorld = Matrix.CreateScale(extents * 2f) * orientation * Matrix.CreateTranslation(center);
+                        Gizmos.DrawCube(orientedBoundingBoxWorld, Color.Red);
+                        break;
+                    }
+                }
             }
-
-            foreach (var movingPlatform in PrefabManager.MovingPlatforms)
-            {
-                var movingBoundingBox = movingPlatform.BoundingBox;
-                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
-            }
-
-            foreach (var movingObstacle in PrefabManager.MovingObstacles)
-            {
-                var movingBoundingBox = movingObstacle.BoundingBox;
-                var center = BoundingVolumesExtensions.GetCenter(movingBoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(movingBoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.GreenYellow);
-            }*/
             
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
         }

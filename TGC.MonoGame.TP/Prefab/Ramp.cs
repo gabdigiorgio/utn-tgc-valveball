@@ -22,6 +22,21 @@ public class Ramp : Prefab
         return OrientedBoundingBox.Intersects(sphere, out _, out _);
     }
     
+    public override Vector3 GetCenter()
+    {
+        return OrientedBoundingBox.Center;
+    }
+    
+    public override Vector3 GetExtents()
+    {
+        return OrientedBoundingBox.Extents;
+    }
+    
+    public override Matrix GetOrientation()
+    {
+        return OrientedBoundingBox.Orientation;
+    }
+    
     public override Vector3 ClosestPoint(Vector3 sphereCenter)
     {
         return OrientedBoundingBox.ClosestPoint(sphereCenter);
