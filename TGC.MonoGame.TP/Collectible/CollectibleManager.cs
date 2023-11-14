@@ -14,12 +14,6 @@ public static class CollectibleManager
 {
     public static readonly List<Collectible> Collectibles = new();
     
-    public static void CreateCollectible<T>(float x, float y, float z) where T : Collectible
-    {
-        var position = new Vector3(x, y, z);
-        Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
-    }
-    
     public static void LoadCollectibles(ContentManager content)
     {
         var collectibleModels = new Dictionary<Type, Model>
@@ -37,6 +31,48 @@ public static class CollectibleManager
             AssignModelAndShader(collectible, collectibleModels, basicShader, powerUpEffect);
             AssignSound(collectible, AudioManager.CollectibleSounds);
         }
+    }
+    
+    public static void CreateCoinsSquareCircuit(float xOffset, float yOffset, float zOffset)
+    {
+        // Side
+        CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 50f + zOffset);
+        CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 75f + zOffset);
+        CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 95f + zOffset);
+        CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -50f + zOffset);
+        CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -75f + zOffset);
+        CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -95f + zOffset);
+        
+        CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 50f + zOffset);
+        CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 75f + zOffset);
+        CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 95f + zOffset);
+        CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -50f + zOffset);
+        CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -75f + zOffset);
+        CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -95f + zOffset);
+
+        // Parable
+        CreateCollectible<Coin>(230f + xOffset, 23f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(210f + xOffset, 28f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(190f + xOffset, 33f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(170f + xOffset, 38f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(150f + xOffset, 38f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(70f + xOffset, 23f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(90f + xOffset, 28f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(110f + xOffset, 33f + yOffset, 0f + zOffset);
+        CreateCollectible<Coin>(130f + xOffset, 38f + yOffset, 0f + zOffset);
+    }
+
+    public static void CreatePowerUpsSquareCircuit(float xOffset, float yOffset, float zOffset)
+    {
+        CreateCollectible<LowGravity>(150f + xOffset, 5f + yOffset, 0f + zOffset);
+        CreateCollectible<SpeedUp>(150f + xOffset, 10f + yOffset, -200f + zOffset);
+        CreateCollectible<SpeedUp>(150f + xOffset, 10f + yOffset, 200f + zOffset);
+    }
+    
+    private static void CreateCollectible<T>(float x, float y, float z) where T : Collectible
+    {
+        var position = new Vector3(x, y, z);
+        Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
     }
     
     private static void AssignModelAndShader(Collectible collectible, Dictionary<Type, Model> collectibleModels, Effect basicShader, Effect powerUpEffect)

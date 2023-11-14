@@ -24,6 +24,10 @@ public static class PrefabManager
             
         // Center platform
         CreateMovingPlatform(new Vector3(50f, 6f, 100f), new Vector3(150f, 0f, 0f) + offset);
+        
+        // Moving Obstacles
+        CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, 260f) + offset);
+        CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f) + offset);
             
         CreateRamps(offset);
     }

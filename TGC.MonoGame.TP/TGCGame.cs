@@ -7,8 +7,6 @@ using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
-using TGC.MonoGame.TP.Collectible.Coins;
-using TGC.MonoGame.TP.Collectible.PowerUps;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
 using TGC.MonoGame.TP.Prefab;
@@ -60,7 +58,19 @@ namespace TGC.MonoGame.TP
         // Camera
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
+        private float CameraFarPlaneDistance { get; set; } = 10000f;
+        private float CameraNearPlaneDistance { get; set; } = 5f;
         
+        // Light
+        private TargetCamera TargetLightCamera { get; set; }
+        private Vector3 LightPosition { get; set;} = new(300f, 250f, 300f);
+        private float LightCameraFarPlaneDistance { get; set; } = 3000f;
+        private float LightCameraNearPlaneDistance { get; set; } = 5f;
+        
+        // ShadowMap
+        private RenderTarget2D ShadowMapRenderTarget { get; set; }
+        private const int ShadowmapSize = 4096;
+
         // Scene
         private Matrix SphereWorld { get; set; }
         private Matrix View { get; set; }
@@ -77,6 +87,7 @@ namespace TGC.MonoGame.TP
 
         // Effects
         private Effect BlinnPhongEffect { get; set; }
+        private Effect BlinnPhongShadows { get; set; }
 
         // Models
         private Model SphereModel { get; set; }
@@ -106,11 +117,15 @@ namespace TGC.MonoGame.TP
             //Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 40, 200), size);
             TargetCamera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 100f, Vector3.Zero);
             
+            // Light
+            TargetLightCamera = new TargetCamera(1f, LightPosition, Vector3.Zero);
+            TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance, MathHelper.PiOver2);
+            
             // Configuramos nuestras matrices de la escena.
             SphereWorld = Matrix.Identity;
             View = Matrix.CreateLookAt(Vector3.UnitZ * 150, Vector3.Zero, Vector3.Up);
-            Projection =
-                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 250);
+            TargetCamera.Projection = 
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, CameraNearPlaneDistance, CameraFarPlaneDistance);
             
             // Player
             Player = new Player.Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
@@ -122,62 +137,18 @@ namespace TGC.MonoGame.TP
             };
             
             // Collectibles
-            CreatePowerUps();
-            CreateCoins(0, 0, 0);
-            CreateCoins(-600, 0, 0);
+            CollectibleManager.CreatePowerUpsSquareCircuit(0, 0, 0);
+            CollectibleManager.CreatePowerUpsSquareCircuit(-600, 0, 0);
+            CollectibleManager.CreateCoinsSquareCircuit(0, 0, 0);
+            CollectibleManager.CreateCoinsSquareCircuit(-600, 0, 0);
 
             // Map
             PrefabManager.CreateSquareCircuit(Vector3.Zero);
             PrefabManager.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
             PrefabManager.CreateBridge();
             PrefabManager.CreateSwitchbackRamp();
-
-            // Obstacles
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, 260f));
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f));
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, 260f));
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, -140f));
             
             base.Initialize();
-        }
-
-        private static void CreateCoins(float xOffset, float yOffset, float zOffset)
-        {
-            // Side
-            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 50f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 75f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, 95f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -50f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -75f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(300f + xOffset, 13f + yOffset, -95f + zOffset);
-            
-            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 50f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 75f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, 95f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -50f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -75f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(0f + xOffset, 13f + yOffset, -95f + zOffset);
-
-            // Parable
-            CollectibleManager.CreateCollectible<Coin>(230f + xOffset, 23f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(210f + xOffset, 28f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(190f + xOffset, 33f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(170f + xOffset, 38f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(150f + xOffset, 38f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(70f + xOffset, 23f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(90f + xOffset, 28f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(110f + xOffset, 33f + yOffset, 0f + zOffset);
-            CollectibleManager.CreateCollectible<Coin>(130f + xOffset, 38f + yOffset, 0f + zOffset);
-        }
-
-        private static void CreatePowerUps()
-        {
-            CollectibleManager.CreateCollectible<LowGravity>(150f, 5f, 0f);
-            CollectibleManager.CreateCollectible<LowGravity>(-450f, 5f, 0f);
-            CollectibleManager.CreateCollectible<SpeedUp>(150f, 10f, -200f);
-            CollectibleManager.CreateCollectible<SpeedUp>(150f, 10f, 200f);
-            CollectibleManager.CreateCollectible<SpeedUp>(-450f, 10f, -200f);
-            CollectibleManager.CreateCollectible<SpeedUp>(-450f, 10f, 200f);
         }
 
         /// <summary>
@@ -203,25 +174,37 @@ namespace TGC.MonoGame.TP
             LoadSphere();
 
             LoadSkyBox();
+
+            LoadShadowMap();
             
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
         }
 
+        private void LoadShadowMap()
+        {
+            BlinnPhongShadows = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongShadows");
+            CreateShadowMapRenderTarget();
+        }
+
+        private void CreateShadowMapRenderTarget()
+        {
+            ShadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, ShadowmapSize, ShadowmapSize, false,
+                SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
+        }
+
         private void LoadSkyBox()
         {
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
-            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/skybox");
+            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/day_skybox_02");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
-            SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
+            SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 2000);
         }
 
         private void LoadSphere()
         {
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
-            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
             SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
         }
 
@@ -252,8 +235,9 @@ namespace TGC.MonoGame.TP
                 SphereWorld = Player.Update(time, keyboardState);
 
                 TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
-
-                SetLightPosition(new Vector3(150f, 750f, 0f));
+                
+                TargetLightCamera.Position = LightPosition;
+                TargetLightCamera.BuildView();
 
                 PrefabManager.UpdatePrefabs(gameTime);
 
@@ -316,12 +300,6 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        private void SetLightPosition(Vector3 lightPosition)
-        {
-            BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
-            BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
-        }
-
         private static void UpdateCollectibles(GameTime gameTime)
         {
             foreach (var collectible in CollectibleManager.Collectibles)
@@ -338,10 +316,8 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
             
-            DrawModel(SphereWorld, BlinnPhongEffect, SphereModel, Player.CurrentSphereMaterial.Material);
+            DrawWithShadows();
 
             DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
@@ -349,13 +325,7 @@ namespace TGC.MonoGame.TP
             
             Gizmos.Draw();
             
-            var originalRasterizerState = GraphicsDevice.RasterizerState;
-            var rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.None;
-            Graphics.GraphicsDevice.RasterizerState = rasterizerState;
-            
-            SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, new Vector3(0f,0f,0f));
-            GraphicsDevice.RasterizerState = originalRasterizerState;
+            DrawSkybox();
 
             const int menuHeight = 60;
             var center = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
@@ -367,6 +337,48 @@ namespace TGC.MonoGame.TP
             DrawGui();
 
             base.Draw(gameTime);
+        }
+
+        private void DrawWithShadows()
+        {
+            #region Pass 1
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
+
+            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
+
+            DrawModelShadows(SphereWorld, SphereModel);
+
+            DrawPrefabsShadows(PrefabManager.Prefabs);
+
+            #endregion
+
+            #region Pass 2
+            
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
+
+            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DrawBlinnPhongShadowed"];
+            SetShadowParameters();
+
+            DrawModel(SphereWorld, BlinnPhongShadows, SphereModel, Player.CurrentSphereMaterial.Material);
+            
+            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongShadows);
+            
+            #endregion
+        }
+        
+        private void DrawSkybox()
+        {
+            var originalRasterizerState = GraphicsDevice.RasterizerState;
+            var rasterizerState = new RasterizerState();
+            rasterizerState.CullMode = CullMode.None;
+            Graphics.GraphicsDevice.RasterizerState = rasterizerState;
+
+            SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, TargetCamera.Position);
+            GraphicsDevice.RasterizerState = originalRasterizerState;
         }
         
         private void DrawMenu(Vector2 center, int menuHeight)
@@ -425,6 +437,21 @@ namespace TGC.MonoGame.TP
                 mesh.Draw();
             }
         }
+        
+        private void DrawModelShadows(Matrix worldMatrix, Model model)
+        {
+            var modelMeshesBaseTransforms = new Matrix[SphereModel.Bones.Count];
+            model.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
+            foreach (var modelMesh in SphereModel.Meshes)
+            {
+                foreach (var part in modelMesh.MeshParts)
+                    part.Effect = BlinnPhongShadows;
+
+                BlinnPhongShadows.Parameters["WorldViewProjection"]
+                    .SetValue(worldMatrix * TargetLightCamera.View * TargetLightCamera.Projection);
+                modelMesh.Draw();
+            }
+        }
 
         private void DrawPrefabs(List<Prefab.Prefab> prefabs, Effect effect)
         {
@@ -434,11 +461,21 @@ namespace TGC.MonoGame.TP
                 BoxPrimitive.Draw(effect);
             }
         }
+
+        private void DrawPrefabsShadows(List<Prefab.Prefab> prefabs)
+        {
+            foreach (var prefab in prefabs)
+            {
+                var prefabWorld = prefab.World;
+                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * TargetLightCamera.View * TargetLightCamera.Projection);
+                BoxPrimitive.Draw(BlinnPhongShadows);
+            }
+        }
         
         private static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
-            effect.CurrentTechnique = effect.Techniques["NormalMapping"];
+            effect.Parameters["eyePosition"].SetValue(camera.Position);
             effect.Parameters["World"].SetValue(worldMatrix);
             effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
             effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * camera.View * camera.Projection);
@@ -452,6 +489,14 @@ namespace TGC.MonoGame.TP
             effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
             effect.Parameters["KSpecular"].SetValue(material.KSpecular);
             effect.Parameters["shininess"].SetValue(material.Shininess);
+        }
+        
+        private void SetShadowParameters()
+        {
+            BlinnPhongShadows.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
+            BlinnPhongShadows.Parameters["lightPosition"].SetValue(LightPosition);
+            BlinnPhongShadows.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
+            BlinnPhongShadows.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
         }
 
         private void DrawGizmos()

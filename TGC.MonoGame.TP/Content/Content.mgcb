@@ -69,6 +69,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/BlinnPhong.fx
 
+#begin Effects/BlinnPhongShadows.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/BlinnPhongShadows.fx
+
 #begin Effects/BlinnPhongTypes.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -92,6 +98,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/PowerUpShader.fx
+
+#begin Effects/ShadowMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ShadowMap.fx
 
 #begin Effects/SkyBox.fx
 /importer:EffectImporter
@@ -473,7 +485,7 @@
 /processorParam:TextureFormat=Color
 /build:Textures/rubber_normal.jpg
 
-#begin Textures/skyboxes/day_skybox.png
+#begin Textures/skyboxes/day_skybox_02.dds
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -482,8 +494,32 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=NoChange
-/build:Textures/skyboxes/day_skybox.png
+/processorParam:TextureFormat=Color
+/build:Textures/skyboxes/day_skybox_02.dds
+
+#begin Textures/skyboxes/day_skybox_hd.dds
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/skyboxes/day_skybox_hd.dds
+
+#begin Textures/skyboxes/day_skybox.dds
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/skyboxes/day_skybox.dds
 
 #begin Textures/skyboxes/skybox.dds
 /importer:TextureImporter
@@ -496,6 +532,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/skyboxes/skybox.dds
+
+#begin Textures/skyboxes/stormday_skybox.dds
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/skyboxes/stormday_skybox.dds
 
 #begin Textures/stones.jpg
 /importer:TextureImporter
