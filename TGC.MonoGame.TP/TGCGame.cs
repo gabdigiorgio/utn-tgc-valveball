@@ -354,38 +354,19 @@ namespace TGC.MonoGame.TP
             }
         }
         
-        private void DrawShadows()
+        private void DrawWithShadows()
         {
             #region Pass 1
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            // Set the render target as our shadow map, we are drawing the depth into this texture
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
             BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
 
-            // We get the base transform for each mesh
-            var modelMeshesBaseTransforms = new Matrix[SphereModel.Bones.Count];
-            SphereModel.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
-            foreach (var modelMesh in SphereModel.Meshes)
-            {
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = BlinnPhongShadows;
+            DrawModelShadows(SphereWorld, SphereModel);
 
-                // WorldViewProjection is used to transform from model space to clip space
-                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetLightCamera.View * TargetLightCamera.Projection);
-
-                // Once we set these matrices we draw
-                modelMesh.Draw();
-            }
-
-            foreach (var prefab in PrefabManager.Prefabs)
-            {
-                var prefabWorld = prefab.World;
-                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * TargetLightCamera.View * TargetLightCamera.Projection);
-                BoxPrimitive.Draw(BlinnPhongShadows);
-            }
+            DrawPrefabsShadows(PrefabManager.Prefabs);
 
             #endregion
 
@@ -396,10 +377,7 @@ namespace TGC.MonoGame.TP
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
             BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DrawBlinnPhongShadowed"];
-            BlinnPhongShadows.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
-            BlinnPhongShadows.Parameters["lightPosition"].SetValue(LightPosition);
-            BlinnPhongShadows.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
-            BlinnPhongShadows.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
+            SetShadowParameters();
 
             DrawModel(SphereWorld, BlinnPhongShadows, SphereModel, Player.CurrentSphereMaterial.Material);
             
@@ -417,11 +395,7 @@ namespace TGC.MonoGame.TP
             GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
-            DrawShadows();
-
-            //DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
-            
-            //DrawModel(SphereWorld, BlinnPhongEffect, SphereModel, Player.CurrentSphereMaterial.Material);
+            DrawWithShadows();
 
             DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
@@ -505,6 +479,21 @@ namespace TGC.MonoGame.TP
                 mesh.Draw();
             }
         }
+        
+        private void DrawModelShadows(Matrix worldMatrix, Model model)
+        {
+            var modelMeshesBaseTransforms = new Matrix[SphereModel.Bones.Count];
+            model.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
+            foreach (var modelMesh in SphereModel.Meshes)
+            {
+                foreach (var part in modelMesh.MeshParts)
+                    part.Effect = BlinnPhongShadows;
+
+                BlinnPhongShadows.Parameters["WorldViewProjection"]
+                    .SetValue(worldMatrix * TargetLightCamera.View * TargetLightCamera.Projection);
+                modelMesh.Draw();
+            }
+        }
 
         private void DrawPrefabs(List<Prefab.Prefab> prefabs, Effect effect)
         {
@@ -512,6 +501,16 @@ namespace TGC.MonoGame.TP
             {
                 SetEffectParameters(effect, prefab.Material, prefab.Tiling, prefab.World, TargetCamera);
                 BoxPrimitive.Draw(effect);
+            }
+        }
+
+        private void DrawPrefabsShadows(List<Prefab.Prefab> prefabs)
+        {
+            foreach (var prefab in prefabs)
+            {
+                var prefabWorld = prefab.World;
+                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * TargetLightCamera.View * TargetLightCamera.Projection);
+                BoxPrimitive.Draw(BlinnPhongShadows);
             }
         }
         
@@ -532,6 +531,14 @@ namespace TGC.MonoGame.TP
             effect.Parameters["KDiffuse"].SetValue(material.KDiffuse);
             effect.Parameters["KSpecular"].SetValue(material.KSpecular);
             effect.Parameters["shininess"].SetValue(material.Shininess);
+        }
+        
+        private void SetShadowParameters()
+        {
+            BlinnPhongShadows.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
+            BlinnPhongShadows.Parameters["lightPosition"].SetValue(LightPosition);
+            BlinnPhongShadows.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
+            BlinnPhongShadows.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
         }
 
         private void DrawGizmos()
