@@ -310,14 +310,10 @@ public class Player
         
         DetectPrefabCollisions(sphereCenter, collisions);
         
-
-        // Solve first near collisions
-        collisions.Sort((a, b) => a.Distance.CompareTo(b.Distance));
-        
         foreach (var collision in collisions)
         {
-            BoundingSphere.Center = SolveCollisionPosition(BoundingSphere.Center, collision.ClosestPoint, radius,
-                collision.Distance) +  (collision.ColliderMovement ?? Vector3.Zero);
+            BoundingSphere.Center = SolveCollisionPosition(BoundingSphere.Center, collision.ClosestPoint, radius, collision.Distance) 
+                                    + (collision.ColliderMovement ?? Vector3.Zero);
         }
 
         PlayBumpSound(wasOnGround, lastJumpSpeed);
