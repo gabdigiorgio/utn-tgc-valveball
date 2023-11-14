@@ -71,7 +71,7 @@ namespace TGC.MonoGame.TP.Cameras
         /// <summary>
         ///     Build view matrix and update the internal directions.
         /// </summary>
-        private void BuildView()
+        public void BuildView()
         {
             FrontDirection = Vector3.Normalize(TargetPosition - Position);
             RightDirection = Vector3.Normalize(Vector3.Cross(_defaultWorldUpVector, FrontDirection));

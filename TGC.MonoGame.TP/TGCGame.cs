@@ -63,9 +63,14 @@ namespace TGC.MonoGame.TP
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
-        private Vector3 LightPosition { get; } = new(150f, 750f, 0f);
-        private float LightCameraFarPlaneDistance { get; } = 3000f;
-        private float LightCameraNearPlaneDistance { get; } = 5f;
+        private Vector3 LightPosition { get; set;} = new(150f, 750f, 0f);
+        private float LightCameraFarPlaneDistance { get; set; } = 3000f;
+        private float LightCameraNearPlaneDistance { get; set; } = 5f;
+        
+        // ShadowMap
+        private RenderTarget2D ShadowMapRenderTarget { get; set; }
+        private Effect ShadowMapEffect { get; set; }
+        private const int ShadowmapSize = 2048;
 
         // Scene
         private Matrix SphereWorld { get; set; }
@@ -213,10 +218,24 @@ namespace TGC.MonoGame.TP
             LoadSphere();
 
             LoadSkyBox();
+
+            LoadShadowMap();
             
             Gizmos.LoadContent(GraphicsDevice, Content);
 
             base.LoadContent();
+        }
+
+        private void LoadShadowMap()
+        {
+            ShadowMapEffect = Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
+            CreateShadowMapRenderTarget();
+        }
+
+        private void CreateShadowMapRenderTarget()
+        {
+            ShadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, ShadowmapSize, ShadowmapSize, false,
+                SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
         }
 
         private void LoadSkyBox()
@@ -264,6 +283,9 @@ namespace TGC.MonoGame.TP
                 TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
 
                 SetLightPosition(LightPosition);
+                
+                TargetLightCamera.Position = LightPosition;
+                TargetLightCamera.BuildView();
 
                 PrefabManager.UpdatePrefabs(gameTime);
 
@@ -339,6 +361,62 @@ namespace TGC.MonoGame.TP
                 collectible.Update(gameTime, Player);
             }
         }
+        
+        private void DrawShadows()
+        {
+            #region Pass 1
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            // Set the render target as our shadow map, we are drawing the depth into this texture
+            GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
+
+            ShadowMapEffect.CurrentTechnique = ShadowMapEffect.Techniques["DepthPass"];
+
+            // We get the base transform for each mesh
+            var modelMeshesBaseTransforms = new Matrix[SphereModel.Bones.Count];
+            SphereModel.CopyAbsoluteBoneTransformsTo(modelMeshesBaseTransforms);
+            foreach (var modelMesh in SphereModel.Meshes)
+            {
+                foreach (var part in modelMesh.MeshParts)
+                    part.Effect = ShadowMapEffect;
+
+                // WorldViewProjection is used to transform from model space to clip space
+                ShadowMapEffect.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetLightCamera.View * TargetLightCamera.Projection);
+
+                // Once we set these matrices we draw
+                modelMesh.Draw();
+            }
+
+            #endregion
+
+            #region Pass 2
+
+            // Set the render target as null, we are drawing on the screen!
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
+
+            ShadowMapEffect.CurrentTechnique = ShadowMapEffect.Techniques["DrawShadowedPCF"];
+            ShadowMapEffect.Parameters["baseTexture"].SetValue(Material.Material.Default.Diffuse);
+            ShadowMapEffect.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
+            ShadowMapEffect.Parameters["lightPosition"].SetValue(LightPosition);
+            ShadowMapEffect.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
+            ShadowMapEffect.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
+            foreach (var modelMesh in SphereModel.Meshes)
+            {
+                foreach (var part in modelMesh.MeshParts)
+                    part.Effect = ShadowMapEffect;
+
+                // WorldViewProjection is used to transform from model space to clip space
+                ShadowMapEffect.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetCamera.View * TargetCamera.Projection);
+                ShadowMapEffect.Parameters["World"].SetValue(SphereWorld);
+                ShadowMapEffect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(SphereWorld)));
+
+                // Once we set these matrices we draw
+                modelMesh.Draw();
+            }
+            #endregion
+        }
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
@@ -348,6 +426,8 @@ namespace TGC.MonoGame.TP
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            
+            DrawShadows();
 
             DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
             
