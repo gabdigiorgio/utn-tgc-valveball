@@ -485,7 +485,7 @@
 /processorParam:TextureFormat=Color
 /build:Textures/rubber_normal.jpg
 
-#begin Textures/skyboxes/day_skybox.png
+#begin Textures/skyboxes/classic_cubemap.dds
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -494,8 +494,20 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
-/processorParam:TextureFormat=NoChange
-/build:Textures/skyboxes/day_skybox.png
+/processorParam:TextureFormat=Color
+/build:Textures/skyboxes/classic_cubemap.dds
+
+#begin Textures/skyboxes/day_skybox.dds
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/skyboxes/day_skybox.dds
 
 #begin Textures/skyboxes/skybox.dds
 /importer:TextureImporter
@@ -508,6 +520,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/skyboxes/skybox.dds
+
+#begin Textures/skyboxes/stormday_skybox.dds
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/skyboxes/stormday_skybox.dds
 
 #begin Textures/stones.jpg
 /importer:TextureImporter
