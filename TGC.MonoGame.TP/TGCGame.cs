@@ -243,7 +243,7 @@ namespace TGC.MonoGame.TP
         private void LoadSkyBox()
         {
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
-            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/day_skybox");
+            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/day_skybox_02");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
             SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 2000);
         }

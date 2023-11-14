@@ -10,7 +10,7 @@ public class Material
     public Texture2D Normal { get; private set; }
     public Vector2 Tiling { get; private set; }
     public Vector3 AmbientColor { get; private set; } = new(1f, 1f, 1f);
-    public Vector3 DiffuseColor { get; private set; } = new(1f, 1f, 0.680f);
+    public Vector3 DiffuseColor { get; private set; } = new(1f, 1f, 0.880f);
     public Vector3 SpecularColor { get; private set; } = new(1f, 1f, 1f);
     
     // Between 0-1
