@@ -61,6 +61,12 @@ namespace TGC.MonoGame.TP
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
         
+        // Light
+        private TargetCamera TargetLightCamera { get; set; }
+        private Vector3 LightPosition { get; } = new(150f, 750f, 0f);
+        private float LightCameraFarPlaneDistance { get; } = 3000f;
+        private float LightCameraNearPlaneDistance { get; } = 5f;
+
         // Scene
         private Matrix SphereWorld { get; set; }
         private Matrix View { get; set; }
@@ -105,6 +111,10 @@ namespace TGC.MonoGame.TP
             size.Y /= 2;
             //Camera = new FreeCamera(GraphicsDevice.Viewport.AspectRatio, new Vector3(0, 40, 200), size);
             TargetCamera = new TargetCamera(GraphicsDevice.Viewport.AspectRatio, Vector3.One * 100f, Vector3.Zero);
+            
+            // Light
+            TargetLightCamera = new TargetCamera(1f, LightPosition, Vector3.Zero);
+            TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance, MathHelper.PiOver2);
             
             // Configuramos nuestras matrices de la escena.
             SphereWorld = Matrix.Identity;
@@ -253,7 +263,7 @@ namespace TGC.MonoGame.TP
 
                 TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
 
-                SetLightPosition(new Vector3(150f, 750f, 0f));
+                SetLightPosition(LightPosition);
 
                 PrefabManager.UpdatePrefabs(gameTime);
 
