@@ -160,10 +160,7 @@ MainVertexShaderOutput MainVS(in MainVertexShaderInput input)
 
 
 float4 MainPS(in MainVertexShaderOutput input) : COLOR
-{
-
-    // BlinnPhong 
-    
+{   
     // Base vectors
     float3 lightDirection = normalize(lightPosition - input.WorldSpacePosition.xyz);
     float3 viewDirection = normalize(eyePosition - input.WorldSpacePosition.xyz);
@@ -180,12 +177,11 @@ float4 MainPS(in MainVertexShaderOutput input) : COLOR
     // Calculate the specular light
     float NdotH = dot(normal, halfVector);
     float3 specularLight = KSpecular * specularColor * pow(NdotH, shininess);
-    
-    // Shadow Map 
+
+
     float3 lightSpacePosition = input.LightSpacePosition.xyz / input.LightSpacePosition.w;
     float2 shadowMapTextureCoordinates = 0.5 * lightSpacePosition.xy + float2(0.5, 0.5);
     shadowMapTextureCoordinates.y = 1.0f - shadowMapTextureCoordinates.y;
-    
 
     float inclinationBias = max(modulatedEpsilon * (1.0 - dot(normal, lightDirection)), maxEpsilon);
     

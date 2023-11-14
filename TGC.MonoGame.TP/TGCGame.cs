@@ -69,7 +69,7 @@ namespace TGC.MonoGame.TP
         
         // ShadowMap
         private RenderTarget2D ShadowMapRenderTarget { get; set; }
-        private Effect ShadowMapEffect { get; set; }
+        private Effect BlinnPhongShadows { get; set; }
         private const int ShadowmapSize = 2048;
 
         // Scene
@@ -228,7 +228,7 @@ namespace TGC.MonoGame.TP
 
         private void LoadShadowMap()
         {
-            ShadowMapEffect = Content.Load<Effect>(ContentFolderEffects + "ShadowMap");
+            BlinnPhongShadows = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongShadows");
             CreateShadowMapRenderTarget();
         }
 
@@ -371,7 +371,7 @@ namespace TGC.MonoGame.TP
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
 
-            ShadowMapEffect.CurrentTechnique = ShadowMapEffect.Techniques["DepthPass"];
+            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
 
             // We get the base transform for each mesh
             var modelMeshesBaseTransforms = new Matrix[SphereModel.Bones.Count];
@@ -379,14 +379,15 @@ namespace TGC.MonoGame.TP
             foreach (var modelMesh in SphereModel.Meshes)
             {
                 foreach (var part in modelMesh.MeshParts)
-                    part.Effect = ShadowMapEffect;
+                    part.Effect = BlinnPhongShadows;
 
                 // WorldViewProjection is used to transform from model space to clip space
-                ShadowMapEffect.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetLightCamera.View * TargetLightCamera.Projection);
+                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetLightCamera.View * TargetLightCamera.Projection);
 
                 // Once we set these matrices we draw
                 modelMesh.Draw();
             }
+            
 
             #endregion
 
@@ -396,25 +397,37 @@ namespace TGC.MonoGame.TP
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
 
-            ShadowMapEffect.CurrentTechnique = ShadowMapEffect.Techniques["DrawShadowedPCF"];
-            ShadowMapEffect.Parameters["baseTexture"].SetValue(Material.Material.Default.Diffuse);
-            ShadowMapEffect.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
-            ShadowMapEffect.Parameters["lightPosition"].SetValue(LightPosition);
-            ShadowMapEffect.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
-            ShadowMapEffect.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
+            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DrawBlinnPhongShadowed"];
+            BlinnPhongShadows.Parameters["shadowMap"].SetValue(ShadowMapRenderTarget);
+            BlinnPhongShadows.Parameters["lightPosition"].SetValue(LightPosition);
+            BlinnPhongShadows.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
+            BlinnPhongShadows.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
             foreach (var modelMesh in SphereModel.Meshes)
             {
                 foreach (var part in modelMesh.MeshParts)
-                    part.Effect = ShadowMapEffect;
+                    part.Effect = BlinnPhongShadows;
 
                 // WorldViewProjection is used to transform from model space to clip space
-                ShadowMapEffect.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetCamera.View * TargetCamera.Projection);
-                ShadowMapEffect.Parameters["World"].SetValue(SphereWorld);
-                ShadowMapEffect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(SphereWorld)));
+                BlinnPhongShadows.Parameters["World"].SetValue(SphereWorld);
+                BlinnPhongShadows.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(SphereWorld)));
+                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetCamera.View * TargetCamera.Projection);
+                BlinnPhongShadows.Parameters["ModelTexture"].SetValue(Player.CurrentSphereMaterial.Material.Diffuse);
+                BlinnPhongShadows.Parameters["NormalTexture"].SetValue(Player.CurrentSphereMaterial.Material.Normal);
+                BlinnPhongShadows.Parameters["Tiling"].SetValue(Player.CurrentSphereMaterial.Material.Tiling);
+                BlinnPhongShadows.Parameters["ambientColor"].SetValue(Player.CurrentSphereMaterial.Material.AmbientColor);
+                BlinnPhongShadows.Parameters["diffuseColor"].SetValue(Player.CurrentSphereMaterial.Material.DiffuseColor);
+                BlinnPhongShadows.Parameters["specularColor"].SetValue(Player.CurrentSphereMaterial.Material.SpecularColor);
+                BlinnPhongShadows.Parameters["KAmbient"].SetValue(Player.CurrentSphereMaterial.Material.KAmbient);
+                BlinnPhongShadows.Parameters["KDiffuse"].SetValue(Player.CurrentSphereMaterial.Material.KDiffuse);
+                BlinnPhongShadows.Parameters["KSpecular"].SetValue(Player.CurrentSphereMaterial.Material.KSpecular);
+                BlinnPhongShadows.Parameters["shininess"].SetValue(Player.CurrentSphereMaterial.Material.Shininess);
 
                 // Once we set these matrices we draw
                 modelMesh.Draw();
             }
+            
+            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongShadows);
+            
             #endregion
         }
 
@@ -429,7 +442,7 @@ namespace TGC.MonoGame.TP
             
             DrawShadows();
 
-            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
+            //DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
             
             //DrawModel(SphereWorld, BlinnPhongEffect, SphereModel, Player.CurrentSphereMaterial.Material);
 
