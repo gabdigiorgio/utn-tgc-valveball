@@ -63,7 +63,7 @@ namespace TGC.MonoGame.TP
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
-        private Vector3 LightPosition { get; set;} = new(150f, 750f, 0f);
+        private Vector3 LightPosition { get; set;} = new(300f, 250f, 300f);
         private float LightCameraFarPlaneDistance { get; set; } = 3000f;
         private float LightCameraNearPlaneDistance { get; set; } = 5f;
         
@@ -387,7 +387,13 @@ namespace TGC.MonoGame.TP
                 // Once we set these matrices we draw
                 modelMesh.Draw();
             }
-            
+
+            foreach (var prefab in PrefabManager.Prefabs)
+            {
+                var prefabWorld = prefab.World;
+                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * TargetLightCamera.View * TargetLightCamera.Projection);
+                BoxPrimitive.Draw(BlinnPhongShadows);
+            }
 
             #endregion
 
@@ -402,29 +408,8 @@ namespace TGC.MonoGame.TP
             BlinnPhongShadows.Parameters["lightPosition"].SetValue(LightPosition);
             BlinnPhongShadows.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
             BlinnPhongShadows.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
-            foreach (var modelMesh in SphereModel.Meshes)
-            {
-                foreach (var part in modelMesh.MeshParts)
-                    part.Effect = BlinnPhongShadows;
 
-                // WorldViewProjection is used to transform from model space to clip space
-                BlinnPhongShadows.Parameters["World"].SetValue(SphereWorld);
-                BlinnPhongShadows.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(SphereWorld)));
-                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(SphereWorld * TargetCamera.View * TargetCamera.Projection);
-                BlinnPhongShadows.Parameters["ModelTexture"].SetValue(Player.CurrentSphereMaterial.Material.Diffuse);
-                BlinnPhongShadows.Parameters["NormalTexture"].SetValue(Player.CurrentSphereMaterial.Material.Normal);
-                BlinnPhongShadows.Parameters["Tiling"].SetValue(Player.CurrentSphereMaterial.Material.Tiling);
-                BlinnPhongShadows.Parameters["ambientColor"].SetValue(Player.CurrentSphereMaterial.Material.AmbientColor);
-                BlinnPhongShadows.Parameters["diffuseColor"].SetValue(Player.CurrentSphereMaterial.Material.DiffuseColor);
-                BlinnPhongShadows.Parameters["specularColor"].SetValue(Player.CurrentSphereMaterial.Material.SpecularColor);
-                BlinnPhongShadows.Parameters["KAmbient"].SetValue(Player.CurrentSphereMaterial.Material.KAmbient);
-                BlinnPhongShadows.Parameters["KDiffuse"].SetValue(Player.CurrentSphereMaterial.Material.KDiffuse);
-                BlinnPhongShadows.Parameters["KSpecular"].SetValue(Player.CurrentSphereMaterial.Material.KSpecular);
-                BlinnPhongShadows.Parameters["shininess"].SetValue(Player.CurrentSphereMaterial.Material.Shininess);
-
-                // Once we set these matrices we draw
-                modelMesh.Draw();
-            }
+            DrawModel(SphereWorld, BlinnPhongShadows, SphereModel, Player.CurrentSphereMaterial.Material);
             
             DrawPrefabs(PrefabManager.Prefabs, BlinnPhongShadows);
             
@@ -541,7 +526,6 @@ namespace TGC.MonoGame.TP
         private static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
-            effect.CurrentTechnique = effect.Techniques["NormalMapping"];
             effect.Parameters["World"].SetValue(worldMatrix);
             effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
             effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * camera.View * camera.Projection);
