@@ -148,12 +148,6 @@ namespace TGC.MonoGame.TP
             PrefabManager.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
             PrefabManager.CreateBridge();
             PrefabManager.CreateSwitchbackRamp();
-
-            // Obstacles
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, 260f));
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f));
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, 260f));
-            PrefabManager.CreateMovingObstacle(Vector3.One*25f, new Vector3(-450f, 16f, -140f));
             
             base.Initialize();
         }
