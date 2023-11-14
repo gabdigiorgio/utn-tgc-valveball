@@ -431,7 +431,7 @@ namespace TGC.MonoGame.TP
 
             DrawPrefabs(PrefabManager.Prefabs, BlinnPhongEffect);
             
-            DrawModel(SphereWorld, BlinnPhongEffect, SphereModel, Player.CurrentSphereMaterial.Material);
+            //DrawModel(SphereWorld, BlinnPhongEffect, SphereModel, Player.CurrentSphereMaterial.Material);
 
             DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             

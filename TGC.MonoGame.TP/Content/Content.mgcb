@@ -69,6 +69,12 @@
 /processorParam:DebugMode=Auto
 /build:Effects/BlinnPhong.fx
 
+#begin Effects/BlinnPhongShadows.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/BlinnPhongShadows.fx
+
 #begin Effects/BlinnPhongTypes.fx
 /importer:EffectImporter
 /processor:EffectProcessor
