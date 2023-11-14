@@ -60,6 +60,8 @@ namespace TGC.MonoGame.TP
         // Camera
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
+        private float CameraFarPlaneDistance { get; set; } = 10000f;
+        private float CameraNearPlaneDistance { get; set; } = 1f;
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
@@ -124,8 +126,8 @@ namespace TGC.MonoGame.TP
             // Configuramos nuestras matrices de la escena.
             SphereWorld = Matrix.Identity;
             View = Matrix.CreateLookAt(Vector3.UnitZ * 150, Vector3.Zero, Vector3.Up);
-            Projection =
-                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 1, 250);
+            TargetCamera.Projection =
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, CameraNearPlaneDistance, CameraFarPlaneDistance);
             
             // Player
             Player = new Player.Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
