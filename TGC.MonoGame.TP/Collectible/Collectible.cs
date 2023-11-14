@@ -40,9 +40,7 @@ public abstract class Collectible
     private void UpdateAnimation(GameTime gameTime)
     {
         var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        
         _totalElapsedTime += elapsedSeconds;
-        
         var verticalOffset = Amplitude * (float)Math.Cos(_totalElapsedTime * VerticalSpeed);
         var rotationAngle = _totalElapsedTime * RotationSpeed;
         Position = new Vector3(Position.X, Position.Y + verticalOffset, Position.Z);
