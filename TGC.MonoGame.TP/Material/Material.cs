@@ -10,7 +10,7 @@ public class Material
     public Texture2D Normal { get; private set; }
     public Vector2 Tiling { get; private set; }
     public Vector3 AmbientColor { get; private set; } = new(1f, 1f, 1f);
-    public Vector3 DiffuseColor { get; private set; } = new(1f, 1f, 1f);
+    public Vector3 DiffuseColor { get; private set; } = new(1f, 1f, 0.680f);
     public Vector3 SpecularColor { get; private set; } = new(1f, 1f, 1f);
     
     // Between 0-1
@@ -32,10 +32,10 @@ public class Material
     
     public static readonly Material Marble = new(0.5f, 0.430f, 0.880f, 32.820f);
     public static readonly Material Rubber = new(0.7f, 0.670f, 0.240f, 3.930f, 5f);
-    public static readonly Material Metal = new(0.310f, 0.830f, 1.0f, 64.0f, 5f);
+    public static readonly Material Metal = new(0.510f, 0.330f, 0.750f, 64.0f, 5f);
     public static readonly Material Default = new(0.5f, 0.5f, 0.1f, 0.5f);
-    public static readonly Material Platform = new(0.4f, 0.320f, 0.340f, 12.820f);
-    public static readonly Material MovingPlatform = new(0.3f, 0.620f, 0.340f, 1.820f);
+    public static readonly Material Platform = new(0.4f, 0.450f, 0.340f, 12.820f);
+    public static readonly Material MovingPlatform = new(0.380f, 0.620f, 0.340f, 1.820f);
     
     public static void LoadMaterials(ContentManager content)
     {
