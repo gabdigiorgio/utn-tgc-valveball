@@ -61,7 +61,7 @@ namespace TGC.MonoGame.TP
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
         private float CameraFarPlaneDistance { get; set; } = 10000f;
-        private float CameraNearPlaneDistance { get; set; } = 1f;
+        private float CameraNearPlaneDistance { get; set; } = 5f;
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
@@ -126,7 +126,7 @@ namespace TGC.MonoGame.TP
             // Configuramos nuestras matrices de la escena.
             SphereWorld = Matrix.Identity;
             View = Matrix.CreateLookAt(Vector3.UnitZ * 150, Vector3.Zero, Vector3.Up);
-            TargetCamera.Projection =
+            TargetCamera.Projection = 
                 Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, CameraNearPlaneDistance, CameraFarPlaneDistance);
             
             // Player
@@ -243,9 +243,9 @@ namespace TGC.MonoGame.TP
         private void LoadSkyBox()
         {
             var skyBox = Content.Load<Model>(ContentFolder3D + "skybox/cube");
-            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/stormday_skybox");
+            var skyBoxTexture = Content.Load<TextureCube>(ContentFolderTextures + "/skyboxes/day_skybox");
             var skyBoxEffect = Content.Load<Effect>(ContentFolderEffects + "SkyBox");
-            SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 1000f);
+            SkyBox = new SkyBox(skyBox, skyBoxTexture, skyBoxEffect, 2000);
         }
 
         private void LoadSphere()
@@ -371,13 +371,7 @@ namespace TGC.MonoGame.TP
             
             Gizmos.Draw();
             
-            var originalRasterizerState = GraphicsDevice.RasterizerState;
-            var rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.None;
-            Graphics.GraphicsDevice.RasterizerState = rasterizerState;
-            
-            SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, TargetCamera.Position);
-            GraphicsDevice.RasterizerState = originalRasterizerState;
+            DrawSkybox();
 
             const int menuHeight = 60;
             var center = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
@@ -390,7 +384,7 @@ namespace TGC.MonoGame.TP
 
             base.Draw(gameTime);
         }
-        
+
         private void DrawWithShadows()
         {
             #region Pass 1
@@ -420,6 +414,17 @@ namespace TGC.MonoGame.TP
             DrawPrefabs(PrefabManager.Prefabs, BlinnPhongShadows);
             
             #endregion
+        }
+        
+        private void DrawSkybox()
+        {
+            var originalRasterizerState = GraphicsDevice.RasterizerState;
+            var rasterizerState = new RasterizerState();
+            rasterizerState.CullMode = CullMode.None;
+            Graphics.GraphicsDevice.RasterizerState = rasterizerState;
+
+            SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, TargetCamera.Position);
+            GraphicsDevice.RasterizerState = originalRasterizerState;
         }
         
         private void DrawMenu(Vector2 center, int menuHeight)
