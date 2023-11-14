@@ -69,7 +69,6 @@ namespace TGC.MonoGame.TP
         
         // ShadowMap
         private RenderTarget2D ShadowMapRenderTarget { get; set; }
-        private Effect BlinnPhongShadows { get; set; }
         private const int ShadowmapSize = 4096;
 
         // Scene
@@ -88,6 +87,7 @@ namespace TGC.MonoGame.TP
 
         // Effects
         private Effect BlinnPhongEffect { get; set; }
+        private Effect BlinnPhongShadows { get; set; }
 
         // Models
         private Model SphereModel { get; set; }
@@ -249,8 +249,6 @@ namespace TGC.MonoGame.TP
         private void LoadSphere()
         {
             SphereModel = Content.Load<Model>(ContentFolder3D + "geometries/sphere");
-            BlinnPhongEffect = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongTypes");
-            loadEffectOnMesh(SphereModel, BlinnPhongEffect);
             SphereWorld = _sphereScale * Matrix.CreateTranslation(InitialSpherePosition);
         }
 
@@ -353,38 +351,6 @@ namespace TGC.MonoGame.TP
                 collectible.Update(gameTime, Player);
             }
         }
-        
-        private void DrawWithShadows()
-        {
-            #region Pass 1
-
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
-
-            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
-
-            DrawModelShadows(SphereWorld, SphereModel);
-
-            DrawPrefabsShadows(PrefabManager.Prefabs);
-
-            #endregion
-
-            #region Pass 2
-
-            // Set the render target as null, we are drawing on the screen!
-            GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
-
-            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DrawBlinnPhongShadowed"];
-            SetShadowParameters();
-
-            DrawModel(SphereWorld, BlinnPhongShadows, SphereModel, Player.CurrentSphereMaterial.Material);
-            
-            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongShadows);
-            
-            #endregion
-        }
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
@@ -421,6 +387,37 @@ namespace TGC.MonoGame.TP
             DrawGui();
 
             base.Draw(gameTime);
+        }
+        
+        private void DrawWithShadows()
+        {
+            #region Pass 1
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
+
+            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
+
+            DrawModelShadows(SphereWorld, SphereModel);
+
+            DrawPrefabsShadows(PrefabManager.Prefabs);
+
+            #endregion
+
+            #region Pass 2
+            
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
+
+            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DrawBlinnPhongShadowed"];
+            SetShadowParameters();
+
+            DrawModel(SphereWorld, BlinnPhongShadows, SphereModel, Player.CurrentSphereMaterial.Material);
+            
+            DrawPrefabs(PrefabManager.Prefabs, BlinnPhongShadows);
+            
+            #endregion
         }
         
         private void DrawMenu(Vector2 center, int menuHeight)
