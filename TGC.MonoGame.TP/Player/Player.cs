@@ -333,7 +333,7 @@ public class Player
         return !wasOnGround && _onGround && (_bumpSoundInstance == null || _bumpSoundInstance.State == SoundState.Stopped);
     }
 
-    private void DetectPrefabCollisions(Vector3 sphereCenter, List<CollisionInfo> collisions)
+    private void DetectPrefabCollisions(Vector3 sphereCenter, ICollection<CollisionInfo> collisions)
     {
         foreach (var prefab in PrefabManager.Prefabs)
         {
@@ -349,12 +349,8 @@ public class Player
                 case Platform when !(sphereCenter.Y > prefab.MaxY()):
                     break;
                 case Platform:
-                    _onGround = true;
-                    EndJump();
-                    break;
                 case Ramp:
-                    _onGround = true;
-                    EndJump();
+                    HandleGroundCollision();
                     break;
             }
         }
@@ -365,5 +361,11 @@ public class Player
         var penetration = radius - distance;
         var direction = Vector3.Normalize(currentPosition - closestPoint);
         return currentPosition + direction * penetration;
+    }
+    
+    private void HandleGroundCollision()
+    {
+        _onGround = true;
+        EndJump();
     }
 }
