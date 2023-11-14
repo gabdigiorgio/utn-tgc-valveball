@@ -70,7 +70,7 @@ namespace TGC.MonoGame.TP
         // ShadowMap
         private RenderTarget2D ShadowMapRenderTarget { get; set; }
         private Effect BlinnPhongShadows { get; set; }
-        private const int ShadowmapSize = 2048;
+        private const int ShadowmapSize = 4096;
 
         // Scene
         private Matrix SphereWorld { get; set; }
@@ -281,8 +281,6 @@ namespace TGC.MonoGame.TP
                 SphereWorld = Player.Update(time, keyboardState);
 
                 TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
-
-                SetLightPosition(LightPosition);
                 
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
@@ -346,12 +344,6 @@ namespace TGC.MonoGame.TP
                     Exit();
                     break;
             }
-        }
-
-        private void SetLightPosition(Vector3 lightPosition)
-        {
-            BlinnPhongEffect.Parameters["lightPosition"].SetValue(lightPosition);
-            BlinnPhongEffect.Parameters["eyePosition"].SetValue(TargetCamera.Position);
         }
 
         private static void UpdateCollectibles(GameTime gameTime)
@@ -526,6 +518,7 @@ namespace TGC.MonoGame.TP
         private static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
+            effect.Parameters["eyePosition"].SetValue(camera.Position);
             effect.Parameters["World"].SetValue(worldMatrix);
             effect.Parameters["InverseTransposeWorld"].SetValue(Matrix.Transpose(Matrix.Invert(worldMatrix)));
             effect.Parameters["WorldViewProjection"].SetValue(worldMatrix * camera.View * camera.Projection);
