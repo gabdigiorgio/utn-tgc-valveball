@@ -376,7 +376,7 @@ namespace TGC.MonoGame.TP
             rasterizerState.CullMode = CullMode.None;
             Graphics.GraphicsDevice.RasterizerState = rasterizerState;
             
-            SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, new Vector3(0f,0f,0f));
+            SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, TargetCamera.Position);
             GraphicsDevice.RasterizerState = originalRasterizerState;
 
             const int menuHeight = 60;
