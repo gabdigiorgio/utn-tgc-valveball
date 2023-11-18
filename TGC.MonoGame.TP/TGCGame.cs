@@ -80,10 +80,11 @@ namespace TGC.MonoGame.TP
         private BoxPrimitive BoxPrimitive { get; set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(300f, 10f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(300f, 10f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
+        private static Player.Player Player { get; set; }
 
         // Effects
         private Effect BlinnPhongEffect { get; set; }
@@ -91,7 +92,6 @@ namespace TGC.MonoGame.TP
 
         // Models
         private Model SphereModel { get; set; }
-        private static Player.Player Player { get; set; }
         
         // Colliders
         public static Gizmos.Gizmos Gizmos { get; private set; }
@@ -143,6 +143,7 @@ namespace TGC.MonoGame.TP
             CollectibleManager.CreateCoinsSquareCircuit(-600, 0, 0);
 
             // Map
+            PrefabManager.CreateInitialCircuit(new Vector3(400f, 100f, 0f));
             PrefabManager.CreateSquareCircuit(Vector3.Zero);
             PrefabManager.CreateSquareCircuit(new Vector3(-600, 0f, 0f));
             PrefabManager.CreateBridge();
@@ -345,7 +346,7 @@ namespace TGC.MonoGame.TP
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1f, 0);
 
             BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
 

@@ -32,6 +32,16 @@ public static class PrefabManager
         CreateRamps(offset);
     }
 
+    public static void CreateInitialCircuit(Vector3 offset)
+    {
+        CreatePlatform(new Vector3(150f, 6f, 60f), new Vector3(646f, 122f, 0f) + offset);
+        CreatePlatform(new Vector3(60f, 6f, 60f), new Vector3(400f, 78f, 0f) + offset);
+        CreateRamp(new Vector3(150f, 6f, 60f), new Vector3(500f, 100f, 0f) + offset, 0f, 0.3f);
+        CreateRamp(new Vector3(60f, 6f, 150f), new Vector3(400f, 100f, -100f) + offset, 0.3f, 0f);
+        CreateRamp(new Vector3(60f, 6f, 150f), new Vector3(400f, 100f, 100f) + offset, -0.3f, 0f);
+        CreateRamp(new Vector3(90f, 6f, 60f), new Vector3(345f, 85f, 0f) + offset, 0f, -0.4f);
+    }
+
     public static void UpdatePrefabs(GameTime gameTime)
     {
         foreach (var prefab in Prefabs)
@@ -255,8 +265,8 @@ public static class PrefabManager
         var movingPlatform = new MovingPlatform(scale, position, Material.Material.MovingPlatform, 3f);
         Prefabs.Add(movingPlatform);
     }
-    
-    public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
+
+    private static void CreateMovingObstacle(Vector3 scale, Vector3 position){
         var movingObstacle = new MovingObstacle(scale, position, Material.Material.Metal, 3f);
         Prefabs.Add(movingObstacle);
     }
