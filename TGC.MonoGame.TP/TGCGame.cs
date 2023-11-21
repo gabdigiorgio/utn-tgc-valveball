@@ -258,7 +258,7 @@ namespace TGC.MonoGame.TP
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
 
-                CubeMapCamera.Position = TargetCamera.Position;
+                CubeMapCamera.Position = Player.SpherePosition;
 
                 PrefabManager.UpdatePrefabs(gameTime, Player);
 
@@ -467,8 +467,7 @@ namespace TGC.MonoGame.TP
             
             if (Player.CurrentSphereMaterial == SphereMaterial.SphereMetal)
             {
-                BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["EnvironmentMapSphere"];
-                BlinnPhongShadows.Parameters["environmentMap"].SetValue(EnvironmentMapRenderTarget);
+                SetEnvMapParameters();
             }
             SetEffectParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
@@ -536,6 +535,12 @@ namespace TGC.MonoGame.TP
             BlinnPhongShadows.Parameters["lightPosition"].SetValue(LightPosition);
             BlinnPhongShadows.Parameters["shadowMapSize"].SetValue(Vector2.One * ShadowmapSize);
             BlinnPhongShadows.Parameters["LightViewProjection"].SetValue(TargetLightCamera.View * TargetLightCamera.Projection);
+        }
+        
+        private void SetEnvMapParameters()
+        {
+            BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["EnvironmentMapSphere"];
+            BlinnPhongShadows.Parameters["environmentMap"].SetValue(EnvironmentMapRenderTarget);
         }
 
         private void DrawGizmos()
