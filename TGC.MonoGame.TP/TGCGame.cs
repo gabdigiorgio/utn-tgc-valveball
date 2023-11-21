@@ -60,6 +60,8 @@ namespace TGC.MonoGame.TP
         // Camera
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
+        private MainMenuCamera MainMenuCamera { get; set; }
+        private bool _inMainMenu;
         private float CameraFarPlaneDistance { get; set; } = 10000f;
         private float CameraNearPlaneDistance { get; set; } = 5f;
         
@@ -140,6 +142,10 @@ namespace TGC.MonoGame.TP
             CubeMapCamera = new StaticCamera(1f, Player.SpherePosition, Vector3.UnitX, Vector3.Up);
             CubeMapCamera.BuildProjection(1f, 1f, 3000f, MathHelper.PiOver2);
             
+            // MainMenu
+            _inMainMenu = true;
+            MainMenuCamera = new MainMenuCamera(TargetCamera);
+            
             // Gizmos
             Gizmos = new Gizmos.Gizmos
             {
@@ -176,7 +182,7 @@ namespace TGC.MonoGame.TP
             _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             AudioManager.LoadSounds(Content);
-            //AudioManager.PlayBackgroundMusic(0.1f, true);
+            AudioManager.PlayBackgroundMusic(0.1f, true);
             
             Material.Material.LoadMaterials(Content);
             
@@ -252,11 +258,21 @@ namespace TGC.MonoGame.TP
 
             if (!_isMenuOpen)
             {
-                _gameTimer += gameTime.ElapsedGameTime;
+                if (_inMainMenu)
+                {
+                    MainMenuCamera.Update(new Vector3(0f, 200f, 0f));
 
-                SphereWorld = Player.Update(time, keyboardState);
-
-                TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
+                    if (keyboardState.IsKeyDown(Keys.Enter))
+                    {
+                        _inMainMenu = false;
+                    }
+                }
+                else
+                {
+                    SphereWorld = Player.Update(time, keyboardState);
+                    TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
+                    _gameTimer += gameTime.ElapsedGameTime;
+                }
                 
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
@@ -371,8 +387,15 @@ namespace TGC.MonoGame.TP
             {
                 DrawMenu(center, menuHeight);
             }
-            
-            DrawGui();
+
+            if (_inMainMenu)
+            {
+                DrawMainMenu();
+            }
+            else
+            {
+                DrawGui();  
+            }
 
             base.Draw(gameTime);
         }
@@ -431,6 +454,23 @@ namespace TGC.MonoGame.TP
             GraphicsDevice.RasterizerState = originalRasterizerState;
         }
         
+        private void DrawMainMenu()
+        {
+            SpriteBatch.Begin();
+
+            const string titleText = "ValveBall";
+            var titleSize = _font.MeasureString(titleText);
+            var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X) / 2, 100);
+            SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed);
+            
+            const string pressStartText = "Press Start";
+            var pressStartSize = _font.MeasureString(pressStartText);
+            var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2, 200);
+            SpriteBatch.DrawString(_font, pressStartText, pressStartPosition, Color.White);
+
+            SpriteBatch.End();
+        }
+        
         private void DrawMenu(Vector2 center, int menuHeight)
         {
             SpriteBatch.Begin();
@@ -446,7 +486,7 @@ namespace TGC.MonoGame.TP
             
             SpriteBatch.End();
         }
-
+        
         private void DrawGui()
         {
             SpriteBatch.Begin();
