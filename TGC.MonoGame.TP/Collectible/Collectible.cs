@@ -36,8 +36,8 @@ public abstract class Collectible
         HandleCollection(player);
         UpdateAnimation(gameTime);
     }
-    
-    private void UpdateAnimation(GameTime gameTime)
+
+    protected virtual void UpdateAnimation(GameTime gameTime)
     {
         var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
         _totalElapsedTime += elapsedSeconds;
@@ -47,13 +47,18 @@ public abstract class Collectible
         BoundingBox = new BoundingBox(BoundingBox.Min + Vector3.Up * verticalOffset, BoundingBox.Max + Vector3.Up * verticalOffset);
         World = Matrix.CreateScale(Scale) * Matrix.CreateRotationY(rotationAngle) * Matrix.CreateTranslation(Position);
     }
+    
+    protected virtual void StopDrawing()
+    {
+        ShouldDraw = false;
+    }
 
     private void HandleCollection(Player.Player player)
     {
         if (!CanInteract || !player.BoundingSphere.Intersects(BoundingBox)) return;
-        Sound.Play();
+        Sound?.Play();
         OnCollected(player);
-        ShouldDraw = false;
+        StopDrawing();
         CanInteract = false;
     }
 

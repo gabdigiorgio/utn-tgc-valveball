@@ -151,6 +151,9 @@ namespace TGC.MonoGame.TP
             CollectibleManager.CreatePowerUpsSquareCircuit(-600, 0, 0);
             CollectibleManager.CreateCoinsSquareCircuit(0, 0, 0);
             CollectibleManager.CreateCoinsSquareCircuit(-600, 0, 0);
+            
+            // Checkpoints
+            CollectibleManager.CreateCheckpoints();
 
             // Map
             PrefabManager.CreateInitialCircuit(new Vector3(400f, 100f, 0f));
@@ -267,6 +270,8 @@ namespace TGC.MonoGame.TP
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
                 
                 AudioManager.ResumeBackgroundMusic();
+
+                HandleGizmos(keyboardState);
             }
             base.Update(gameTime);
         }
@@ -326,6 +331,18 @@ namespace TGC.MonoGame.TP
             foreach (var collectible in CollectibleManager.Collectibles)
             {
                 collectible.Update(gameTime, Player);
+            }
+        }
+
+        private void HandleGizmos(KeyboardState keyboardState)
+        {
+            if (keyboardState.IsKeyDown(Keys.G) && !Gizmos.Enabled)
+            {
+                Gizmos.Enabled = true;
+            }
+            else if (keyboardState.IsKeyUp(Keys.G) && Gizmos.Enabled)
+            {
+                Gizmos.Enabled = false;
             }
         }
 
