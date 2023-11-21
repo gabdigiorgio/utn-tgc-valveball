@@ -16,7 +16,7 @@ public class Player
     public float Gravity { private get;  set; } = MaxGravity;
     public int Score { get; private set; }
     public BoundingSphere BoundingSphere;
-    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMetal;
     
     private readonly Matrix _sphereScale;
     private float _pitch;

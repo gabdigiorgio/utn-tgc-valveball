@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.VisualBasic.FileIO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,6 +10,7 @@ using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
+using TGC.MonoGame.TP.Player;
 using TGC.MonoGame.TP.Prefab;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
@@ -87,8 +89,12 @@ namespace TGC.MonoGame.TP
         private static Player.Player Player { get; set; }
 
         // Effects
-        private Effect BlinnPhongEffect { get; set; }
         private Effect BlinnPhongShadows { get; set; }
+        
+        // EnvMap
+        private RenderTargetCube EnvironmentMapRenderTarget { get; set; }
+        private const int EnvironmentmapSize = 100;
+        private StaticCamera CubeMapCamera { get; set; }
 
         // Models
         private Model SphereModel { get; set; }
@@ -129,6 +135,10 @@ namespace TGC.MonoGame.TP
             
             // Player
             Player = new Player.Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
+            
+            // EnvMap camera
+            CubeMapCamera = new StaticCamera(1f, Player.SpherePosition, Vector3.UnitX, Vector3.Up);
+            CubeMapCamera.BuildProjection(1f, 1f, 3000f, MathHelper.PiOver2);
             
             // Gizmos
             Gizmos = new Gizmos.Gizmos
@@ -187,12 +197,20 @@ namespace TGC.MonoGame.TP
         {
             BlinnPhongShadows = Content.Load<Effect>(ContentFolderEffects + "BlinnPhongShadows");
             CreateShadowMapRenderTarget();
+            CreateEnvironmentMapRenderTarget();
         }
 
         private void CreateShadowMapRenderTarget()
         {
             ShadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, ShadowmapSize, ShadowmapSize, false,
                 SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
+        }
+        
+        private void CreateEnvironmentMapRenderTarget()
+        {
+            EnvironmentMapRenderTarget = new RenderTargetCube(GraphicsDevice, EnvironmentmapSize, false,
+                SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+            GraphicsDevice.BlendState = BlendState.Opaque;
         }
 
         private void LoadSkyBox()
@@ -239,6 +257,8 @@ namespace TGC.MonoGame.TP
                 
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
+
+                CubeMapCamera.Position = TargetCamera.Position;
 
                 PrefabManager.UpdatePrefabs(gameTime, Player);
 
@@ -316,7 +336,7 @@ namespace TGC.MonoGame.TP
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            //GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
             DrawWithShadows();
 
@@ -326,7 +346,7 @@ namespace TGC.MonoGame.TP
             
             Gizmos.Draw();
             
-            DrawSkybox();
+            DrawSkybox(TargetCamera);
 
             const int menuHeight = 60;
             var center = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
@@ -342,6 +362,17 @@ namespace TGC.MonoGame.TP
 
         private void DrawWithShadows()
         {
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            for (var face = CubeMapFace.PositiveX; face <= CubeMapFace.NegativeZ; face++)
+            { 
+                GraphicsDevice.SetRenderTarget(EnvironmentMapRenderTarget, face);
+                GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
+                SetCubemapCameraForOrientation(face);
+                CubeMapCamera.BuildView();
+                DrawSkybox(CubeMapCamera);
+                DrawPrefabs(PrefabManager.Prefabs, CubeMapCamera);
+            }
+            
             #region Pass 1
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -352,7 +383,7 @@ namespace TGC.MonoGame.TP
 
             DrawModelShadows(SphereWorld, SphereModel);
 
-            DrawPrefabsShadows(PrefabManager.Prefabs);
+            DrawPrefabs(PrefabManager.Prefabs, TargetLightCamera);
 
             #endregion
 
@@ -363,22 +394,23 @@ namespace TGC.MonoGame.TP
 
             BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DrawBlinnPhongShadowed"];
             SetShadowParameters();
-
-            DrawModel(SphereWorld, BlinnPhongShadows, SphereModel, Player.CurrentSphereMaterial.Material);
             
             DrawPrefabs(PrefabManager.Prefabs, BlinnPhongShadows);
             
+            DrawModel(SphereWorld, BlinnPhongShadows, SphereModel, Player.CurrentSphereMaterial.Material);
+            
             #endregion
+            
         }
         
-        private void DrawSkybox()
+        private void DrawSkybox(Camera camera)
         {
             var originalRasterizerState = GraphicsDevice.RasterizerState;
             var rasterizerState = new RasterizerState();
             rasterizerState.CullMode = CullMode.None;
             Graphics.GraphicsDevice.RasterizerState = rasterizerState;
 
-            SkyBox.Draw(TargetCamera.View, TargetCamera.Projection, TargetCamera.Position);
+            SkyBox.Draw(camera.View, camera.Projection, camera.Position);
             GraphicsDevice.RasterizerState = originalRasterizerState;
         }
         
@@ -432,6 +464,12 @@ namespace TGC.MonoGame.TP
         }
 
         private void DrawModel(Matrix worldMatrix, Effect effect, Model model, Material.Material material){
+            
+            if (Player.CurrentSphereMaterial == SphereMaterial.SphereMetal)
+            {
+                BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["EnvironmentMapSphere"];
+                BlinnPhongShadows.Parameters["environmentMap"].SetValue(EnvironmentMapRenderTarget);
+            }
             SetEffectParameters(effect, material, material.Tiling, worldMatrix, TargetCamera);
             foreach (var mesh in model.Meshes)
             {   
@@ -463,12 +501,12 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        private void DrawPrefabsShadows(List<Prefab.Prefab> prefabs)
+        private void DrawPrefabs(List<Prefab.Prefab> prefabs, Camera camera)
         {
             foreach (var prefab in prefabs)
             {
                 var prefabWorld = prefab.World;
-                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * TargetLightCamera.View * TargetLightCamera.Projection);
+                BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * camera.View * camera.Projection);
                 BoxPrimitive.Draw(BlinnPhongShadows);
             }
         }
@@ -533,6 +571,43 @@ namespace TGC.MonoGame.TP
                 var meshMatrix = mesh.ParentBone.Transform;
                 effect.Parameters["World"].SetValue(meshMatrix * world);
                 mesh.Draw();
+            }
+        }
+        
+        private void SetCubemapCameraForOrientation(CubeMapFace face)
+        {
+            switch (face)
+            {
+                default:
+                case CubeMapFace.PositiveX:
+                    CubeMapCamera.FrontDirection = -Vector3.UnitX;
+                    CubeMapCamera.UpDirection = Vector3.Down;
+                    break;
+
+                case CubeMapFace.NegativeX:
+                    CubeMapCamera.FrontDirection = Vector3.UnitX;
+                    CubeMapCamera.UpDirection = Vector3.Down;
+                    break;
+
+                case CubeMapFace.PositiveY:
+                    CubeMapCamera.FrontDirection = Vector3.Down;
+                    CubeMapCamera.UpDirection = Vector3.UnitZ;
+                    break;
+
+                case CubeMapFace.NegativeY:
+                    CubeMapCamera.FrontDirection = Vector3.Up;
+                    CubeMapCamera.UpDirection = -Vector3.UnitZ;
+                    break;
+
+                case CubeMapFace.PositiveZ:
+                    CubeMapCamera.FrontDirection = -Vector3.UnitZ;
+                    CubeMapCamera.UpDirection = Vector3.Down;
+                    break;
+
+                case CubeMapFace.NegativeZ:
+                    CubeMapCamera.FrontDirection = Vector3.UnitZ;
+                    CubeMapCamera.UpDirection = Vector3.Down;
+                    break;
             }
         }
 
