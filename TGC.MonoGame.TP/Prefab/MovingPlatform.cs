@@ -13,7 +13,7 @@ public class MovingPlatform : Platform
         GizmosDrawColor = Color.GreenYellow;
     }
 
-    public override void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime, Player.Player player)
     {
         SolveXCollisions();
         var increment = Move(gameTime);

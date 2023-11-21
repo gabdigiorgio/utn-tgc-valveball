@@ -169,7 +169,7 @@ public class Player
         BoundingSphere.Center = newYPosition;
     }
     
-    private void StartJump()
+    public void StartJump()
     {
         AudioManager.JumpSound.Play();
         _isJumping = true;

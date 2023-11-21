@@ -13,7 +13,7 @@ public static class PrefabManager
         CreatePlatform(new Vector3(60f, 6f, 60f), new Vector3(400f, 78f, 0f) + offset);
         CreateRamp(new Vector3(150f, 6f, 60f), new Vector3(500f, 100f, 0f) + offset, 0f, 0.3f);
         CreateRamp(new Vector3(100f, 6f, 60f), new Vector3(325f, 92f, 0f) + offset, 0f, -0.3f);
-        CreatePlatform(new Vector3(60f, 6f, 60f), new Vector3(250f, 106f, 0f) + offset, Material.Material.PlatformBlue);
+        CreateJumpingPlatform(new Vector3(60f, 6f, 60f), new Vector3(250f, 106f, 0f) + offset);
     }
     
     public static void CreateSquareCircuit(Vector3 offset)
@@ -41,11 +41,11 @@ public static class PrefabManager
         CreateRamps(offset);
     }
 
-    public static void UpdatePrefabs(GameTime gameTime)
+    public static void UpdatePrefabs(GameTime gameTime, Player.Player player)
     {
         foreach (var prefab in Prefabs)
         {
-            prefab.Update(gameTime);
+            prefab.Update(gameTime, player);
         }
     }
     
@@ -252,6 +252,11 @@ public static class PrefabManager
     private static void CreatePlatform(Vector3 scale, Vector3 position)
     {
         Prefabs.Add(new Platform(scale, position, Material.Material.Platform, 3f));
+    }
+    
+    private static void CreateJumpingPlatform(Vector3 scale, Vector3 position)
+    {
+        Prefabs.Add(new JumpingPlatform(scale, position, Material.Material.PlatformBlue, 3f));
     }
 
     private static void CreatePlatform(Vector3 scale, Vector3 position, Material.Material material)

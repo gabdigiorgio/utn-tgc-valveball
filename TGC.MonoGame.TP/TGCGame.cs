@@ -240,7 +240,7 @@ namespace TGC.MonoGame.TP
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
 
-                PrefabManager.UpdatePrefabs(gameTime);
+                PrefabManager.UpdatePrefabs(gameTime, Player);
 
                 UpdateCollectibles(gameTime);
 
