@@ -66,6 +66,15 @@ sampler_state
 	AddressV = Clamp;
 };
 
+texture environmentMap;
+samplerCUBE environmentMapSampler = sampler_state
+{
+    Texture = (environmentMap);
+    MagFilter = Linear;
+    MinFilter = Linear;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 struct DepthPassVertexShaderInput
 {
@@ -206,6 +215,27 @@ float4 MainPS(in MainVertexShaderOutput input) : COLOR
 	return finalColor;
 }
 
+float4 EnvironmentMapPS(MainVertexShaderOutput input) : COLOR
+{
+	//Normalizar vectores
+	float3 normal =  getNormalFromMap(input.TextureCoordinates, input.WorldSpacePosition.xyz, normalize(input.Normal.xyz));     
+    
+	// Get the texel from the texture
+	float3 baseColor = tex2D(textureSampler, input.TextureCoordinates).rgb;
+	
+    // Not part of the mapping, just adjusting color
+    baseColor = lerp(baseColor, float3(1, 1, 1), step(length(baseColor), 0.01));
+    
+	//Obtener texel de CubeMap
+	float3 view = normalize(eyePosition.xyz - input.WorldSpacePosition.xyz);
+	float3 reflection = reflect(view, normal);
+	float3 reflectionColor = texCUBE(environmentMapSampler, reflection).rgb;
+
+    float fresnel = saturate((1.0 - dot(normal, view)));
+
+    return float4(lerp(baseColor, reflectionColor, fresnel), 1);
+}
+
 
 float4 ShadowedPCFPS(in ShadowedVertexShaderOutput input) : COLOR
 {
@@ -301,13 +331,20 @@ technique DrawShadowedPCF
     }
 };
 
-
-
 technique NormalMapping
 {
     pass Pass0
     {
         VertexShader = compile VS_SHADERMODEL NormalMapVS();
         PixelShader = compile PS_SHADERMODEL NormalMapPS();
+    }
+};
+
+technique EnvironmentMapSphere
+{
+    pass Pass0
+    {
+        VertexShader = compile VS_SHADERMODEL SphereVS();
+        PixelShader = compile PS_SHADERMODEL EnvironmentMapPS();
     }
 };
