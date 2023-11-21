@@ -7,6 +7,14 @@ public static class PrefabManager
 {
     public static readonly List<Prefab> Prefabs = new();
     
+    public static void CreateInitialCircuit(Vector3 offset)
+    {
+        CreatePlatform(new Vector3(150f, 6f, 60f), new Vector3(646f, 122f, 0f) + offset);
+        CreatePlatform(new Vector3(60f, 6f, 60f), new Vector3(400f, 78f, 0f) + offset);
+        CreateRamp(new Vector3(150f, 6f, 60f), new Vector3(500f, 100f, 0f) + offset, 0f, 0.3f);
+        CreateRamp(new Vector3(100f, 6f, 60f), new Vector3(325f, 92f, 0f) + offset, 0f, -0.3f);
+    }
+    
     public static void CreateSquareCircuit(Vector3 offset)
     {
         // Platform
@@ -30,16 +38,6 @@ public static class PrefabManager
         CreateMovingObstacle(Vector3.One*25f, new Vector3(150f, 16f, -140f) + offset);
             
         CreateRamps(offset);
-    }
-
-    public static void CreateInitialCircuit(Vector3 offset)
-    {
-        CreatePlatform(new Vector3(150f, 6f, 60f), new Vector3(646f, 122f, 0f) + offset);
-        CreatePlatform(new Vector3(60f, 6f, 60f), new Vector3(400f, 78f, 0f) + offset);
-        CreateRamp(new Vector3(150f, 6f, 60f), new Vector3(500f, 100f, 0f) + offset, 0f, 0.3f);
-        CreateRamp(new Vector3(60f, 6f, 150f), new Vector3(400f, 100f, -100f) + offset, 0.3f, 0f);
-        CreateRamp(new Vector3(60f, 6f, 150f), new Vector3(400f, 100f, 100f) + offset, -0.3f, 0f);
-        CreateRamp(new Vector3(90f, 6f, 60f), new Vector3(345f, 85f, 0f) + offset, 0f, -0.4f);
     }
 
     public static void UpdatePrefabs(GameTime gameTime)
