@@ -35,6 +35,7 @@ public class Material
     public static readonly Material Metal = new(0.510f, 0.330f, 0.750f, 64.0f, 5f);
     public static readonly Material Default = new(0.5f, 0.5f, 0.1f, 0.5f);
     public static readonly Material Platform = new(0.4f, 0.450f, 0.340f, 12.820f);
+    public static readonly Material PlatformBlue = new(0.4f, 0.550f, 0.340f, 12.820f);
     public static readonly Material MovingPlatform = new(0.380f, 0.620f, 0.340f, 1.820f);
     
     public static void LoadMaterials(ContentManager content)
@@ -44,6 +45,7 @@ public class Material
         var defaultDiffuse = content.Load<Texture2D>(contentFolderTextures + "default_diffuse");
         var platformGreenDiffuse = content.Load<Texture2D>(contentFolderTextures + "platform_green_diffuse");
         var platformOrangeDiffuse = content.Load<Texture2D>(contentFolderTextures + "platform_orange_diffuse");
+        var platformBlueDiffuse = content.Load<Texture2D>(contentFolderTextures + "platform_blue_diffuse");
         var marbleDiffuse = content.Load<Texture2D>(contentFolderTextures + "marble_black_diffuse");
         var rubberDiffuse = content.Load<Texture2D>(contentFolderTextures + "rubber_diffuse");
         var metalDiffuse = content.Load<Texture2D>(contentFolderTextures + "metal_diffuse");
@@ -51,6 +53,7 @@ public class Material
         var defaultNormal = content.Load<Texture2D>(contentFolderTextures + "default_normal");
         var platformSquareNormal = content.Load<Texture2D>(contentFolderTextures + "platform_square_normal");
         var platformNormal = content.Load<Texture2D>(contentFolderTextures + "platform_normal");
+        var platformBlueNormal = content.Load<Texture2D>(contentFolderTextures + "platform_blue_normal");
         var plainNormal = content.Load<Texture2D>(contentFolderTextures + "plain_normal");
         var rubberNormal = content.Load<Texture2D>(contentFolderTextures + "rubber_normal");
         var metalNormal = content.Load<Texture2D>(contentFolderTextures + "metal_normal");
@@ -59,6 +62,7 @@ public class Material
         Default.LoadTexture(defaultDiffuse, defaultNormal);
         Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
         MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
+        PlatformBlue.LoadTexture(platformBlueDiffuse, platformBlueNormal);
         Marble.LoadTexture(marbleDiffuse, plainNormal);
         Rubber.LoadTexture(rubberDiffuse, rubberNormal);
         Metal.LoadTexture(metalDiffuse, metalNormal);
