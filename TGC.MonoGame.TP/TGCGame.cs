@@ -63,7 +63,7 @@ namespace TGC.MonoGame.TP
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
-        private Vector3 LightPosition { get; set;} = new(300f, 250f, 300f);
+        private Vector3 LightPosition { get; } = new(300f, 250f, 390f);
         private float LightCameraFarPlaneDistance { get; set; } = 3000f;
         private float LightCameraNearPlaneDistance { get; set; } = 5f;
         

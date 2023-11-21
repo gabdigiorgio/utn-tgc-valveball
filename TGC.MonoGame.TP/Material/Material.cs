@@ -35,7 +35,7 @@ public class Material
     public static readonly Material Metal = new(0.510f, 0.330f, 0.750f, 64.0f, 5f);
     public static readonly Material Default = new(0.5f, 0.5f, 0.1f, 0.5f);
     public static readonly Material Platform = new(0.4f, 0.450f, 0.340f, 12.820f);
-    public static readonly Material PlatformBlue = new(0.4f, 0.550f, 0.340f, 12.820f);
+    public static readonly Material JumpingPlatform = new(0.4f, 0.550f, 0.640f, 12.820f);
     public static readonly Material MovingPlatform = new(0.380f, 0.620f, 0.340f, 1.820f);
     
     public static void LoadMaterials(ContentManager content)
@@ -62,7 +62,7 @@ public class Material
         Default.LoadTexture(defaultDiffuse, defaultNormal);
         Platform.LoadTexture(platformGreenDiffuse, platformSquareNormal);
         MovingPlatform.LoadTexture(platformOrangeDiffuse, platformNormal);
-        PlatformBlue.LoadTexture(platformBlueDiffuse, platformBlueNormal);
+        JumpingPlatform.LoadTexture(platformBlueDiffuse, platformBlueNormal);
         Marble.LoadTexture(marbleDiffuse, plainNormal);
         Rubber.LoadTexture(rubberDiffuse, rubberNormal);
         Metal.LoadTexture(metalDiffuse, metalNormal);

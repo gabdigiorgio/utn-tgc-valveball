@@ -256,7 +256,7 @@ public static class PrefabManager
     
     private static void CreateJumpingPlatform(Vector3 scale, Vector3 position)
     {
-        Prefabs.Add(new JumpingPlatform(scale, position, Material.Material.PlatformBlue, 3f));
+        Prefabs.Add(new JumpingPlatform(scale, position, Material.Material.JumpingPlatform, 3f));
     }
 
     private static void CreatePlatform(Vector3 scale, Vector3 position, Material.Material material)
