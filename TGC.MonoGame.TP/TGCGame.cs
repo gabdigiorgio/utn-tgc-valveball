@@ -246,13 +246,6 @@ namespace TGC.MonoGame.TP
             var keyboardState = Keyboard.GetState();
             var mouseState = Mouse.GetState();
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-
-            if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
-            {
-                AudioManager.PauseBackgroundMusic();
-                AudioManager.OpenMenuSound.Play();
-                _isMenuOpen = true;
-            }
             
             UpdateMenuSelection(keyboardState);
 
@@ -269,6 +262,12 @@ namespace TGC.MonoGame.TP
                 }
                 else
                 {
+                    if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
+                    {
+                        AudioManager.PauseBackgroundMusic();
+                        AudioManager.OpenMenuSound.Play();
+                        _isMenuOpen = true;
+                    }
                     SphereWorld = Player.Update(time, keyboardState);
                     TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
                     _gameTimer += gameTime.ElapsedGameTime;
@@ -460,16 +459,29 @@ namespace TGC.MonoGame.TP
 
             const string titleText = "ValveBall";
             var titleSize = _font.MeasureString(titleText);
-            var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X) / 2, 100);
-            SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed);
+            const float titleScale = 1.5f;
             
-            const string pressStartText = "Press Start";
+            var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X * titleScale) / 2,
+                (GraphicsDevice.Viewport.Height - titleSize.Y * titleScale) / 2 - 50);
+
+            SpriteBatch.DrawString(_font, titleText, titlePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
+                titleScale, SpriteEffects.None, 0f);
+            
+            SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed, 0f, Vector2.Zero,
+                titleScale, SpriteEffects.None, 0f);
+
+            const string pressStartText = "<Press Start>";
             var pressStartSize = _font.MeasureString(pressStartText);
-            var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2, 200);
+            
+            var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
+                (GraphicsDevice.Viewport.Height - pressStartSize.Y) / 2);
+            
             SpriteBatch.DrawString(_font, pressStartText, pressStartPosition, Color.White);
 
             SpriteBatch.End();
         }
+
+
         
         private void DrawMenu(Vector2 center, int menuHeight)
         {
