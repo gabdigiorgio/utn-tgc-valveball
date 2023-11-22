@@ -20,7 +20,7 @@ namespace TGC.MonoGame.TP.Cameras
         private const float RadiusIncrement = 10f;
         private const float CameraUpDistance = 15f;
 
-        
+
         /// <summary>
         ///     The direction that is "up" from the camera's point of view.
         /// </summary>

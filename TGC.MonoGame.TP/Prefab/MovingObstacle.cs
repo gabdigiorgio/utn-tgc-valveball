@@ -12,7 +12,7 @@ public class MovingObstacle : MovingPlatform
     {
     }
     
-    public override void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime, Player.Player player)
     {
         var increment = Move(gameTime);
         UpdateBoundingBox(increment);

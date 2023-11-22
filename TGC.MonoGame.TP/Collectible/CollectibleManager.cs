@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.TP.Audio;
+using TGC.MonoGame.TP.Collectible.Checkpoints;
 using TGC.MonoGame.TP.Collectible.Coins;
 using TGC.MonoGame.TP.Collectible.PowerUps;
 
@@ -20,7 +21,8 @@ public static class CollectibleManager
         {
             { typeof(LowGravity), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/Gold_Star") },
             { typeof(SpeedUp), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/speed_power") },
-            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/coin") }
+            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/coin") },
+            { typeof(Checkpoint), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/checkpoint") }
         };
         
         var powerUpEffect = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
@@ -67,6 +69,13 @@ public static class CollectibleManager
         CreateCollectible<LowGravity>(150f + xOffset, 5f + yOffset, 0f + zOffset);
         CreateCollectible<SpeedUp>(150f + xOffset, 10f + yOffset, -200f + zOffset);
         CreateCollectible<SpeedUp>(150f + xOffset, 10f + yOffset, 200f + zOffset);
+    }
+
+    public static void CreateCheckpoints()
+    {
+        CreateCollectible<Checkpoint>(1100, 225f, 0f);
+        CreateCollectible<Checkpoint>(300f, 3f, 0f);
+        CreateCollectible<Checkpoint>(-600f, 3f, 0f);
     }
     
     private static void CreateCollectible<T>(float x, float y, float z) where T : Collectible

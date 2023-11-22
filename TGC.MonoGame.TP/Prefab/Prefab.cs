@@ -8,7 +8,7 @@ public abstract class Prefab
     public Matrix World;
     public Vector3 Position { get; protected set; }
     public Vector3? PreviousPosition { get; protected set; }
-    public Material.Material Material { get; }
+    public Material.Material Material { get; protected set; }
     public Vector2 Tiling { get; }
     protected Color GizmosDrawColor { get; init; }
     
@@ -31,7 +31,7 @@ public abstract class Prefab
 
     protected abstract Vector3 GetExtents();
 
-    public virtual void Update(GameTime gameTime)
+    public virtual void Update(GameTime gameTime, Player.Player player)
     {
     }
 

@@ -7,6 +7,15 @@ public static class PrefabManager
 {
     public static readonly List<Prefab> Prefabs = new();
     
+    public static void CreateInitialCircuit(Vector3 offset)
+    {
+        CreatePlatform(new Vector3(150f, 6f, 60f), new Vector3(646f, 122f, 0f) + offset);
+        CreatePlatform(new Vector3(60f, 6f, 60f), new Vector3(400f, 78f, 0f) + offset);
+        CreateRamp(new Vector3(150f, 6f, 60f), new Vector3(500f, 100f, 0f) + offset, 0f, 0.3f);
+        CreateRamp(new Vector3(100f, 6f, 60f), new Vector3(325f, 92f, 0f) + offset, 0f, -0.3f);
+        CreateJumpingPlatform(new Vector3(60f, 6f, 60f), new Vector3(250f, 106f, 0f) + offset);
+    }
+    
     public static void CreateSquareCircuit(Vector3 offset)
     {
         // Platform
@@ -32,11 +41,11 @@ public static class PrefabManager
         CreateRamps(offset);
     }
 
-    public static void UpdatePrefabs(GameTime gameTime)
+    public static void UpdatePrefabs(GameTime gameTime, Player.Player player)
     {
         foreach (var prefab in Prefabs)
         {
-            prefab.Update(gameTime);
+            prefab.Update(gameTime, player);
         }
     }
     
@@ -244,6 +253,16 @@ public static class PrefabManager
     {
         Prefabs.Add(new Platform(scale, position, Material.Material.Platform, 3f));
     }
+    
+    private static void CreateJumpingPlatform(Vector3 scale, Vector3 position)
+    {
+        Prefabs.Add(new JumpingPlatform(scale, position, Material.Material.JumpingPlatform, 3f));
+    }
+
+    private static void CreatePlatform(Vector3 scale, Vector3 position, Material.Material material)
+    {
+        Prefabs.Add(new Platform(scale, position, material, 3f));
+    }
 
     private static void CreateRamp(Vector3 scale, Vector3 position, float angleX, float angleZ)
     {
@@ -255,8 +274,8 @@ public static class PrefabManager
         var movingPlatform = new MovingPlatform(scale, position, Material.Material.MovingPlatform, 3f);
         Prefabs.Add(movingPlatform);
     }
-    
-    public static void CreateMovingObstacle(Vector3 scale, Vector3 position){
+
+    private static void CreateMovingObstacle(Vector3 scale, Vector3 position){
         var movingObstacle = new MovingObstacle(scale, position, Material.Material.Metal, 3f);
         Prefabs.Add(movingObstacle);
     }
