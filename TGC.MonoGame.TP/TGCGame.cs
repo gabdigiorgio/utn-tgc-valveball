@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualBasic.FileIO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -61,6 +60,7 @@ namespace TGC.MonoGame.TP
         private Camera Camera { get; set; }
         private TargetCamera TargetCamera { get; set; }
         private MainMenuCamera MainMenuCamera { get; set; }
+        private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
         private bool _inMainMenu;
         private float CameraFarPlaneDistance { get; set; } = 10000f;
         private float CameraNearPlaneDistance { get; set; } = 5f;
@@ -253,9 +253,9 @@ namespace TGC.MonoGame.TP
             {
                 if (_inMainMenu)
                 {
-                    MainMenuCamera.Update(new Vector3(0f, 200f, 0f));
+                    MainMenuCamera.Update(MainMenuCameraTarget);
 
-                    if (keyboardState.IsKeyDown(Keys.Enter))
+                    if (keyboardState.IsKeyDown(Keys.Enter) || keyboardState.IsKeyDown(Keys.Space))
                     {
                         _inMainMenu = false;
                     }

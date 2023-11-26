@@ -25,7 +25,8 @@ float2 Tiling;
 
 float2 shadowMapSize;
 
-static const float modulatedEpsilon = 0.000041200182749889791011810302734375;
+//static const float modulatedEpsilon = 0.000041200182749889791011810302734375;
+static const float modulatedEpsilon = 0.000011200182749889791011810302734375;
 static const float maxEpsilon = 0.000023200045689009130001068115234375;
 
 texture ModelTexture;
@@ -38,8 +39,6 @@ sampler2D textureSampler = sampler_state
     AddressV = Wrap;
     MIPFILTER = LINEAR;
 };
-
-
 
 //Textura para Normals
 texture NormalTexture;
