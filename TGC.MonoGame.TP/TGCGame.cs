@@ -62,8 +62,8 @@ namespace TGC.MonoGame.TP
         private MainMenuCamera MainMenuCamera { get; set; }
         private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
         private bool _inMainMenu;
-        private float CameraFarPlaneDistance { get; set; } = 10000f;
-        private float CameraNearPlaneDistance { get; set; } = 5f;
+        public static float CameraFarPlaneDistance { get; set; } = 10000f;
+        public static float CameraNearPlaneDistance { get; set; } = 5f;
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
@@ -269,7 +269,7 @@ namespace TGC.MonoGame.TP
                         _isMenuOpen = true;
                     }
                     SphereWorld = Player.Update(time, keyboardState);
-                    TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState, gameTime);
+                    TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState, gameTime, Player.Speed, GraphicsDevice);
                     _gameTimer += gameTime.ElapsedGameTime;
                 }
                 

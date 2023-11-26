@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Prefab;
 
@@ -101,9 +102,12 @@ namespace TGC.MonoGame.TP.Cameras
             _elapsedShakeTime = 0f;
         }
         
-        public void Update(Vector3 playerPosition, float yaw, MouseState mouseState, GameTime gameTime)
+        public void Update(Vector3 playerPosition, float yaw, MouseState mouseState, GameTime gameTime, float playerSpeed, GraphicsDevice graphicsDevice)
         {
             UpdateFollowRadius(mouseState);
+
+            AdjustFov(playerSpeed, graphicsDevice);
+
             var playerBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
             var orbitalPosition = playerBackDirection * _cameraFollowRadius;
             var upDistance = Vector3.Up * CameraUpDistance;
@@ -129,7 +133,20 @@ namespace TGC.MonoGame.TP.Cameras
             TargetPosition = playerPosition;
             BuildView();
         }
-        
+
+        private void AdjustFov(float playerSpeed, GraphicsDevice graphicsDevice)
+        {
+            const float initialFoV = MathHelper.PiOver4;
+            const float maxFoV = MathHelper.PiOver2;
+
+            var adjustmentFactor = MathHelper.Clamp(playerSpeed / 600f, 0.0f, 1.0f);
+
+            var adjustedFoV = MathHelper.Lerp(initialFoV, maxFoV, adjustmentFactor);
+
+            Projection = Matrix.CreatePerspectiveFieldOfView(adjustedFoV, graphicsDevice.Viewport.AspectRatio,
+                TGCGame.CameraNearPlaneDistance, TGCGame.CameraFarPlaneDistance);
+        }
+
         private static float? CameraCollided(Vector3 cameraPosition, Vector3 playerPosition)
         {
             var difference = playerPosition - cameraPosition;
