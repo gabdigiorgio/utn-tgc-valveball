@@ -21,16 +21,17 @@ public static class CollectibleManager
         {
             { typeof(LowGravity), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/Gold_Star") },
             { typeof(SpeedUp), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/speed_power") },
-            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/coin") },
+            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/dollar_coin") },
             { typeof(Checkpoint), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/checkpoint") }
         };
         
         var powerUpEffect = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
         var basicShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "BasicShader");
+        var blinnPhong = content.Load<Effect>(TGCGame.ContentFolderEffects + "BlinnPhongTypes");
 
         foreach (var collectible in Collectibles)
         {
-            AssignModelAndShader(collectible, collectibleModels, basicShader, powerUpEffect);
+            AssignModelAndShader(collectible, collectibleModels, blinnPhong, powerUpEffect);
             AssignSound(collectible, AudioManager.CollectibleSounds);
         }
     }
@@ -84,11 +85,11 @@ public static class CollectibleManager
         Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
     }
     
-    private static void AssignModelAndShader(Collectible collectible, Dictionary<Type, Model> collectibleModels, Effect basicShader, Effect powerUpEffect)
+    private static void AssignModelAndShader(Collectible collectible, Dictionary<Type, Model> collectibleModels, Effect coinShader, Effect powerUpShader)
     {
         if (!collectibleModels.TryGetValue(collectible.GetType(), out var model)) return;
         collectible.Model = model;
-        collectible.Shader = collectible is Coin ? basicShader : powerUpEffect;
+        collectible.Shader = collectible is Coin ? coinShader : powerUpShader;
         TGCGame.loadEffectOnMesh(collectible.Model, collectible.Shader);
     }
 

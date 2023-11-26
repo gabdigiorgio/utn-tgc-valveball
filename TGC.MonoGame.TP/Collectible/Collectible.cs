@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.TP.Cameras;
 
 namespace TGC.MonoGame.TP.Collectible;
 
@@ -35,6 +37,20 @@ public abstract class Collectible
     {
         HandleCollection(player);
         UpdateAnimation(gameTime);
+    }
+    
+    public virtual void Draw(GameTime gameTime, Camera camera){
+        Shader.Parameters["View"].SetValue(camera.View);
+        Shader.Parameters["Projection"].SetValue(camera.Projection);
+        Shader.Parameters["DiffuseColor"]?.SetValue(Color.Yellow.ToVector3());
+        Shader.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
+
+        foreach (var mesh in Model.Meshes)
+        {
+            var meshMatrix = mesh.ParentBone.Transform;
+            Shader.Parameters["World"].SetValue(meshMatrix * World);
+            mesh.Draw();
+        }
     }
 
     protected virtual void UpdateAnimation(GameTime gameTime)

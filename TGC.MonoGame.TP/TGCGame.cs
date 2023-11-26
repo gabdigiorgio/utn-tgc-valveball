@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -60,10 +61,11 @@ namespace TGC.MonoGame.TP
         private Camera Camera { get; set; }
         public static TargetCamera TargetCamera { get; set; }
         private MainMenuCamera MainMenuCamera { get; set; }
+        private BoundingFrustum BoundingFrustum { get; set; }
         private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
         private bool _inMainMenu;
         public static float CameraFarPlaneDistance { get; set; } = 10000f;
-        public static float CameraNearPlaneDistance { get; set; } = 5f;
+        public static float CameraNearPlaneDistance { get; set; } = 1f;
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
@@ -127,13 +129,18 @@ namespace TGC.MonoGame.TP
             
             // Light
             TargetLightCamera = new TargetCamera(1f, LightPosition, Vector3.Zero);
-            TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance, MathHelper.PiOver2);
+            TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance, 
+                MathHelper.PiOver2);
             
             // Configuramos nuestras matrices de la escena.
             SphereWorld = Matrix.Identity;
             View = Matrix.CreateLookAt(Vector3.UnitZ * 150, Vector3.Zero, Vector3.Up);
+            
             TargetCamera.Projection = 
-                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, CameraNearPlaneDistance, CameraFarPlaneDistance);
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 
+                    CameraNearPlaneDistance, CameraFarPlaneDistance);
+            
+            BoundingFrustum = new BoundingFrustum(TargetCamera.View * TargetCamera.Projection);
             
             // Player
             Player = new Player.Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
@@ -275,6 +282,9 @@ namespace TGC.MonoGame.TP
                 
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
+                
+                // Update the view projection matrix of the bounding frustum
+                BoundingFrustum.Matrix = TargetCamera.View * TargetCamera.Projection;
 
                 CubeMapCamera.Position = Player.SpherePosition;
 
@@ -419,7 +429,7 @@ namespace TGC.MonoGame.TP
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1f, 0);
 
             BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
-
+            
             DrawModelShadows(SphereWorld, SphereModel);
 
             DrawPrefabs(PrefabManager.Prefabs, TargetLightCamera);
@@ -560,26 +570,25 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        private void DrawPrefabs(List<Prefab.Prefab> prefabs, Effect effect)
+        private void DrawPrefabs(IEnumerable<Prefab.Prefab> prefabs, Effect effect)
         {
-            foreach (var prefab in prefabs)
+            foreach (var prefab in prefabs.Where(prefab => prefab.Intersects(BoundingFrustum)))
             {
                 SetEffectParameters(effect, prefab.Material, prefab.Tiling, prefab.World, TargetCamera);
                 BoxPrimitive.Draw(effect);
             }
         }
 
-        private void DrawPrefabs(List<Prefab.Prefab> prefabs, Camera camera)
+        private void DrawPrefabs(IEnumerable<Prefab.Prefab> prefabs, Camera camera)
         {
-            foreach (var prefab in prefabs)
+            foreach (var prefabWorld in from prefab in prefabs where prefab.Intersects(BoundingFrustum) select prefab.World)
             {
-                var prefabWorld = prefab.World;
                 BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * camera.View * camera.Projection);
                 BoxPrimitive.Draw(BlinnPhongShadows);
             }
         }
         
-        private static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
+        public static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
             effect.Parameters["eyePosition"].SetValue(camera.Position);
@@ -620,6 +629,8 @@ namespace TGC.MonoGame.TP
             }
             
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
+            
+            //Gizmos.DrawFrustum(TargetCamera.View * TargetCamera.Projection, Color.Yellow);
         }
 
         private void DrawCollectibles(IEnumerable<Collectible.Collectible> collectibles, GameTime gameTime)
@@ -627,10 +638,7 @@ namespace TGC.MonoGame.TP
             foreach (var collectible in collectibles)
             {
                 if (!collectible.ShouldDraw) continue;
-                DrawModel(collectible.World, collectible.Model, collectible.Shader, gameTime);
-                var center = BoundingVolumesExtensions.GetCenter(collectible.BoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(collectible.BoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.Red);
+                collectible.Draw(gameTime, TargetCamera);
             }
         }
         

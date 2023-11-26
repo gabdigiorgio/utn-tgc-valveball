@@ -23,6 +23,8 @@ public abstract class Prefab
     
     public abstract bool Intersects(BoundingSphere sphere);
     
+    public abstract bool Intersects(BoundingFrustum boundingFrustum);
+    
     public abstract Vector3 ClosestPoint(Vector3 sphereCenter);
     
     public abstract float MaxY();

@@ -18,6 +18,11 @@ public class Platform : Prefab
         return BoundingBox.Intersects(sphere);
     }
 
+    public override bool Intersects(BoundingFrustum boundingFrustum)
+    {
+       return boundingFrustum.Intersects(BoundingBox);
+    }
+
     protected override Vector3 GetCenter()
     {
         return BoundingVolumesExtensions.GetCenter(BoundingBox);
