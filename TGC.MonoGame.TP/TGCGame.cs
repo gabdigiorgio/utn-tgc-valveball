@@ -58,7 +58,7 @@ namespace TGC.MonoGame.TP
         
         // Camera
         private Camera Camera { get; set; }
-        private TargetCamera TargetCamera { get; set; }
+        public static TargetCamera TargetCamera { get; set; }
         private MainMenuCamera MainMenuCamera { get; set; }
         private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
         private bool _inMainMenu;
@@ -269,7 +269,7 @@ namespace TGC.MonoGame.TP
                         _isMenuOpen = true;
                     }
                     SphereWorld = Player.Update(time, keyboardState);
-                    TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
+                    TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState, gameTime);
                     _gameTimer += gameTime.ElapsedGameTime;
                 }
                 

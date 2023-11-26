@@ -14,6 +14,14 @@ namespace TGC.MonoGame.TP.Cameras
         private int _previousScrollValue;
         private bool _mouseWheelChanged;
         private float _cameraFollowRadius = InitialCameraFollowRadius;
+        
+        // Camera shake
+        private bool _isShaking;
+        private float _shakeIntensity;
+        private float _shakeDuration;
+        private float _elapsedShakeTime;
+        private Vector3 _originalCameraPosition;
+        
         private const float MaxCameraFollowRadius = 100f;
         private const float MinCameraFollowRadius = 30f;
         private const float InitialCameraFollowRadius = 60f;
@@ -84,8 +92,16 @@ namespace TGC.MonoGame.TP.Cameras
         {
             // This camera has no movement, once initialized with position and lookAt it is no longer updated automatically.
         }
+
+        public void Shake(float shakeIntensity, float shakeDuration)
+        {
+            _isShaking = true;
+            _shakeIntensity = shakeIntensity;
+            _shakeDuration = shakeDuration;
+            _elapsedShakeTime = 0f;
+        }
         
-        public void Update(Vector3 playerPosition, float yaw, MouseState mouseState)
+        public void Update(Vector3 playerPosition, float yaw, MouseState mouseState, GameTime gameTime)
         {
             UpdateFollowRadius(mouseState);
             var playerBackDirection = Vector3.Transform(Vector3.Backward, Matrix.CreateRotationY(yaw));
@@ -107,6 +123,8 @@ namespace TGC.MonoGame.TP.Cameras
             {
                 Position = newCameraPosition;
             }
+            
+            ApplyCameraShake(gameTime);
 
             TargetPosition = playerPosition;
             BuildView();
@@ -164,6 +182,29 @@ namespace TGC.MonoGame.TP.Cameras
         private void AdjustCameraFollowRadius()
         {
             _cameraFollowRadius = MathHelper.Clamp(_cameraFollowRadius, MinCameraFollowRadius, MaxCameraFollowRadius);
+        }
+        
+        private void ApplyCameraShake(GameTime gameTime)
+        {
+            if (_isShaking)
+            {
+                _elapsedShakeTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (_elapsedShakeTime >= _shakeDuration)
+                {
+                    _isShaking = false;
+                }
+                else
+                {
+                    var shakeFactor = 1.0f - _elapsedShakeTime / _shakeDuration;
+
+                    var offsetX = MathF.Sin(_elapsedShakeTime * 45f) * _shakeIntensity * shakeFactor;
+                    var offsetY = MathF.Cos(_elapsedShakeTime * 25f) * _shakeIntensity * shakeFactor;
+                    var offsetZ = MathF.Sin(_elapsedShakeTime * 45f) * _shakeIntensity * shakeFactor;
+
+                    Position = new Vector3(Position.X + offsetX, Position.Y + offsetY, Position.Z + offsetZ);
+                }
+            }
         }
     }
 }

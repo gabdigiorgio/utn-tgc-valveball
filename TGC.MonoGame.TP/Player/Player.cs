@@ -21,7 +21,7 @@ public class Player
     private readonly Matrix _sphereScale;
     private float _pitch;
     private float _roll;
-    private float _speed;
+    public float Speed { get; private set; }
     private float _pitchSpeed; 
     private float _yawSpeed;
     private float _jumpSpeed;
@@ -156,7 +156,7 @@ public class Player
     private void SetSpeedToZero()
     {
         _pitchSpeed = 0;
-        _speed = 0;
+        Speed = 0;
         _jumpSpeed = 0;
     }
 
@@ -267,8 +267,8 @@ public class Player
 
     private void AdjustSpeed(float time, Vector3 forward)
     {
-        _speed = MathHelper.Clamp(_speed, -CurrentSphereMaterial.MaxSpeed, CurrentSphereMaterial.MaxSpeed);
-        BoundingSphere.Center += forward * time * _speed;
+        Speed = MathHelper.Clamp(Speed, -CurrentSphereMaterial.MaxSpeed, CurrentSphereMaterial.MaxSpeed);
+        BoundingSphere.Center += forward * time * Speed;
     }
 
     private void AdjustPitchSpeed(float time)
@@ -295,13 +295,13 @@ public class Player
 
     private void Accelerate(float acceleration, float time)
     {
-        _speed += acceleration * time;
+        Speed += acceleration * time;
     }
 
     private void Decelerate(float acceleration, float time)
     {
-        var decelerationDirection = Math.Sign(_speed) * -1;
-        _speed += acceleration * time * decelerationDirection;
+        var decelerationDirection = Math.Sign(Speed) * -1;
+        Speed += acceleration * time * decelerationDirection;
     }
 
     private void SolveCollisions()
