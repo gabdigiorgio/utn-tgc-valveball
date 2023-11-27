@@ -41,7 +41,6 @@ public class FinalCheckpoint : Collectible
 
     protected override void OnCollected(Player.Player player)
     {
-        player.ChangeRestartPosition(new Vector3(Position.X, Position.Y + 10f, Position.Z));
-        //TGCGame.ShowEnding();
+        //TGCGame.EndGame();
     }
 }

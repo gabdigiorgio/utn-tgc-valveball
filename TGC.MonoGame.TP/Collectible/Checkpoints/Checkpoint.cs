@@ -6,14 +6,12 @@ namespace TGC.MonoGame.TP.Collectible.Checkpoints;
 
 public class Checkpoint : Collectible
 {
-    private const float DefaultScale = 0.1f;
-    private const float DefaultXRotation = -MathHelper.PiOver2;
-
-    public Checkpoint(Vector3 position) 
+    public float YawRestartPosition { get; }
+    public Checkpoint(Vector3 position, float yawRestartPosition) 
         : base(new BoundingBox(new Vector3(-8, -5, -8) + position, new Vector3(8, 10, 8) + position))
     {
         Position = position;
-        //Scale = DefaultScale;
+        YawRestartPosition = yawRestartPosition;
         World = Matrix.CreateTranslation(position);
     }
     
@@ -53,6 +51,6 @@ public class Checkpoint : Collectible
 
     protected override void OnCollected(Player.Player player)
     {
-        player.ChangeRestartPosition(new Vector3(Position.X, Position.Y + 10f, Position.Z));
+        player.ChangeRestartPosition(new Vector3(Position.X, Position.Y + 10f, Position.Z), YawRestartPosition);
     }
 }

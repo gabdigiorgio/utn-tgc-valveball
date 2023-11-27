@@ -129,10 +129,10 @@ public static class CollectibleManager
 
     public static void CreateCheckpoints()
     {
-        CreateCollectible<Checkpoint>(1100, 230.5f, 0f);
-        CreateCollectible<Checkpoint>(300f, 8.5f, 0f);
-        CreateCollectible<Checkpoint>(-600f, 8.5f, 0f);
-        CreateCollectible<Checkpoint>(-625f, 680.5f, 0f);
+        CreateCollectible<Checkpoint>(1100, 230.5f, 0f, MathHelper.PiOver2);
+        CreateCollectible<Checkpoint>(300f, 8.5f, 0f, MathHelper.PiOver2);
+        CreateCollectible<Checkpoint>(-600f, 8.5f, 0f, MathHelper.PiOver2);
+        CreateCollectible<Checkpoint>(-625f, 680.5f, 0f, -MathHelper.PiOver2);
         CreateCollectible<FinalCheckpoint>(100f, 678f, 0f);
     }
     
@@ -140,6 +140,12 @@ public static class CollectibleManager
     {
         var position = new Vector3(x, y, z);
         Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
+    }
+    
+    private static void CreateCollectible<T>(float x, float y, float z, float yaw) where T : Collectible
+    {
+        var position = new Vector3(x, y, z);
+        Collectibles.Add((T)Activator.CreateInstance(typeof(T), position, yaw));
     }
 
     private static void AssignModelAndShader(Collectible collectible, Dictionary<Type, Model> collectibleModels,

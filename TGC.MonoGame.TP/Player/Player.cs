@@ -41,6 +41,7 @@ public class Player
     private const float YawAcceleration = 5f;
     private const float MaxGravity = 175f;
     private Vector3 _restartPosition = TGCGame.InitialSpherePosition;
+    private float _restartYaw = TGCGame.InitialSphereYaw;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -150,13 +151,14 @@ public class Player
     {
         if (!(BoundingSphere.Center.Y <= -150f) && !keyboardState.IsKeyDown(Keys.R)) return;
         BoundingSphere.Center = _restartPosition;
-        Yaw = TGCGame.InitialSphereYaw;
+        Yaw = _restartYaw;
         SetSpeedToZero();
     }
     
-    public void ChangeRestartPosition(Vector3 newPosition)
+    public void ChangeRestartPosition(Vector3 newPosition, float newYaw)
     {
         _restartPosition = newPosition;
+        _restartYaw = newYaw;
     }
     
     public void ResetGravity()

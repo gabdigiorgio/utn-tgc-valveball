@@ -92,7 +92,7 @@ namespace TGC.MonoGame.TP
         
         // Sphere position & rotation
         public static readonly Vector3 InitialSpherePosition = new(-625f, 690f, 0f);//new(1100, 250f, 0f);
-        public const float InitialSphereYaw = 1.57f;
+        public const float InitialSphereYaw = MathHelper.PiOver2;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
         private static Player.Player Player { get; set; }
