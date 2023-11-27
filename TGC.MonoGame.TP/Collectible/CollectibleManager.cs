@@ -79,29 +79,18 @@ public static class CollectibleManager
     public static void CreateCoinsMaze()
     {
         CreateCollectible<Coin>(-250f, 685, 0f);
-        //CreateCollectible<Coin>(-250f, 685, 30f);
         CreateCollectible<Coin>(-250f, 685, 60f);
-        //CreateCollectible<Coin>(-250f, 685, 90f);
         CreateCollectible<Coin>(-250f, 685, 120f);
-        //CreateCollectible<Coin>(-250f, 685, 150f);
-        
         CreateCollectible<Coin>(-220f, 685, 150f);
-        //CreateCollectible<Coin>(-190f, 685, 150f);
         CreateCollectible<Coin>(-150f, 685, 150f);
-        
         CreateCollectible<Coin>(-150f, 685, 180f);
-        //CreateCollectible<Coin>(-150f, 685, 210f);
         CreateCollectible<Coin>(-150f, 685, 240f);
-        //CreateCollectible<Coin>(-150f, 685, 270f);
         CreateCollectible<Coin>(-150f, 685, 300f);
-        
         CreateCollectible<Coin>(-205f, 685, 345f);
         CreateCollectible<Coin>(-145f, 685, 345f);
         CreateCollectible<Coin>(-85f, 685, 345f);
-        
         CreateCollectible<Coin>(-40, 685, 300f);
         CreateCollectible<Coin>(40f, 685, 300f);
-        
         CreateCollectible<Coin>(40f, 685, 250f);
         CreateCollectible<Coin>(90f, 685, 250f);
         CreateCollectible<Coin>(90f, 685, 200f);

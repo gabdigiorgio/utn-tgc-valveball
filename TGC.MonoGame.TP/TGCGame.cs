@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BepuPhysics.Collidables;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -594,10 +593,12 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        private void DrawPrefabs(IEnumerable<Prefab.Prefab> prefabs, Camera camera)
+        private void DrawPrefabs(List<Prefab.Prefab> prefabs, Camera camera)
         {
-            foreach (var prefabWorld in from prefab in prefabs where prefab.Intersects(BoundingFrustum) select prefab.World)
+            foreach (var prefab in prefabs)
             {
+                if (!prefab.Intersects(BoundingFrustum)) continue;
+                var prefabWorld = prefab.World;
                 BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * camera.View * camera.Projection);
                 BoxPrimitive.Draw(BlinnPhongShadows);
             }
@@ -648,7 +649,7 @@ namespace TGC.MonoGame.TP
             //Gizmos.DrawFrustum(TargetCamera.View * TargetCamera.Projection, Color.Yellow);
         }
 
-        private void DrawCollectibles(IEnumerable<Collectible.Collectible> collectibles, GameTime gameTime)
+        private void DrawCollectibles(List<Collectible.Collectible> collectibles, GameTime gameTime)
         {
             var originalRasterizerState = GraphicsDevice.RasterizerState;
             var rasterizerState = new RasterizerState();
@@ -657,8 +658,13 @@ namespace TGC.MonoGame.TP
             
             foreach (var collectible in collectibles)
             {
-                if (!collectible.ShouldDraw) continue;
-                collectible.Draw(gameTime, TargetCamera, GraphicsDevice);
+                if (collectible.ShouldDraw)
+                {
+                    if (collectible.Intersects(BoundingFrustum))
+                    {
+                        collectible.Draw(gameTime, TargetCamera, GraphicsDevice);
+                    }
+                }
             }
         }
         

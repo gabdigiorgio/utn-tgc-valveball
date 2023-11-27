@@ -15,12 +15,7 @@ public class Coin : Collectible
         Position = position;
         Scale = DefaultScale;
     }
-
-    protected override void OnCollected(Player.Player player)
-    {
-        player.IncreaseScore(Value);
-    }
-
+    
     public override void Draw(GameTime gameTime, Camera camera, GraphicsDevice graphicsDevice)
     {
         TGCGame.SetEffectParameters(Shader, Material.Material.Coin, Vector2.One * 1f, World, camera);
@@ -32,5 +27,15 @@ public class Coin : Collectible
             mesh.Draw();
         }
         DrawGizmos();
+    }
+
+    public override bool Intersects(BoundingFrustum boundingFrustum)
+    {
+        return BoundingBox.Intersects(boundingFrustum);
+    }
+
+    protected override void OnCollected(Player.Player player)
+    {
+        player.IncreaseScore(Value);
     }
 }

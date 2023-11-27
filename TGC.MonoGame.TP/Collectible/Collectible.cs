@@ -39,6 +39,11 @@ public abstract class Collectible
         HandleCollection(player);
         UpdateAnimation(gameTime);
     }
+
+    public virtual bool Intersects(BoundingFrustum boundingFrustum)
+    {
+        return true;
+    }
     
     public abstract void Draw(GameTime gameTime, Camera camera, GraphicsDevice graphicsDevice);
 
