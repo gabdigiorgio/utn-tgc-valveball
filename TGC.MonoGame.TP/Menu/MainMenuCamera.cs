@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Cameras;
 
-namespace TGC.MonoGame.TP;
+namespace TGC.MonoGame.TP.Menu;
 
 public class MainMenuCamera
 {

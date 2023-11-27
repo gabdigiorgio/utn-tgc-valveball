@@ -1,4 +1,4 @@
-﻿namespace TGC.MonoGame.TP;
+﻿namespace TGC.MonoGame.TP.Menu;
 
 public enum MenuState
 {
