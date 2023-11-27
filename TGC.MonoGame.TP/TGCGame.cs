@@ -430,7 +430,7 @@ namespace TGC.MonoGame.TP
             
             #region Pass 1
             
-            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);

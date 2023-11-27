@@ -55,7 +55,8 @@ namespace TGC.MonoGame.TP.Geometries
             }
 
             // Create flat triangle fan caps to seal the top and bottom.
-            CreateCap(tessellation, height, radius, Vector3.Up);
+            
+            //CreateCap(tessellation, height, radius, Vector3.Up); 
             CreateCap(tessellation, height, radius, Vector3.Down);
 
             InitializePrimitive(graphicsDevice);

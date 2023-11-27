@@ -21,7 +21,7 @@ public class Checkpoint : Collectible
         graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
         graphicsDevice.BlendState = BlendState.AlphaBlend;
         
-        Shader.Parameters["Texture"]?.SetValue(Material.Material.Metal.Diffuse); // test
+        Shader.Parameters["Texture"]?.SetValue(Material.Material.Metal.Diffuse);
         Shader.Parameters["AlphaFactor"].SetValue(0.5f);
         Shader.Parameters["Tint"].SetValue(Color.Red.ToVector3());
         Shader.Parameters["WorldViewProjection"].SetValue(World * camera.View * camera.Projection);
