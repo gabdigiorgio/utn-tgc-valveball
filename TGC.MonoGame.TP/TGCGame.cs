@@ -92,7 +92,7 @@ namespace TGC.MonoGame.TP
         public static CylinderPrimitive CylinderPrimitive { get; private set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(1100, 250f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(-625f, 690f, 0f);//new(1100, 250f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
@@ -170,6 +170,10 @@ namespace TGC.MonoGame.TP
             CollectibleManager.CreatePowerUpsSquareCircuit(-600, 0, 0);
             CollectibleManager.CreateCoinsSquareCircuit(0, 0, 0);
             CollectibleManager.CreateCoinsSquareCircuit(-600, 0, 0);
+            CollectibleManager.CreateCoinsSwitchBackRamp();
+            CollectibleManager.CreatePowerUpsSwitchBackRamp();
+            CollectibleManager.CreateCoinsMaze();
+            CollectibleManager.CreatePowerUpsMaze();
             
             // Checkpoints
             CollectibleManager.CreateCheckpoints();
@@ -195,7 +199,7 @@ namespace TGC.MonoGame.TP
             _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             AudioManager.LoadSounds(Content);
-            AudioManager.PlayBackgroundMusic(0.1f, true);
+            //AudioManager.PlayBackgroundMusic(0.1f, true);
             
             Material.Material.LoadMaterials(Content);
             

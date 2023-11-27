@@ -64,6 +64,51 @@ public static class CollectibleManager
         CreateCollectible<Coin>(110f + xOffset, 33f + yOffset, 0f + zOffset);
         CreateCollectible<Coin>(130f + xOffset, 38f + yOffset, 0f + zOffset);
     }
+    
+    public static void CreateCoinsSwitchBackRamp()
+    {
+        float[] heights = { 47f, 163f, 279f, 395f, 511f, 627f };
+
+        foreach (var height in heights)
+        {
+            CreateCollectible<Coin>(-922f, height, 0f);
+            CreateCollectible<Coin>(-922f, height, 46f);
+        }
+    }
+    
+    public static void CreateCoinsMaze()
+    {
+        CreateCollectible<Coin>(-250f, 685, 0f);
+        //CreateCollectible<Coin>(-250f, 685, 30f);
+        CreateCollectible<Coin>(-250f, 685, 60f);
+        //CreateCollectible<Coin>(-250f, 685, 90f);
+        CreateCollectible<Coin>(-250f, 685, 120f);
+        //CreateCollectible<Coin>(-250f, 685, 150f);
+        
+        CreateCollectible<Coin>(-220f, 685, 150f);
+        //CreateCollectible<Coin>(-190f, 685, 150f);
+        CreateCollectible<Coin>(-150f, 685, 150f);
+        
+        CreateCollectible<Coin>(-150f, 685, 180f);
+        //CreateCollectible<Coin>(-150f, 685, 210f);
+        CreateCollectible<Coin>(-150f, 685, 240f);
+        //CreateCollectible<Coin>(-150f, 685, 270f);
+        CreateCollectible<Coin>(-150f, 685, 300f);
+    }
+    
+    public static void CreatePowerUpsSwitchBackRamp()
+    {
+        CreateCollectible<SpeedUp>(-675f, 110f, 25f);
+        CreateCollectible<SpeedUp>(-675f, 226f, 25f);
+        CreateCollectible<SpeedUp>(-675f, 342f, 25f);
+        CreateCollectible<SpeedUp>(-675f, 458f, 25f);
+        CreateCollectible<SpeedUp>(-675f, 574f, 25f);
+    }
+    
+    public static void CreatePowerUpsMaze()
+    {
+        CreateCollectible<LowGravity>(-250f, 680f, -310f);
+    }
 
     public static void CreatePowerUpsSquareCircuit(float xOffset, float yOffset, float zOffset)
     {
