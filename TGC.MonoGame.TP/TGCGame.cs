@@ -425,14 +425,18 @@ namespace TGC.MonoGame.TP
         private void DrawWithShadows()
         {
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            for (var face = CubeMapFace.PositiveX; face <= CubeMapFace.NegativeZ; face++)
-            { 
-                GraphicsDevice.SetRenderTarget(EnvironmentMapRenderTarget, face);
-                GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
-                SetCubemapCameraForOrientation(face);
-                CubeMapCamera.BuildView();
-                DrawSkybox(CubeMapCamera);
-                DrawPrefabs(PrefabManager.Prefabs, CubeMapCamera);
+
+            if (Player.CurrentSphereMaterial == SphereMaterial.SphereMetal)
+            {
+                for (var face = CubeMapFace.PositiveX; face <= CubeMapFace.NegativeZ; face++)
+                { 
+                    GraphicsDevice.SetRenderTarget(EnvironmentMapRenderTarget, face);
+                    GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
+                    SetCubemapCameraForOrientation(face);
+                    CubeMapCamera.BuildView();
+                    DrawSkybox(CubeMapCamera);
+                    DrawPrefabs(PrefabManager.Prefabs, CubeMapCamera);
+                }
             }
             
             #region Pass 1
@@ -505,8 +509,6 @@ namespace TGC.MonoGame.TP
 
             SpriteBatch.End();
         }
-
-
         
         private void DrawMenu(Vector2 center, int menuHeight)
         {
