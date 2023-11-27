@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using TGC.MonoGame.TP.Collisions;
 
 namespace TGC.MonoGame.TP.Prefab;
@@ -21,6 +22,12 @@ public sealed class Ramp : Prefab
     public override bool Intersects(BoundingSphere sphere)
     {
         return OrientedBoundingBox.Intersects(sphere, out _, out _);
+    }
+    
+    public override bool Intersects(BoundingFrustum boundingFrustum)
+    {
+        return true;
+        //return OrientedBoundingBox.Intersects(boundingFrustum);
     }
 
     protected override Vector3 GetCenter()

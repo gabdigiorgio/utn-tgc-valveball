@@ -359,7 +359,6 @@ namespace TGC.MonoGame.TP.Collisions
         }
 
 
-
         /// <summary>
         ///     Tests the intersection between the OBB and a Plane.
         /// </summary>

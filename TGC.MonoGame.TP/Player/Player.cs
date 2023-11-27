@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using TGC.MonoGame.TP.Audio;
+using TGC.MonoGame.TP.Collectible.PowerUps;
 using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Prefab;
 
@@ -16,17 +17,20 @@ public class Player
     public float Gravity { private get;  set; } = MaxGravity;
     public int Score { get; private set; }
     public BoundingSphere BoundingSphere;
-    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMetal;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
     
     private readonly Matrix _sphereScale;
     private float _pitch;
     private float _roll;
-    private float _speed;
+    public float Speed { get; private set; }
     private float _pitchSpeed; 
     private float _yawSpeed;
     private float _jumpSpeed;
     private bool _isJumping;
     private bool _onGround;
+    private float _speedIncrement = 0f;
+    private float _accelerationIncrement = 0f;
+    private float _jumpHeightIncrement = 0f;
     private SoundEffectInstance _rollingSoundInstance;
     private SoundEffectInstance _bumpSoundInstance;
     private readonly Random _random = new();
@@ -37,6 +41,7 @@ public class Player
     private const float YawAcceleration = 5f;
     private const float MaxGravity = 175f;
     private Vector3 _restartPosition = TGCGame.InitialSpherePosition;
+    private float _restartYaw = TGCGame.InitialSphereYaw;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
     {
@@ -60,6 +65,17 @@ public class Player
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
         return _sphereScale * rotationX * rotationY * translation;
+    }
+
+    public void ApplySpeedPowerUp(float accelerationIncrement, float speedIncrement)
+    {
+        _accelerationIncrement += accelerationIncrement;
+        _speedIncrement += speedIncrement;
+    }
+
+    public void ApplyLowGravityPowerUp(float jumpHeightIncrement)
+    {
+        _jumpHeightIncrement += jumpHeightIncrement;
     }
 
     private void ChangeSphereMaterial(KeyboardState keyboardState)
@@ -134,13 +150,14 @@ public class Player
     {
         if (!(BoundingSphere.Center.Y <= -150f) && !keyboardState.IsKeyDown(Keys.R)) return;
         BoundingSphere.Center = _restartPosition;
-        Yaw = TGCGame.InitialSphereYaw;
+        Yaw = _restartYaw;
         SetSpeedToZero();
     }
     
-    public void ChangeRestartPosition(Vector3 newPosition)
+    public void ChangeRestartPosition(Vector3 newPosition, float newYaw)
     {
         _restartPosition = newPosition;
+        _restartYaw = newYaw;
     }
     
     public void ResetGravity()
@@ -156,7 +173,7 @@ public class Player
     private void SetSpeedToZero()
     {
         _pitchSpeed = 0;
-        _speed = 0;
+        Speed = 0;
         _jumpSpeed = 0;
     }
 
@@ -198,7 +215,8 @@ public class Player
 
     private float CalculateJumpSpeed()
     {
-        return (float)Math.Sqrt(2 * CurrentSphereMaterial.MaxJumpHeight * Math.Abs(Gravity));
+        var maxJumpHeight = CurrentSphereMaterial.MaxJumpHeight + _jumpHeightIncrement;
+        return (float)Math.Sqrt(2 * maxJumpHeight * Math.Abs(Gravity));
     }
 
     private void HandleYaw(float time, KeyboardState keyboardState)
@@ -238,19 +256,21 @@ public class Player
 
     private void HandleMovement(float time, KeyboardState keyboardState, Vector3 forward)
     {
+        var acceleration = CurrentSphereMaterial.Acceleration + _accelerationIncrement;
+        
         if (keyboardState.IsKeyDown(Keys.W))
         {
-            Accelerate(CurrentSphereMaterial.Acceleration, time);
+            Accelerate(acceleration, time);
             AcceleratePitch(PitchAcceleration, time);
         }
         else if (keyboardState.IsKeyDown(Keys.S))
         {
-            Accelerate(-CurrentSphereMaterial.Acceleration, time);
+            Accelerate(-acceleration, time);
             AcceleratePitch(-PitchAcceleration, time);
         }
         else
         {
-            Decelerate(CurrentSphereMaterial.Acceleration, time);
+            Decelerate(acceleration, time);
             DeceleratePitch(time);
         }
 
@@ -267,8 +287,9 @@ public class Player
 
     private void AdjustSpeed(float time, Vector3 forward)
     {
-        _speed = MathHelper.Clamp(_speed, -CurrentSphereMaterial.MaxSpeed, CurrentSphereMaterial.MaxSpeed);
-        BoundingSphere.Center += forward * time * _speed;
+        var maxSpeed = CurrentSphereMaterial.MaxSpeed + _speedIncrement;
+        Speed = MathHelper.Clamp(Speed, -maxSpeed, maxSpeed);
+        BoundingSphere.Center += forward * time * Speed;
     }
 
     private void AdjustPitchSpeed(float time)
@@ -295,13 +316,13 @@ public class Player
 
     private void Accelerate(float acceleration, float time)
     {
-        _speed += acceleration * time;
+        Speed += acceleration * time;
     }
 
     private void Decelerate(float acceleration, float time)
     {
-        var decelerationDirection = Math.Sign(_speed) * -1;
-        _speed += acceleration * time * decelerationDirection;
+        var decelerationDirection = Math.Sign(Speed) * -1;
+        Speed += acceleration * time * decelerationDirection;
     }
 
     private void SolveCollisions()
@@ -353,6 +374,7 @@ public class Player
             switch (prefab)
             {
                 case Platform when !(sphereCenter.Y > prefab.MaxY()):
+                    ReduceHorizontalSpeed();
                     break;
                 case Platform:
                 case Ramp:
@@ -360,6 +382,15 @@ public class Player
                     break;
             }
         }
+    }
+
+    private void ReduceHorizontalSpeed()
+    {
+        var reducedSpeed = Speed * 0.99f;
+        var reducedPitchSpeed = _pitchSpeed * 0.99f;
+
+        Speed = reducedSpeed;
+        _pitchSpeed = reducedPitchSpeed;
     }
 
     private static Vector3 SolveCollisionPosition(Vector3 currentPosition, Vector3 closestPoint, float radius, float distance)

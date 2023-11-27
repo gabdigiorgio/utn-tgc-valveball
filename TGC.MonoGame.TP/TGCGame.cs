@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualBasic.FileIO;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -8,8 +8,9 @@ using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
-using TGC.MonoGame.TP.Collisions;
 using TGC.MonoGame.TP.Geometries;
+using TGC.MonoGame.TP.Material;
+using TGC.MonoGame.TP.Menu;
 using TGC.MonoGame.TP.Player;
 using TGC.MonoGame.TP.Prefab;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
@@ -59,11 +60,15 @@ namespace TGC.MonoGame.TP
         
         // Camera
         private Camera Camera { get; set; }
-        private TargetCamera TargetCamera { get; set; }
+        public static TargetCamera TargetCamera { get; set; }
         private MainMenuCamera MainMenuCamera { get; set; }
+        private BoundingFrustum BoundingFrustum { get; set; }
+        private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
+        private Vector3 EndingCameraTarget { get; } =  new(100f, 1200f, 100f);
         private bool _inMainMenu;
-        private float CameraFarPlaneDistance { get; set; } = 10000f;
-        private float CameraNearPlaneDistance { get; set; } = 5f;
+        private static bool _inEnding;
+        public static float CameraFarPlaneDistance { get; set; } = 10000f;
+        public static float CameraNearPlaneDistance { get; set; } = 1f;
         
         // Light
         private TargetCamera TargetLightCamera { get; set; }
@@ -81,11 +86,14 @@ namespace TGC.MonoGame.TP
         private Matrix Projection { get; set; }
         
         // Geometries
-        private BoxPrimitive BoxPrimitive { get; set; }
+        // Platform
+        private BoxPrimitive BoxPrimitive { get; set; } 
+        // Checkpoint
+        public static CylinderPrimitive CylinderPrimitive { get; private set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(300f, 10f, 0f);
-        public const float InitialSphereYaw = 1.57f;
+        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(-625f, 690f, 0f);
+        public const float InitialSphereYaw = MathHelper.PiOver2;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
         private static Player.Player Player { get; set; }
@@ -127,13 +135,18 @@ namespace TGC.MonoGame.TP
             
             // Light
             TargetLightCamera = new TargetCamera(1f, LightPosition, Vector3.Zero);
-            TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance, MathHelper.PiOver2);
+            TargetLightCamera.BuildProjection(1f, LightCameraNearPlaneDistance, LightCameraFarPlaneDistance, 
+                MathHelper.PiOver2);
             
             // Configuramos nuestras matrices de la escena.
             SphereWorld = Matrix.Identity;
             View = Matrix.CreateLookAt(Vector3.UnitZ * 150, Vector3.Zero, Vector3.Up);
+            
             TargetCamera.Projection = 
-                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, CameraNearPlaneDistance, CameraFarPlaneDistance);
+                Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 
+                    CameraNearPlaneDistance, CameraFarPlaneDistance);
+            
+            BoundingFrustum = new BoundingFrustum(TargetCamera.View * TargetCamera.Projection);
             
             // Player
             Player = new Player.Player(_sphereScale, InitialSpherePosition, new BoundingSphere(InitialSpherePosition, SphereRadius), InitialSphereYaw);
@@ -157,6 +170,10 @@ namespace TGC.MonoGame.TP
             CollectibleManager.CreatePowerUpsSquareCircuit(-600, 0, 0);
             CollectibleManager.CreateCoinsSquareCircuit(0, 0, 0);
             CollectibleManager.CreateCoinsSquareCircuit(-600, 0, 0);
+            CollectibleManager.CreateCoinsSwitchBackRamp();
+            CollectibleManager.CreatePowerUpsSwitchBackRamp();
+            CollectibleManager.CreateCoinsMaze();
+            CollectibleManager.CreatePowerUpsMaze();
             
             // Checkpoints
             CollectibleManager.CreateCheckpoints();
@@ -188,6 +205,9 @@ namespace TGC.MonoGame.TP
             
             // Platform
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, Material.Material.Default.Diffuse);
+            
+            // Checkpoint
+            CylinderPrimitive = new CylinderPrimitive(GraphicsDevice, 10f, 20f);
             
             CollectibleManager.LoadCollectibles(Content);
             
@@ -253,12 +273,16 @@ namespace TGC.MonoGame.TP
             {
                 if (_inMainMenu)
                 {
-                    MainMenuCamera.Update(new Vector3(0f, 200f, 0f));
+                    MainMenuCamera.Update(MainMenuCameraTarget);
 
-                    if (keyboardState.IsKeyDown(Keys.Enter))
+                    if (keyboardState.IsKeyDown(Keys.Enter) || keyboardState.IsKeyDown(Keys.Space))
                     {
                         _inMainMenu = false;
                     }
+                }
+                else if (_inEnding)
+                {
+                    MainMenuCamera.Update(EndingCameraTarget);
                 }
                 else
                 {
@@ -269,12 +293,15 @@ namespace TGC.MonoGame.TP
                         _isMenuOpen = true;
                     }
                     SphereWorld = Player.Update(time, keyboardState);
-                    TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState);
+                    TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState, gameTime, Player.Speed, GraphicsDevice);
                     _gameTimer += gameTime.ElapsedGameTime;
                 }
                 
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
+                
+                // Update the view projection matrix of the bounding frustum
+                BoundingFrustum.Matrix = TargetCamera.View * TargetCamera.Projection;
 
                 CubeMapCamera.Position = Player.SpherePosition;
 
@@ -371,14 +398,14 @@ namespace TGC.MonoGame.TP
             //GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
             DrawWithShadows();
-
-            DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
             DrawGizmos();
             
             Gizmos.Draw();
             
             DrawSkybox(TargetCamera);
+            
+            DrawCollectibles(CollectibleManager.Collectibles, gameTime);
 
             const int menuHeight = 60;
             var center = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
@@ -402,24 +429,30 @@ namespace TGC.MonoGame.TP
         private void DrawWithShadows()
         {
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            for (var face = CubeMapFace.PositiveX; face <= CubeMapFace.NegativeZ; face++)
-            { 
-                GraphicsDevice.SetRenderTarget(EnvironmentMapRenderTarget, face);
-                GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
-                SetCubemapCameraForOrientation(face);
-                CubeMapCamera.BuildView();
-                DrawSkybox(CubeMapCamera);
-                DrawPrefabs(PrefabManager.Prefabs, CubeMapCamera);
+
+            if (Player.CurrentSphereMaterial == SphereMaterial.SphereMetal)
+            {
+                for (var face = CubeMapFace.PositiveX; face <= CubeMapFace.NegativeZ; face++)
+                { 
+                    GraphicsDevice.SetRenderTarget(EnvironmentMapRenderTarget, face);
+                    GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1f, 0);
+                    SetCubemapCameraForOrientation(face);
+                    CubeMapCamera.BuildView();
+                    DrawSkybox(CubeMapCamera);
+                    DrawPrefabs(PrefabManager.Prefabs, CubeMapCamera);
+                }
             }
             
             #region Pass 1
-
+            
+            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1f, 0);
 
             BlinnPhongShadows.CurrentTechnique = BlinnPhongShadows.Techniques["DepthPass"];
-
+            
             DrawModelShadows(SphereWorld, SphereModel);
 
             DrawPrefabs(PrefabManager.Prefabs, TargetLightCamera);
@@ -470,7 +503,7 @@ namespace TGC.MonoGame.TP
             SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
 
-            const string pressStartText = "<Press Start>";
+            const string pressStartText = "<Press Enter>";
             var pressStartSize = _font.MeasureString(pressStartText);
             
             var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
@@ -480,8 +513,6 @@ namespace TGC.MonoGame.TP
 
             SpriteBatch.End();
         }
-
-
         
         private void DrawMenu(Vector2 center, int menuHeight)
         {
@@ -560,9 +591,9 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        private void DrawPrefabs(List<Prefab.Prefab> prefabs, Effect effect)
+        private void DrawPrefabs(IEnumerable<Prefab.Prefab> prefabs, Effect effect)
         {
-            foreach (var prefab in prefabs)
+            foreach (var prefab in prefabs.Where(prefab => prefab.Intersects(BoundingFrustum)))
             {
                 SetEffectParameters(effect, prefab.Material, prefab.Tiling, prefab.World, TargetCamera);
                 BoxPrimitive.Draw(effect);
@@ -573,13 +604,14 @@ namespace TGC.MonoGame.TP
         {
             foreach (var prefab in prefabs)
             {
+                if (!prefab.Intersects(BoundingFrustum)) continue;
                 var prefabWorld = prefab.World;
                 BlinnPhongShadows.Parameters["WorldViewProjection"].SetValue(prefabWorld * camera.View * camera.Projection);
                 BoxPrimitive.Draw(BlinnPhongShadows);
             }
         }
         
-        private static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
+        public static void SetEffectParameters(Effect effect, Material.Material material, Vector2 tiling, Matrix worldMatrix, 
             Camera camera)
         {
             effect.Parameters["eyePosition"].SetValue(camera.Position);
@@ -620,17 +652,24 @@ namespace TGC.MonoGame.TP
             }
             
             Gizmos.DrawSphere(Player.BoundingSphere.Center, Player.BoundingSphere.Radius * Vector3.One, Color.Yellow);
+            
+            //Gizmos.DrawFrustum(TargetCamera.View * TargetCamera.Projection, Color.Yellow);
         }
 
-        private void DrawCollectibles(IEnumerable<Collectible.Collectible> collectibles, GameTime gameTime)
+        private void DrawCollectibles(List<Collectible.Collectible> collectibles, GameTime gameTime)
         {
+            var originalRasterizerState = GraphicsDevice.RasterizerState;
+            var rasterizerState = new RasterizerState();
+            rasterizerState.CullMode = CullMode.None;
+            Graphics.GraphicsDevice.RasterizerState = rasterizerState;
+            
             foreach (var collectible in collectibles)
             {
                 if (!collectible.ShouldDraw) continue;
-                DrawModel(collectible.World, collectible.Model, collectible.Shader, gameTime);
-                var center = BoundingVolumesExtensions.GetCenter(collectible.BoundingBox);
-                var extents = BoundingVolumesExtensions.GetExtents(collectible.BoundingBox);
-                Gizmos.DrawCube(center, extents * 2f, Color.Red);
+                if (collectible.Intersects(BoundingFrustum))
+                {
+                    collectible.Draw(gameTime, TargetCamera, GraphicsDevice);
+                }
             }
         }
         
@@ -705,6 +744,12 @@ namespace TGC.MonoGame.TP
                     meshPart.Effect = effect;
                 }
             }
+        }
+
+        public static void EndGame()
+        {
+            AudioManager.PauseBackgroundMusic();
+            _inEnding = true;
         }
     }
 }

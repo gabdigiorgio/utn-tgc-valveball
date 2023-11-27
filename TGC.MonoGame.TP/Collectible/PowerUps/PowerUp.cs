@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.TP.Cameras;
 
 namespace TGC.MonoGame.TP.Collectible.PowerUps;
 
@@ -18,6 +20,27 @@ public abstract class PowerUp : Collectible
     {
         base.Update(gameTime, player);
         UpdatePowerUpState(gameTime, player);
+    }
+    
+    public override void Draw(GameTime gameTime, Camera camera, GraphicsDevice graphicsDevice){
+        Shader.Parameters["View"].SetValue(camera.View);
+        Shader.Parameters["Projection"].SetValue(camera.Projection);
+        Shader.Parameters["DiffuseColor"]?.SetValue(Color.Yellow.ToVector3());
+        Shader.Parameters["Time"]?.SetValue((float)gameTime.TotalGameTime.TotalSeconds);
+
+        foreach (var mesh in Model.Meshes)
+        {
+            var meshMatrix = mesh.ParentBone.Transform;
+            Shader.Parameters["World"].SetValue(meshMatrix * World);
+            mesh.Draw();
+        }
+        
+        DrawGizmos();
+    }
+
+    public override bool Intersects(BoundingFrustum boundingFrustum)
+    {
+        return BoundingBox.Intersects(boundingFrustum);
     }
 
     protected abstract void SetPowerUp(Player.Player player);

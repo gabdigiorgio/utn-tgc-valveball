@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using TGC.MonoGame.TP.Cameras;
+using TGC.MonoGame.TP.Collisions;
 
 namespace TGC.MonoGame.TP.Collectible;
 
@@ -35,6 +38,21 @@ public abstract class Collectible
     {
         HandleCollection(player);
         UpdateAnimation(gameTime);
+    }
+
+    public virtual bool Intersects(BoundingFrustum boundingFrustum)
+    {
+        return true;
+    }
+    
+    public abstract void Draw(GameTime gameTime, Camera camera, GraphicsDevice graphicsDevice);
+
+    protected void DrawGizmos()
+    {
+        if (!TGCGame.Gizmos.Enabled) return;
+        var center = BoundingVolumesExtensions.GetCenter(BoundingBox);
+        var extents = BoundingVolumesExtensions.GetExtents(BoundingBox);
+        TGCGame.Gizmos.DrawCube(center, extents * 2f, Color.Orange);
     }
 
     protected virtual void UpdateAnimation(GameTime gameTime)
