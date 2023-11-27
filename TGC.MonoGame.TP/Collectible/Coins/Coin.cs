@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.TP.Cameras;
 
 namespace TGC.MonoGame.TP.Collectible.Coins;
@@ -20,7 +21,7 @@ public class Coin : Collectible
         player.IncreaseScore(Value);
     }
 
-    public override void Draw(GameTime gameTime, Camera camera)
+    public override void Draw(GameTime gameTime, Camera camera, GraphicsDevice graphicsDevice)
     {
         TGCGame.SetEffectParameters(Shader, Material.Material.Coin, Vector2.One * 1f, World, camera);
         
@@ -30,5 +31,6 @@ public class Coin : Collectible
             Shader.Parameters["World"].SetValue(meshMatrix * World);
             mesh.Draw();
         }
+        DrawGizmos();
     }
 }

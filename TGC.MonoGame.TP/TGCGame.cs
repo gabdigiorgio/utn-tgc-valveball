@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BepuPhysics.Collidables;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -85,9 +86,10 @@ namespace TGC.MonoGame.TP
         
         // Geometries
         private BoxPrimitive BoxPrimitive { get; set; }
+        public static CylinderPrimitive CylinderPrimitive { get; private set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(100, 690f, 0f);//new(1100, 250f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(100, 690f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
@@ -196,6 +198,9 @@ namespace TGC.MonoGame.TP
             
             // Platform
             BoxPrimitive = new BoxPrimitive(GraphicsDevice, Vector3.One, Material.Material.Default.Diffuse);
+            
+            // Checkpoint
+            CylinderPrimitive = new CylinderPrimitive(GraphicsDevice, 10f, 20f);
             
             CollectibleManager.LoadCollectibles(Content);
             
@@ -382,14 +387,14 @@ namespace TGC.MonoGame.TP
             //GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
             DrawWithShadows();
-
-            DrawCollectibles(CollectibleManager.Collectibles, gameTime);
             
             DrawGizmos();
             
             Gizmos.Draw();
             
             DrawSkybox(TargetCamera);
+            
+            DrawCollectibles(CollectibleManager.Collectibles, gameTime);
 
             const int menuHeight = 60;
             var center = GraphicsDevice.Viewport.Bounds.Center.ToVector2();
@@ -424,8 +429,10 @@ namespace TGC.MonoGame.TP
             }
             
             #region Pass 1
-
+            
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1f, 0);
 
@@ -639,7 +646,7 @@ namespace TGC.MonoGame.TP
             foreach (var collectible in collectibles)
             {
                 if (!collectible.ShouldDraw) continue;
-                collectible.Draw(gameTime, TargetCamera);
+                collectible.Draw(gameTime, TargetCamera, GraphicsDevice);
             }
         }
         

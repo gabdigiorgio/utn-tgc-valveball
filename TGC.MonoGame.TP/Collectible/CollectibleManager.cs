@@ -21,17 +21,16 @@ public static class CollectibleManager
         {
             { typeof(LowGravity), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/Gold_Star") },
             { typeof(SpeedUp), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/speed_power") },
-            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/dollar_coin") },
-            { typeof(Checkpoint), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/checkpoint") }
+            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/dollar_coin") }
         };
         
-        var powerUpEffect = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
-        var basicShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "BasicShader");
+        var powerUpShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
+        var checkpointShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "AlphaBlending");
         var blinnPhong = content.Load<Effect>(TGCGame.ContentFolderEffects + "BlinnPhongTypes");
 
         foreach (var collectible in Collectibles)
         {
-            AssignModelAndShader(collectible, collectibleModels, blinnPhong, powerUpEffect);
+            AssignModelAndShader(collectible, collectibleModels, blinnPhong, powerUpShader, checkpointShader);
             AssignSound(collectible, AudioManager.CollectibleSounds);
         }
     }
@@ -74,11 +73,11 @@ public static class CollectibleManager
 
     public static void CreateCheckpoints()
     {
-        CreateCollectible<Checkpoint>(1100, 225f, 0f);
-        CreateCollectible<Checkpoint>(300f, 3f, 0f);
-        CreateCollectible<Checkpoint>(-600f, 3f, 0f);
-        CreateCollectible<Checkpoint>(-625f, 675f, 0f);
-        CreateCollectible<Checkpoint>(100f, 675f, 0f);
+        CreateCollectible<Checkpoint>(1100, 230f, 0f);
+        CreateCollectible<Checkpoint>(300f, 8f, 0f);
+        CreateCollectible<Checkpoint>(-600f, 8f, 0f);
+        CreateCollectible<Checkpoint>(-625f, 680f, 0f);
+        CreateCollectible<Checkpoint>(100f, 680f, 0f);
     }
     
     private static void CreateCollectible<T>(float x, float y, float z) where T : Collectible
@@ -86,14 +85,24 @@ public static class CollectibleManager
         var position = new Vector3(x, y, z);
         Collectibles.Add((T)Activator.CreateInstance(typeof(T), position));
     }
-    
-    private static void AssignModelAndShader(Collectible collectible, Dictionary<Type, Model> collectibleModels, Effect coinShader, Effect powerUpShader)
+
+    private static void AssignModelAndShader(Collectible collectible, Dictionary<Type, Model> collectibleModels,
+        Effect coinShader, Effect powerUpShader,
+        Effect checkpointShader)
     {
+        collectible.Shader = collectible switch
+        {
+            Checkpoint => checkpointShader,
+            Coin => coinShader,
+            _ => powerUpShader
+        };
+        
         if (!collectibleModels.TryGetValue(collectible.GetType(), out var model)) return;
         collectible.Model = model;
-        collectible.Shader = collectible is Coin ? coinShader : powerUpShader;
+        
         TGCGame.loadEffectOnMesh(collectible.Model, collectible.Shader);
     }
+
 
     private static void AssignSound(Collectible collectible, Dictionary<Type, SoundEffect> collectibleSounds)
     {
