@@ -51,6 +51,12 @@
 /processorParam:TextureFormat=Compressed
 /build:3D/geometries/sphere.fbx
 
+#begin Effects/AlphaBlending.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/AlphaBlending.fx
+
 #begin Effects/BasicShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor

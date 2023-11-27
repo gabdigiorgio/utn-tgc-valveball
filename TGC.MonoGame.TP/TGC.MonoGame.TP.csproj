@@ -40,6 +40,7 @@
     <Folder Include="Content\obj\" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Content\Effects\AlphaBlending.fx" />
     <ClCompile Include="Content\Effects\BlinnPhong.fx" />
     <ClCompile Include="Content\Effects\BlinnPhongTypes.fx" />
     <ClCompile Include="Content\Effects\Gizmos.fx" />
