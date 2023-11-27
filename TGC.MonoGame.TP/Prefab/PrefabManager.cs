@@ -102,7 +102,7 @@ public static class PrefabManager
         CreatePlatform(new Vector3(750f, 6f, 750f), new Vector3(100f, height, 0f));
 
         // Center platform to go next level, tendria que moverse hacia arriba hasta 900f
-        CreatePlatform(new Vector3(50f, 6f, 50f), new Vector3(100f, height + 3f, 0f), Material.Material.EndingPlatform);
+        CreatePlatform(new Vector3(50f, 6f, 50f), new Vector3(100f, height + 3f, 0f), Material.Material.EndingPlatform); // TODO: Ending platform!!
 
         // Border Walls
         CreatePlatform(new Vector3(750f, 50f, 6f), new Vector3(100f, height + 25f, 375f));

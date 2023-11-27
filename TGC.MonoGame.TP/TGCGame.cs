@@ -65,6 +65,7 @@ namespace TGC.MonoGame.TP
         private MainMenuCamera MainMenuCamera { get; set; }
         private BoundingFrustum BoundingFrustum { get; set; }
         private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
+        private Vector3 EndingCameraTarget { get; } =  new(100f, 1200f, 100f);
         private bool _inMainMenu;
         public static float CameraFarPlaneDistance { get; set; } = 10000f;
         public static float CameraNearPlaneDistance { get; set; } = 1f;
@@ -89,7 +90,7 @@ namespace TGC.MonoGame.TP
         public static CylinderPrimitive CylinderPrimitive { get; private set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(100, 690f, 0f);//new(100, 690f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(100, 690, 0f);//new(1100, 250f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
@@ -488,7 +489,7 @@ namespace TGC.MonoGame.TP
             SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
 
-            const string pressStartText = "<Press Start>";
+            const string pressStartText = "<Press Enter>";
             var pressStartSize = _font.MeasureString(pressStartText);
             
             var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
