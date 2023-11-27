@@ -40,7 +40,6 @@ public class Player
     private const float PitchAcceleration = 5f;
     private const float YawAcceleration = 5f;
     private const float MaxGravity = 175f;
-    private const float EPSILON = 0.00001f;
     private Vector3 _restartPosition = TGCGame.InitialSpherePosition;
 
     public Player(Matrix sphereScale, Vector3 spherePosition, BoundingSphere boundingSphere, float yaw)
@@ -374,6 +373,7 @@ public class Player
             switch (prefab)
             {
                 case Platform when !(sphereCenter.Y > prefab.MaxY()):
+                    ReduceHorizontalSpeed();
                     break;
                 case Platform:
                 case Ramp:
@@ -383,11 +383,18 @@ public class Player
         }
     }
 
+    private void ReduceHorizontalSpeed()
+    {
+        var reducedSpeed = Speed * 0.99f;
+        var reducedPitchSpeed = _pitchSpeed * 0.99f;
+
+        Speed = reducedSpeed;
+        _pitchSpeed = reducedPitchSpeed;
+    }
 
     private static Vector3 SolveCollisionPosition(Vector3 currentPosition, Vector3 closestPoint, float radius, float distance)
     {
-        // For precission problems, we push the cylinder with a small increment to prevent re-colliding into the geometry
-        var penetration = radius - distance + EPSILON;
+        var penetration = radius - distance;
         var direction = Vector3.Normalize(currentPosition - closestPoint);
         return currentPosition + direction * penetration;
     }
