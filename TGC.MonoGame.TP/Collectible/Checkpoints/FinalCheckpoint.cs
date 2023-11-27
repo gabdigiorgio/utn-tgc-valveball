@@ -41,6 +41,6 @@ public class FinalCheckpoint : Collectible
 
     protected override void OnCollected(Player.Player player)
     {
-        //TGCGame.EndGame();
+        TGCGame.EndGame();
     }
 }

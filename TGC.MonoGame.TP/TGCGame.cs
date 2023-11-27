@@ -66,7 +66,7 @@ namespace TGC.MonoGame.TP
         private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
         private Vector3 EndingCameraTarget { get; } =  new(100f, 1200f, 100f);
         private bool _inMainMenu;
-        private bool _inEnding;
+        private static bool _inEnding;
         public static float CameraFarPlaneDistance { get; set; } = 10000f;
         public static float CameraNearPlaneDistance { get; set; } = 1f;
         
@@ -279,6 +279,10 @@ namespace TGC.MonoGame.TP
                     {
                         _inMainMenu = false;
                     }
+                }
+                else if (_inEnding)
+                {
+                    MainMenuCamera.Update(EndingCameraTarget);
                 }
                 else
                 {
@@ -740,6 +744,12 @@ namespace TGC.MonoGame.TP
                     meshPart.Effect = effect;
                 }
             }
+        }
+
+        public static void EndGame()
+        {
+            AudioManager.PauseBackgroundMusic();
+            _inEnding = true;
         }
     }
 }
