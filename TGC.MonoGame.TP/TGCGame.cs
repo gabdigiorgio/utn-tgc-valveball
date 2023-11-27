@@ -87,7 +87,7 @@ namespace TGC.MonoGame.TP
         private BoxPrimitive BoxPrimitive { get; set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(300f, 10f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(100, 690f, 0f);//new(1100, 250f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;

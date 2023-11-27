@@ -62,6 +62,7 @@ public class Player
         var rotationX = Matrix.CreateRotationX(_pitch);
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
+        Console.WriteLine("Sphere position: " + SpherePosition);
         return _sphereScale * rotationX * rotationY * translation;
     }
 
