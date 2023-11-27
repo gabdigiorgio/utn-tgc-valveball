@@ -10,7 +10,7 @@ public class FinalCheckpoint : Collectible
     private const float DefaultXRotation = -MathHelper.PiOver2;
 
     public FinalCheckpoint(Vector3 position) 
-        : base(new BoundingBox(new Vector3(-8, -5, -8) + position, new Vector3(8, 10, 8) + position))
+        : base(new BoundingBox(new Vector3(-4, -0, -4) + position, new Vector3(4, 22, 4) + position))
     {
         Position = position;
         Scale = DefaultScale;

@@ -78,7 +78,7 @@ public static class CollectibleManager
         CreateCollectible<Checkpoint>(300f, 8.5f, 0f);
         CreateCollectible<Checkpoint>(-600f, 8.5f, 0f);
         CreateCollectible<Checkpoint>(-625f, 680.5f, 0f);
-        CreateCollectible<FinalCheckpoint>(100f, 680.5f, 0f);
+        CreateCollectible<FinalCheckpoint>(100f, 678f, 0f);
     }
     
     private static void CreateCollectible<T>(float x, float y, float z) where T : Collectible
