@@ -38,6 +38,11 @@ public abstract class PowerUp : Collectible
         DrawGizmos();
     }
 
+    public override bool Intersects(BoundingFrustum boundingFrustum)
+    {
+        return BoundingBox.Intersects(boundingFrustum);
+    }
+
     protected abstract void SetPowerUp(Player.Player player);
     protected abstract void ResetPowerUp(Player.Player player);
     

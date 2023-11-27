@@ -66,6 +66,7 @@ namespace TGC.MonoGame.TP
         private Vector3 MainMenuCameraTarget { get; } =  new(0f, 200f, 0f);
         private Vector3 EndingCameraTarget { get; } =  new(100f, 1200f, 100f);
         private bool _inMainMenu;
+        private bool _inEnding;
         public static float CameraFarPlaneDistance { get; set; } = 10000f;
         public static float CameraNearPlaneDistance { get; set; } = 1f;
         
@@ -91,7 +92,7 @@ namespace TGC.MonoGame.TP
         public static CylinderPrimitive CylinderPrimitive { get; private set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(-625f, 690f, 0f);//new(1100, 250f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(-625f, 690f, 0f);
         public const float InitialSphereYaw = MathHelper.PiOver2;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;
@@ -198,7 +199,7 @@ namespace TGC.MonoGame.TP
             _font = Content.Load<SpriteFont>(ContentFolderSpriteFonts + "CascadiaCode/CascadiaCodePL");
             
             AudioManager.LoadSounds(Content);
-            //AudioManager.PlayBackgroundMusic(0.1f, true);
+            AudioManager.PlayBackgroundMusic(0.1f, true);
             
             Material.Material.LoadMaterials(Content);
             
@@ -658,12 +659,10 @@ namespace TGC.MonoGame.TP
             
             foreach (var collectible in collectibles)
             {
-                if (collectible.ShouldDraw)
+                if (!collectible.ShouldDraw) continue;
+                if (collectible.Intersects(BoundingFrustum))
                 {
-                    if (collectible.Intersects(BoundingFrustum))
-                    {
-                        collectible.Draw(gameTime, TargetCamera, GraphicsDevice);
-                    }
+                    collectible.Draw(gameTime, TargetCamera, GraphicsDevice);
                 }
             }
         }
