@@ -86,11 +86,13 @@ namespace TGC.MonoGame.TP
         private Matrix Projection { get; set; }
         
         // Geometries
-        private BoxPrimitive BoxPrimitive { get; set; }
+        // Platform
+        private BoxPrimitive BoxPrimitive { get; set; } 
+        // Checkpoint
         public static CylinderPrimitive CylinderPrimitive { get; private set; }
         
         // Sphere position & rotation
-        public static readonly Vector3 InitialSpherePosition = new(100, 690, 0f);//new(1100, 250f, 0f);
+        public static readonly Vector3 InitialSpherePosition = new(1100, 250f, 0f);//new(1100, 250f, 0f);
         public const float InitialSphereYaw = 1.57f;
         private readonly Matrix _sphereScale = Matrix.CreateScale(5f);
         private const float SphereRadius = 5f;

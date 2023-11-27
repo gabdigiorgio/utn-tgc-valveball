@@ -20,13 +20,28 @@ public class Checkpoint : Collectible
     public override void Draw(GameTime gameTime, Camera camera, GraphicsDevice graphicsDevice){
         graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
         graphicsDevice.BlendState = BlendState.AlphaBlend;
+
+        var worldMidCylinder = Matrix.CreateScale(0.98f) * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y - 1.5f, Position.Z));
+        var worldShortCylinder = Matrix.CreateScale(0.94f) * Matrix.CreateTranslation(new Vector3(Position.X, Position.Y - 2.5f, Position.Z));
         
         Shader.Parameters["Texture"]?.SetValue(Material.Material.Metal.Diffuse);
-        Shader.Parameters["AlphaFactor"].SetValue(0.5f);
+        Shader.Parameters["AlphaFactor"].SetValue(0.1f);
         Shader.Parameters["Tint"].SetValue(Color.Red.ToVector3());
         Shader.Parameters["WorldViewProjection"].SetValue(World * camera.View * camera.Projection);
         TGCGame.CylinderPrimitive.Draw(Shader);
         
+        Shader.Parameters["Texture"]?.SetValue(Material.Material.Metal.Diffuse);
+        Shader.Parameters["AlphaFactor"].SetValue(0.15f);
+        Shader.Parameters["Tint"].SetValue(Color.Red.ToVector3());
+        Shader.Parameters["WorldViewProjection"].SetValue(worldMidCylinder * camera.View * camera.Projection);
+        TGCGame.CylinderPrimitive.Draw(Shader);
+        
+        Shader.Parameters["Texture"]?.SetValue(Material.Material.Metal.Diffuse);
+        Shader.Parameters["AlphaFactor"].SetValue(0.3f);
+        Shader.Parameters["Tint"].SetValue(Color.Red.ToVector3());
+        Shader.Parameters["WorldViewProjection"].SetValue(worldShortCylinder * camera.View * camera.Projection);
+        TGCGame.CylinderPrimitive.Draw(Shader);
+      
         DrawGizmos();
     }
     
