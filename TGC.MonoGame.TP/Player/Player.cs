@@ -16,7 +16,7 @@ public class Player
     public float Gravity { private get;  set; } = MaxGravity;
     public int Score { get; private set; }
     public BoundingSphere BoundingSphere;
-    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMetal;
+    public SphereMaterial CurrentSphereMaterial { get; private set; } = SphereMaterial.SphereMarble;
     
     private readonly Matrix _sphereScale;
     private float _pitch;
@@ -27,6 +27,9 @@ public class Player
     private float _jumpSpeed;
     private bool _isJumping;
     private bool _onGround;
+    private float _speedIncrement = 0f;
+    private float _accelerationIncrement = 0f;
+    private float _jumpHeightIncrement = 0f;
     private SoundEffectInstance _rollingSoundInstance;
     private SoundEffectInstance _bumpSoundInstance;
     private readonly Random _random = new();
@@ -60,6 +63,17 @@ public class Player
         var translation = Matrix.CreateTranslation(BoundingSphere.Center);
         RestartPosition(keyboardState);
         return _sphereScale * rotationX * rotationY * translation;
+    }
+
+    public void ApplySpeedPowerUp(float accelerationIncrement, float speedIncrement)
+    {
+        _accelerationIncrement += accelerationIncrement;
+        _speedIncrement += speedIncrement;
+    }
+
+    public void ApplyLowGravityPowerUp(float jumpHeightIncrement)
+    {
+        _jumpHeightIncrement += jumpHeightIncrement;
     }
 
     private void ChangeSphereMaterial(KeyboardState keyboardState)
@@ -198,7 +212,8 @@ public class Player
 
     private float CalculateJumpSpeed()
     {
-        return (float)Math.Sqrt(2 * CurrentSphereMaterial.MaxJumpHeight * Math.Abs(Gravity));
+        var maxJumpHeight = CurrentSphereMaterial.MaxJumpHeight + _jumpHeightIncrement;
+        return (float)Math.Sqrt(2 * maxJumpHeight * Math.Abs(Gravity));
     }
 
     private void HandleYaw(float time, KeyboardState keyboardState)
@@ -238,19 +253,21 @@ public class Player
 
     private void HandleMovement(float time, KeyboardState keyboardState, Vector3 forward)
     {
+        var acceleration = CurrentSphereMaterial.Acceleration + _accelerationIncrement;
+        
         if (keyboardState.IsKeyDown(Keys.W))
         {
-            Accelerate(CurrentSphereMaterial.Acceleration, time);
+            Accelerate(acceleration, time);
             AcceleratePitch(PitchAcceleration, time);
         }
         else if (keyboardState.IsKeyDown(Keys.S))
         {
-            Accelerate(-CurrentSphereMaterial.Acceleration, time);
+            Accelerate(-acceleration, time);
             AcceleratePitch(-PitchAcceleration, time);
         }
         else
         {
-            Decelerate(CurrentSphereMaterial.Acceleration, time);
+            Decelerate(acceleration, time);
             DeceleratePitch(time);
         }
 
@@ -267,7 +284,8 @@ public class Player
 
     private void AdjustSpeed(float time, Vector3 forward)
     {
-        Speed = MathHelper.Clamp(Speed, -CurrentSphereMaterial.MaxSpeed, CurrentSphereMaterial.MaxSpeed);
+        var maxSpeed = CurrentSphereMaterial.MaxSpeed + _speedIncrement;
+        Speed = MathHelper.Clamp(Speed, -maxSpeed, maxSpeed);
         BoundingSphere.Center += forward * time * Speed;
     }
 

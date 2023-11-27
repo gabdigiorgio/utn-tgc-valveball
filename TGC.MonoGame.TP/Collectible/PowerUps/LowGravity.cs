@@ -18,11 +18,11 @@ public class LowGravity : PowerUp
     protected override void SetPowerUp(Player.Player player)
     {
         player.Gravity = 60f;
-        player.CurrentSphereMaterial.MaxJumpHeight += 60f;
+        player.ApplyLowGravityPowerUp(60f);
     }
     protected override void ResetPowerUp(Player.Player player)
     {
         player.ResetGravity();
-        player.CurrentSphereMaterial.MaxJumpHeight -= 60f;
+        player.ApplyLowGravityPowerUp(-60f);
     }
 }

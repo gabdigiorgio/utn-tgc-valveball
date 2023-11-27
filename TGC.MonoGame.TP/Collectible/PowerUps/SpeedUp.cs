@@ -18,12 +18,11 @@ public class SpeedUp : PowerUp
     protected override void SetPowerUp(Player.Player player)
     {
         TGCGame.TargetCamera.Shake(3.5f, 0.5f);
-        player.CurrentSphereMaterial.Acceleration += SpeedIncrement;
-        player.CurrentSphereMaterial.MaxSpeed += SpeedIncrement;
+        
+        player.ApplySpeedPowerUp(SpeedIncrement, SpeedIncrement);
     }
     protected override void ResetPowerUp(Player.Player player)
     {
-        player.CurrentSphereMaterial.Acceleration -= SpeedIncrement;
-        player.CurrentSphereMaterial.MaxSpeed -= SpeedIncrement;
+        player.ApplySpeedPowerUp(-SpeedIncrement, -SpeedIncrement);
     }
 }

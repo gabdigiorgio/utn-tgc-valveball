@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using TGC.MonoGame.TP.Cameras;
 
 namespace TGC.MonoGame.TP.Collectible.Coins;
