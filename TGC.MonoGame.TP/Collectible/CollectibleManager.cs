@@ -21,7 +21,8 @@ public static class CollectibleManager
         {
             { typeof(LowGravity), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/Gold_Star") },
             { typeof(SpeedUp), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/speed_power") },
-            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/dollar_coin") }
+            { typeof(Coin), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/dollar_coin") },
+            { typeof(FinalCheckpoint), content.Load<Model>(TGCGame.ContentFolder3D + "collectibles/checkpoint")}
         };
         
         var powerUpShader = content.Load<Effect>(TGCGame.ContentFolderEffects + "PowerUpShader");
@@ -77,7 +78,7 @@ public static class CollectibleManager
         CreateCollectible<Checkpoint>(300f, 8.5f, 0f);
         CreateCollectible<Checkpoint>(-600f, 8.5f, 0f);
         CreateCollectible<Checkpoint>(-625f, 680.5f, 0f);
-        CreateCollectible<Checkpoint>(100f, 680.5f, 0f);
+        CreateCollectible<FinalCheckpoint>(100f, 680.5f, 0f);
     }
     
     private static void CreateCollectible<T>(float x, float y, float z) where T : Collectible

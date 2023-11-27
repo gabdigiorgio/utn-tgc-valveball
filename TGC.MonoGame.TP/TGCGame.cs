@@ -430,7 +430,7 @@ namespace TGC.MonoGame.TP
             
             #region Pass 1
             
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.SetRenderTarget(ShadowMapRenderTarget);
@@ -643,6 +643,11 @@ namespace TGC.MonoGame.TP
 
         private void DrawCollectibles(IEnumerable<Collectible.Collectible> collectibles, GameTime gameTime)
         {
+            var originalRasterizerState = GraphicsDevice.RasterizerState;
+            var rasterizerState = new RasterizerState();
+            rasterizerState.CullMode = CullMode.None;
+            Graphics.GraphicsDevice.RasterizerState = rasterizerState;
+            
             foreach (var collectible in collectibles)
             {
                 if (!collectible.ShouldDraw) continue;
