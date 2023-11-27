@@ -94,15 +94,36 @@ public static class CollectibleManager
         CreateCollectible<Coin>(-150f, 685, 240f);
         //CreateCollectible<Coin>(-150f, 685, 270f);
         CreateCollectible<Coin>(-150f, 685, 300f);
+        
+        CreateCollectible<Coin>(-205f, 685, 345f);
+        CreateCollectible<Coin>(-145f, 685, 345f);
+        CreateCollectible<Coin>(-85f, 685, 345f);
+        
+        CreateCollectible<Coin>(-40, 685, 300f);
+        CreateCollectible<Coin>(40f, 685, 300f);
+        
+        CreateCollectible<Coin>(40f, 685, 250f);
+        CreateCollectible<Coin>(90f, 685, 250f);
+        CreateCollectible<Coin>(90f, 685, 200f);
+        CreateCollectible<Coin>(150f, 685, 200f);
+        CreateCollectible<Coin>(150f, 685, 245f);
+        CreateCollectible<Coin>(250f, 685, 200f);
+        CreateCollectible<Coin>(250f, 685, 150f);
+        CreateCollectible<Coin>(350f, 685, 150f);
+        CreateCollectible<Coin>(300f, 685, -50f);
+        CreateCollectible<Coin>(250f, 685, -50f);
+        CreateCollectible<Coin>(250f, 685, 30f);
+        CreateCollectible<Coin>(250f, 685, 100f);
+        CreateCollectible<Coin>(150f, 685, 100f);
     }
     
     public static void CreatePowerUpsSwitchBackRamp()
     {
-        CreateCollectible<SpeedUp>(-675f, 110f, 25f);
+        //CreateCollectible<SpeedUp>(-675f, 110f, 25f);
         CreateCollectible<SpeedUp>(-675f, 226f, 25f);
-        CreateCollectible<SpeedUp>(-675f, 342f, 25f);
+        //CreateCollectible<SpeedUp>(-675f, 342f, 25f);
         CreateCollectible<SpeedUp>(-675f, 458f, 25f);
-        CreateCollectible<SpeedUp>(-675f, 574f, 25f);
+        //CreateCollectible<SpeedUp>(-675f, 574f, 25f);
     }
     
     public static void CreatePowerUpsMaze()

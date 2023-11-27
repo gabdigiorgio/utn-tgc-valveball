@@ -44,6 +44,7 @@ public abstract class Collectible
 
     protected void DrawGizmos()
     {
+        if (!TGCGame.Gizmos.Enabled) return;
         var center = BoundingVolumesExtensions.GetCenter(BoundingBox);
         var extents = BoundingVolumesExtensions.GetExtents(BoundingBox);
         TGCGame.Gizmos.DrawCube(center, extents * 2f, Color.Orange);
