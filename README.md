@@ -1,4 +1,4 @@
-![Captura4](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/75cb751a-e98d-4e4a-b44f-ec7db36050fb)![Captura4](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/4cd4041f-1523-4caf-8826-2f652563cd85)# TGC - MonoGame - TP
+# TGC - MonoGame - TP
 
 [![.NET](https://github.com/tgc-utn/tgc-monogame-tp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/tgc-utn/tgc-monogame-tp/actions/workflows/dotnet.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/63382c4441444632b06d83dcc6dab106)](https://app.codacy.com/gh/tgc-utn/tgc-monogame-tp/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
