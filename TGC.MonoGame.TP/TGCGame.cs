@@ -441,6 +441,7 @@ namespace TGC.MonoGame.TP
                     break;
                 case GodModeMenuState.Exit:
                     _isGodModeMenuOpen = false;
+                    AudioManager.ResumeBackgroundMusic();
                     break;
             }
         }
