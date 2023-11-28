@@ -1,4 +1,4 @@
-# TGC - MonoGame - TP
+![Captura4](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/75cb751a-e98d-4e4a-b44f-ec7db36050fb)![Captura4](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/4cd4041f-1523-4caf-8826-2f652563cd85)# TGC - MonoGame - TP
 
 [![.NET](https://github.com/tgc-utn/tgc-monogame-tp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/tgc-utn/tgc-monogame-tp/actions/workflows/dotnet.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/63382c4441444632b06d83dcc6dab106)](https://app.codacy.com/gh/tgc-utn/tgc-monogame-tp/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
@@ -26,11 +26,12 @@ TGC, Tgcito  |  Apellido, Nombre
 
 ## Capturas
 
-![screenshot1](https://github.com/tgc-utn/tgc-monogame-tp/blob/master/TGC.MonoGame.TP/Icon.bmp)
-![screenshot2](https://github.com/tgc-utn/tgc-monogame-tp/blob/master/TGC.MonoGame.TP/Icon.bmp)
-![screenshot3](https://github.com/tgc-utn/tgc-monogame-tp/blob/master/TGC.MonoGame.TP/Icon.bmp)
-![screenshot4](https://github.com/tgc-utn/tgc-monogame-tp/blob/master/TGC.MonoGame.TP/Icon.bmp)
-![screenshot5](https://github.com/tgc-utn/tgc-monogame-tp/blob/master/TGC.MonoGame.TP/Icon.bmp)
+![screenshot1](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/92700866-bc9b-461e-b085-363c4bb2cdf0)
+![screenshot2](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/6f85fc3b-6ac1-40d6-ad40-d9c414d2ebd8)
+![screenshot3](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/ab5570c0-f717-410f-88d4-97a3b2cc8b75)
+![screenshot4](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/7c5a54bf-9a08-4a73-a054-756a57ce45d3)
+![screenshot5](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/1827bf7b-7e5f-4f45-9673-fb37d2a25225)
+![screenshot6](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/1973496a-5361-481f-9067-1fc3ec810d9e)
 
 ## Game Play
 
