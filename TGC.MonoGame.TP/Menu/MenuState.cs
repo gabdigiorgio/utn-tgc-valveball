@@ -4,5 +4,6 @@ public enum MenuState
 {
     Resume,
     StopMusic,
+    GodModeMenu,
     Exit
 }

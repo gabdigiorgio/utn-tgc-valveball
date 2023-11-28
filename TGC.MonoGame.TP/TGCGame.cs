@@ -4,10 +4,10 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
+using TGC.MonoGame.TP.Collectible.Coins;
 using TGC.MonoGame.TP.Geometries;
 using TGC.MonoGame.TP.Material;
 using TGC.MonoGame.TP.Menu;
@@ -52,7 +52,9 @@ namespace TGC.MonoGame.TP
         
         // GUI
         private bool _isMenuOpen;
+        private bool _isGodModeMenuOpen;
         private MenuState _menuState = MenuState.Resume;
+        private GodModeMenuState _godModeMenuState = GodModeMenuState.First;
         private TimeSpan _gameTimer = TimeSpan.Zero;
         
         // Skybox
@@ -268,6 +270,7 @@ namespace TGC.MonoGame.TP
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
             
             UpdateMenuSelection(keyboardState);
+            UpdateGodModeMenuSelection(keyboardState);
 
             if (!_isMenuOpen)
             {
@@ -283,14 +286,17 @@ namespace TGC.MonoGame.TP
                 else if (_inEnding)
                 {
                     MainMenuCamera.Update(EndingCameraTarget);
+
+                    if (keyboardState.IsKeyDown(Keys.Escape))
+                    {
+                        Exit();
+                    }
                 }
                 else
                 {
-                    if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
+                    if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen && !_isGodModeMenuOpen)
                     {
-                        AudioManager.PauseBackgroundMusic();
-                        AudioManager.OpenMenuSound.Play();
-                        _isMenuOpen = true;
+                        OpenMenu();
                     }
                     SphereWorld = Player.Update(time, keyboardState);
                     TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState, gameTime, Player.Speed, GraphicsDevice);
@@ -300,7 +306,6 @@ namespace TGC.MonoGame.TP
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
                 
-                // Update the view projection matrix of the bounding frustum
                 BoundingFrustum.Matrix = TargetCamera.View * TargetCamera.Projection;
 
                 CubeMapCamera.Position = Player.SpherePosition;
@@ -310,8 +315,6 @@ namespace TGC.MonoGame.TP
                 UpdateCollectibles(gameTime);
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
-                
-                AudioManager.ResumeBackgroundMusic();
 
                 HandleGizmos(keyboardState);
             }
@@ -319,6 +322,7 @@ namespace TGC.MonoGame.TP
         }
 
         private bool _wasKeyPressed;
+        private bool _wasEnterKeyPressed;
 
         private void UpdateMenuSelection(KeyboardState keyboardState)
         {
@@ -347,9 +351,55 @@ namespace TGC.MonoGame.TP
                 _wasKeyPressed = false;
             }
 
-            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space)) return;
+            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space))
+            {
+                _wasEnterKeyPressed = false;
+                return;
+            }
+            AudioManager.ClickMenuSound.Play();
+            if (_wasEnterKeyPressed) return;
             AudioManager.ClickMenuSound.Play();
             HandleMenuSelection();
+            _wasEnterKeyPressed = true;
+        }
+        
+        private void UpdateGodModeMenuSelection(KeyboardState keyboardState)
+        {
+            if (!_isGodModeMenuOpen) return;
+
+            if (keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W))
+            {
+                if (!_wasKeyPressed && _godModeMenuState > GodModeMenuState.First)
+                {
+                    _godModeMenuState--;
+                    _wasKeyPressed = true;
+                    AudioManager.SelectMenuSound.Play();
+                }
+            }
+            else if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S))
+            {
+                if (!_wasKeyPressed && _godModeMenuState < GodModeMenuState.Exit)
+                {
+                    _godModeMenuState++;
+                    _wasKeyPressed = true;
+                    AudioManager.SelectMenuSound.Play();
+                }
+            }
+            else
+            {
+                _wasKeyPressed = false;
+            }
+
+            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space))
+            {
+                _wasEnterKeyPressed = false;
+                return;
+            }
+
+            if (_wasEnterKeyPressed) return;
+            AudioManager.ClickMenuSound.Play();
+            HandleGodModeMenuSelection();
+            _wasEnterKeyPressed = true;
         }
 
         private void HandleMenuSelection()
@@ -357,13 +407,40 @@ namespace TGC.MonoGame.TP
             switch (_menuState)
             {
                 case MenuState.Resume:
+                    AudioManager.ResumeBackgroundMusic();
                     _isMenuOpen = false;
                     break;
                 case MenuState.StopMusic:
-                    MediaPlayer.Stop();
+                    AudioManager.StopBackgroundMusic();
+                    break;
+                case MenuState.GodModeMenu:
+                    _isMenuOpen = false;
+                    _isGodModeMenuOpen = true;
                     break;
                 case MenuState.Exit:
                     Exit();
+                    break;
+            }
+        }
+        
+        private void HandleGodModeMenuSelection()
+        {
+            switch (_godModeMenuState)
+            {
+                case GodModeMenuState.First:
+                    Player.BoundingSphere.Center = new Vector3(1100, 230.5f, 0f);
+                    break;
+                case GodModeMenuState.Second:
+                    Player.BoundingSphere.Center = new Vector3(300f, 8.5f, 0f);
+                    break;
+                case GodModeMenuState.Third:
+                    Player.BoundingSphere.Center = new Vector3(-600f, 8.5f, 0f);
+                    break;
+                case GodModeMenuState.Fourth:
+                    Player.BoundingSphere.Center = new Vector3(-625f, 680.5f, 0f);
+                    break;
+                case GodModeMenuState.Exit:
+                    _isGodModeMenuOpen = false;
                     break;
             }
         }
@@ -413,10 +490,17 @@ namespace TGC.MonoGame.TP
             {
                 DrawMenu(center, menuHeight);
             }
-
+            if (_isGodModeMenuOpen)
+            {
+                DrawGodModeMenu(center, menuHeight);
+            }
             if (_inMainMenu)
             {
                 DrawMainMenu();
+            }
+            else if (_inEnding)
+            {
+                DrawEnding();
             }
             else
             {
@@ -493,23 +577,68 @@ namespace TGC.MonoGame.TP
             const string titleText = "ValveBall";
             var titleSize = _font.MeasureString(titleText);
             const float titleScale = 1.5f;
-            
+
             var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X * titleScale) / 2,
                 (GraphicsDevice.Viewport.Height - titleSize.Y * titleScale) / 2 - 50);
 
             SpriteBatch.DrawString(_font, titleText, titlePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
-            
+
             SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
 
-            const string pressStartText = "<Press Enter>";
-            var pressStartSize = _font.MeasureString(pressStartText);
-            
+            const string pressEnterText = "<Press Enter>";
+            var pressStartSize = _font.MeasureString(pressEnterText);
+
             var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
                 (GraphicsDevice.Viewport.Height - pressStartSize.Y) / 2);
+
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition + new Vector2(2, 2), Color.Black);
+
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition, Color.White);
+
+            SpriteBatch.End();
+        }
+
+        
+        private void DrawEnding()
+        {
+            SpriteBatch.Begin();
+
+            const string titleText = "You win!!!";
+            var titleSize = _font.MeasureString(titleText);
+            const float titleScale = 1.5f;
+
+            var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X * titleScale) / 2,
+                (GraphicsDevice.Viewport.Height - titleSize.Y * titleScale) / 2 - 50);
+
+            SpriteBatch.DrawString(_font, titleText, titlePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
+                titleScale, SpriteEffects.None, 0f);
+
+            SpriteBatch.DrawString(_font, titleText, titlePosition, Color.Gold, 0f, Vector2.Zero,
+                titleScale, SpriteEffects.None, 0f);
             
-            SpriteBatch.DrawString(_font, pressStartText, pressStartPosition, Color.White);
+            var totalCoins = CollectibleManager.Collectibles.OfType<Coin>().Count();
+            var scoreText = "Score: " + Player.Score + " / " + totalCoins;
+            var scoreSize = _font.MeasureString(scoreText);
+            var scorePosition = new Vector2((GraphicsDevice.Viewport.Width - scoreSize.X) / 2,
+                titlePosition.Y + titleSize.Y * titleScale + 20);
+
+            SpriteBatch.DrawString(_font, scoreText, scorePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
+                1.0f, SpriteEffects.None, 0f);
+
+            SpriteBatch.DrawString(_font, scoreText, scorePosition, Color.White, 0f, Vector2.Zero,
+                1.0f, SpriteEffects.None, 0f);
+
+            const string pressEnterText = "<Press Escape to exit>";
+            var pressStartSize = _font.MeasureString(pressEnterText);
+
+            var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
+                scorePosition.Y + scoreSize.Y + 20);
+
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition + new Vector2(2, 2), Color.Black);
+
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition, Color.White);
 
             SpriteBatch.End();
         }
@@ -525,7 +654,32 @@ namespace TGC.MonoGame.TP
             SpriteBatch.DrawString(_font, "Stop Music", position, _menuState == MenuState.StopMusic ? Color.Yellow : Color.White);
             position.Y += 30;
             
+            SpriteBatch.DrawString(_font, "God Mode", position, _menuState == MenuState.GodModeMenu ? Color.Yellow : Color.White);
+            position.Y += 30;
+            
             SpriteBatch.DrawString(_font, "Exit", position, _menuState == MenuState.Exit ? Color.Yellow : Color.White);
+            
+            SpriteBatch.End();
+        }
+        
+        private void DrawGodModeMenu(Vector2 center, int menuHeight)
+        {
+            SpriteBatch.Begin();
+    
+            var position = center - new Vector2(30, menuHeight / 2f);
+            SpriteBatch.DrawString(_font, "Checkpoint 1", position, _godModeMenuState == GodModeMenuState.First ? Color.Yellow : Color.White);
+            position.Y += 30;
+    
+            SpriteBatch.DrawString(_font, "Checkpoint 2", position, _godModeMenuState == GodModeMenuState.Second ? Color.Yellow : Color.White);
+            position.Y += 30;
+    
+            SpriteBatch.DrawString(_font, "Checkpoint 3", position, _godModeMenuState == GodModeMenuState.Third? Color.Yellow : Color.White);
+            position.Y += 30;
+    
+            SpriteBatch.DrawString(_font, "Checkpoint 4", position, _godModeMenuState == GodModeMenuState.Fourth ? Color.Yellow : Color.White);
+            position.Y += 30;
+            
+            SpriteBatch.DrawString(_font, "Exit God Mode", position, _godModeMenuState == GodModeMenuState.Exit ? Color.Yellow : Color.White);
             
             SpriteBatch.End();
         }
@@ -746,10 +900,19 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        public static void EndGame()
-        {
+        private void OpenMenu()
+        {           
+            _isMenuOpen = true;
             AudioManager.PauseBackgroundMusic();
+            AudioManager.OpenMenuSound.Play();
+        }
+
+        public static void EndGame()
+        {           
             _inEnding = true;
+            AudioManager.StopBackgroundMusic();
+            Player.StopRollingSoundInstance();
+            AudioManager.PlayEndingMusic(0.1f, true);
         }
     }
 }
