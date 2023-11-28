@@ -4,10 +4,10 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using TGC.MonoGame.TP.Audio;
 using TGC.MonoGame.TP.Cameras;
 using TGC.MonoGame.TP.Collectible;
+using TGC.MonoGame.TP.Collectible.Coins;
 using TGC.MonoGame.TP.Geometries;
 using TGC.MonoGame.TP.Material;
 using TGC.MonoGame.TP.Menu;
@@ -498,26 +498,29 @@ namespace TGC.MonoGame.TP
             const string titleText = "ValveBall";
             var titleSize = _font.MeasureString(titleText);
             const float titleScale = 1.5f;
-            
+
             var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X * titleScale) / 2,
                 (GraphicsDevice.Viewport.Height - titleSize.Y * titleScale) / 2 - 50);
 
             SpriteBatch.DrawString(_font, titleText, titlePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
-            
+
             SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
 
             const string pressEnterText = "<Press Enter>";
             var pressStartSize = _font.MeasureString(pressEnterText);
-            
+
             var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
                 (GraphicsDevice.Viewport.Height - pressStartSize.Y) / 2);
-            
+
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition + new Vector2(2, 2), Color.Black);
+
             SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition, Color.White);
 
             SpriteBatch.End();
         }
+
         
         private void DrawEnding()
         {
@@ -526,22 +529,36 @@ namespace TGC.MonoGame.TP
             const string titleText = "You win!!!";
             var titleSize = _font.MeasureString(titleText);
             const float titleScale = 1.5f;
-            
+
             var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X * titleScale) / 2,
                 (GraphicsDevice.Viewport.Height - titleSize.Y * titleScale) / 2 - 50);
 
             SpriteBatch.DrawString(_font, titleText, titlePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
-            
+
             SpriteBatch.DrawString(_font, titleText, titlePosition, Color.Gold, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
+            
+            var totalCoins = CollectibleManager.Collectibles.OfType<Coin>().Count();
+            var scoreText = "Score: " + Player.Score + " / " + totalCoins;
+            var scoreSize = _font.MeasureString(scoreText);
+            var scorePosition = new Vector2((GraphicsDevice.Viewport.Width - scoreSize.X) / 2,
+                titlePosition.Y + titleSize.Y * titleScale + 20);
+
+            SpriteBatch.DrawString(_font, scoreText, scorePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
+                1.0f, SpriteEffects.None, 0f);
+
+            SpriteBatch.DrawString(_font, scoreText, scorePosition, Color.White, 0f, Vector2.Zero,
+                1.0f, SpriteEffects.None, 0f);
 
             const string pressEnterText = "<Press Escape to exit>";
             var pressStartSize = _font.MeasureString(pressEnterText);
-            
+
             var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
-                (GraphicsDevice.Viewport.Height - pressStartSize.Y) / 2);
-            
+                scorePosition.Y + scoreSize.Y + 20);
+
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition + new Vector2(2, 2), Color.Black);
+
             SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition, Color.White);
 
             SpriteBatch.End();
