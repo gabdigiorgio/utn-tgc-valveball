@@ -322,6 +322,7 @@ namespace TGC.MonoGame.TP
         }
 
         private bool _wasKeyPressed;
+        private bool _wasEnterKeyPressed;
 
         private void UpdateMenuSelection(KeyboardState keyboardState)
         {
@@ -350,9 +351,16 @@ namespace TGC.MonoGame.TP
                 _wasKeyPressed = false;
             }
 
-            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space)) return;
+            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space))
+            {
+                _wasEnterKeyPressed = false;
+                return;
+            }
+            AudioManager.ClickMenuSound.Play();
+            if (_wasEnterKeyPressed) return;
             AudioManager.ClickMenuSound.Play();
             HandleMenuSelection();
+            _wasEnterKeyPressed = true;
         }
         
         private void UpdateGodModeMenuSelection(KeyboardState keyboardState)
@@ -382,9 +390,16 @@ namespace TGC.MonoGame.TP
                 _wasKeyPressed = false;
             }
 
-            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space)) return;
+            if (!keyboardState.IsKeyDown(Keys.Enter) && !keyboardState.IsKeyDown(Keys.Space))
+            {
+                _wasEnterKeyPressed = false;
+                return;
+            }
+
+            if (_wasEnterKeyPressed) return;
             AudioManager.ClickMenuSound.Play();
             HandleGodModeMenuSelection();
+            _wasEnterKeyPressed = true;
         }
 
         private void HandleMenuSelection()
