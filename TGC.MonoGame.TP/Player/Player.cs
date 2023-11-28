@@ -138,7 +138,7 @@ public class Player
         return MathHelper.Clamp(Math.Abs(_pitchSpeed) * pitchScaleFactor, 0.0f, 1.0f);
     }
 
-    private void StopRollingSoundInstance()
+    public void StopRollingSoundInstance()
     {
         if (_rollingSoundInstance == null) return;
         _rollingSoundInstance.Stop();

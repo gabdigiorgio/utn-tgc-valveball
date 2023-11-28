@@ -18,6 +18,7 @@ public static class AudioManager
     public static SoundEffect ClickMenuSound { get; private set; }
     public static Dictionary<Type, SoundEffect> CollectibleSounds { get; } = new();
     private static Song BackgroundMusic { get; set; }
+    private static Song EndingMusic { get; set; }
     
     public static void LoadSounds(ContentManager contentManager)
     {
@@ -31,6 +32,7 @@ public static class AudioManager
         CollectibleSounds[typeof(SpeedUp)] = LoadAudio<SoundEffect>(contentManager, "speed_up");
         CollectibleSounds[typeof(LowGravity)] = LoadAudio<SoundEffect>(contentManager, "gravity_change");
         BackgroundMusic = LoadAudio<Song>(contentManager, "classic_vibe");
+        EndingMusic = LoadAudio<Song>(contentManager, "ending_song");
     }
     
     public static void PlayBackgroundMusic(float volume, bool isRepeating)
@@ -38,6 +40,18 @@ public static class AudioManager
         MediaPlayer.IsRepeating = isRepeating;
         MediaPlayer.Play(BackgroundMusic);
         MediaPlayer.Volume = Math.Clamp(volume, 0.0f, 1.0f);
+    }
+    
+    public static void PlayEndingMusic(float volume, bool isRepeating)
+    {
+        MediaPlayer.IsRepeating = isRepeating;
+        MediaPlayer.Play(EndingMusic);
+        MediaPlayer.Volume = Math.Clamp(volume, 0.0f, 1.0f);
+    }
+    
+    public static void StopBackgroundMusic()
+    {
+        MediaPlayer.Stop();
     }
     
     public static void PauseBackgroundMusic()

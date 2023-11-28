@@ -283,14 +283,17 @@ namespace TGC.MonoGame.TP
                 else if (_inEnding)
                 {
                     MainMenuCamera.Update(EndingCameraTarget);
+
+                    if (keyboardState.IsKeyDown(Keys.Escape))
+                    {
+                        Exit();
+                    }
                 }
                 else
                 {
                     if (keyboardState.IsKeyDown(Keys.Escape) && !_isMenuOpen)
                     {
-                        AudioManager.PauseBackgroundMusic();
-                        AudioManager.OpenMenuSound.Play();
-                        _isMenuOpen = true;
+                        OpenMenu();
                     }
                     SphereWorld = Player.Update(time, keyboardState);
                     TargetCamera.Update(Player.SpherePosition, Player.Yaw, mouseState, gameTime, Player.Speed, GraphicsDevice);
@@ -300,7 +303,6 @@ namespace TGC.MonoGame.TP
                 TargetLightCamera.Position = LightPosition;
                 TargetLightCamera.BuildView();
                 
-                // Update the view projection matrix of the bounding frustum
                 BoundingFrustum.Matrix = TargetCamera.View * TargetCamera.Projection;
 
                 CubeMapCamera.Position = Player.SpherePosition;
@@ -310,8 +312,6 @@ namespace TGC.MonoGame.TP
                 UpdateCollectibles(gameTime);
 
                 Gizmos.UpdateViewProjection(TargetCamera.View, TargetCamera.Projection);
-                
-                AudioManager.ResumeBackgroundMusic();
 
                 HandleGizmos(keyboardState);
             }
@@ -357,10 +357,11 @@ namespace TGC.MonoGame.TP
             switch (_menuState)
             {
                 case MenuState.Resume:
+                    AudioManager.ResumeBackgroundMusic();
                     _isMenuOpen = false;
                     break;
                 case MenuState.StopMusic:
-                    MediaPlayer.Stop();
+                    AudioManager.StopBackgroundMusic();
                     break;
                 case MenuState.Exit:
                     Exit();
@@ -417,6 +418,10 @@ namespace TGC.MonoGame.TP
             if (_inMainMenu)
             {
                 DrawMainMenu();
+            }
+            else if (_inEnding)
+            {
+                DrawEnding();
             }
             else
             {
@@ -503,13 +508,41 @@ namespace TGC.MonoGame.TP
             SpriteBatch.DrawString(_font, titleText, titlePosition, Color.IndianRed, 0f, Vector2.Zero,
                 titleScale, SpriteEffects.None, 0f);
 
-            const string pressStartText = "<Press Enter>";
-            var pressStartSize = _font.MeasureString(pressStartText);
+            const string pressEnterText = "<Press Enter>";
+            var pressStartSize = _font.MeasureString(pressEnterText);
             
             var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
                 (GraphicsDevice.Viewport.Height - pressStartSize.Y) / 2);
             
-            SpriteBatch.DrawString(_font, pressStartText, pressStartPosition, Color.White);
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition, Color.White);
+
+            SpriteBatch.End();
+        }
+        
+        private void DrawEnding()
+        {
+            SpriteBatch.Begin();
+
+            const string titleText = "You win!!!";
+            var titleSize = _font.MeasureString(titleText);
+            const float titleScale = 1.5f;
+            
+            var titlePosition = new Vector2((GraphicsDevice.Viewport.Width - titleSize.X * titleScale) / 2,
+                (GraphicsDevice.Viewport.Height - titleSize.Y * titleScale) / 2 - 50);
+
+            SpriteBatch.DrawString(_font, titleText, titlePosition + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero,
+                titleScale, SpriteEffects.None, 0f);
+            
+            SpriteBatch.DrawString(_font, titleText, titlePosition, Color.Gold, 0f, Vector2.Zero,
+                titleScale, SpriteEffects.None, 0f);
+
+            const string pressEnterText = "<Press Escape to exit>";
+            var pressStartSize = _font.MeasureString(pressEnterText);
+            
+            var pressStartPosition = new Vector2((GraphicsDevice.Viewport.Width - pressStartSize.X) / 2,
+                (GraphicsDevice.Viewport.Height - pressStartSize.Y) / 2);
+            
+            SpriteBatch.DrawString(_font, pressEnterText, pressStartPosition, Color.White);
 
             SpriteBatch.End();
         }
@@ -746,10 +779,19 @@ namespace TGC.MonoGame.TP
             }
         }
 
-        public static void EndGame()
-        {
+        private void OpenMenu()
+        {           
+            _isMenuOpen = true;
             AudioManager.PauseBackgroundMusic();
+            AudioManager.OpenMenuSound.Play();
+        }
+
+        public static void EndGame()
+        {           
             _inEnding = true;
+            AudioManager.StopBackgroundMusic();
+            Player.StopRollingSoundInstance();
+            AudioManager.PlayEndingMusic(0.1f, true);
         }
     }
 }
