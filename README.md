@@ -10,6 +10,8 @@
 
 Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técnicas de Gráficos por Computadora](http://tgc-utn.github.io/) (TGC) en la carrera de Ingeniería en Sistemas de Información. Universidad Tecnológica Nacional, Facultad Regional Buenos Aires (UTN-FRBA).
 
+Enunciado: https://docs.google.com/document/d/1R9nnQYHihX_bXz55AWbHuvmFl8olRc1Jlz7njMbOlYg/edit
+
 ## Configuración del entorno de desarrollo
 
 Los pasos a seguir según su sistema operativo se pueden leer en el siguiente documento [install.md](https://github.com/tgc-utn/tgc-monogame-samples/blob/master/docs/install/install.md).
@@ -36,4 +38,6 @@ Los recursos usados se almacenan utilizando [Git LFS](https://git-lfs.github.com
 
 ## Game Play
 
-[![Watch the video](https://img.youtube.com/vi/pgEwUC0jvH4/0.jpg)](https://www.youtube.com/playlist?list=PLRM4L32DjvnazuMl8wZlbpEYL5Qh63ulG)
+[![Watch the video]()](https://www.youtube.com/watch?v=OAiAdMem6BY&ab_channel=GABRIELENRIQUEDIGIORGIO)
+
+
