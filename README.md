@@ -22,10 +22,10 @@ Los recursos usados se almacenan utilizando [Git LFS](https://git-lfs.github.com
 
 ## Integrantes
 
-1. Damian Alvarez
-2. Facundo Dalsasso
-3. Gabriel Di Giorgio
-4. Federico Jaralampidis
+Foto  |  Apellido, Nombre
+------------ | -------------
+|![me](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/3459ade9-01d8-452a-b809-873e8a170fdb)| Di Giorgio, Gabriel Enrique |
+|| Jaralampidis, Federico |
 
 ## Capturas
 
