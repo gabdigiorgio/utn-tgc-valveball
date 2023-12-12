@@ -25,7 +25,7 @@ Los recursos usados se almacenan utilizando [Git LFS](https://git-lfs.github.com
 Foto  |  Apellido, Nombre
 ------------ | -------------
 |![me](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/3459ade9-01d8-452a-b809-873e8a170fdb)| Di Giorgio, Gabriel Enrique |
-|| Jaralampidis, Federico |
+|![6c8d7af1-0687-42ac-bd4d-578058e87225](https://github.com/Damuchi99/2023-2C-3551-ValveBall/assets/102607654/69e8f6b2-206a-42d3-a61b-a8a7cebf31a0)| Jaralampidis, Federico |
 
 ## Capturas
 
